@@ -107,3 +107,4 @@ venv.bak/
 data/
 dataset/
 runs/
+outs/

@@ -29,11 +29,11 @@ def downsample(image, factor=2, data_type=np.float32):
         h_cropped = int(h_current/factor)*factor
     image = image[:w_cropped, :h_cropped]
     # Downsample image. 
-    image_down = Image.fromarray(image)
+    image_down = Image.fromarray(np.uint8(image))
     w_target = int(w_current/factor)
     h_target = int(h_current/factor)
-    image_down = image_down.resize((w_target, h_target, image.shape[2]), \
-                                   Image.ANTIALIAS, Image.BICUBIC)
+    image_down = image_down.resize((h_target, w_target), 
+                                   resample=Image.BICUBIC)
     image_down = np.asarray(image_down, dtype=data_type)
     return image, image_down
 
@@ -45,12 +45,16 @@ def load_image(filename, data_type=np.float32):
     data = np.asarray(img, dtype=data_type)
     return data
 
+def normalize(image): 
+    ''' Normalize image in between interval [-0.5,0.5]. Input image
+    should be numpy array ranging from 0 to 255. '''
+    data = np.asarray(image, dtype=np.float32)
+    assert not np.any(data > 255.0) or not np.any(data < 0.0)
+    return data/255.0 - 0.5
+
 def save_image(data, filename) :
     ''' Save image with filename using PIL module, convert from numpy array. '''
-    img = Image.fromarray(np.asarray(np.clip(data,0,255), dtype="uint8"), "L")
+    img = Image.fromarray(np.uint8(data))
     img.save(filename)
 
-def save(data): 
-    ''' Save image using PIL module from numpy array. '''
-    img = Image.fromarray(np.asarray(np.clip(data,0,255), dtype="uint8"), "L")
-    img.save()
+
