@@ -26,8 +26,6 @@ class TestImageToolbox(unittest.TestCase):
     def test_normalization(self): 
         image = img_tools.load_image(IMAGE)
         image = img_tools.normalize(image)
-        print("Normalized image")
-        print(image)
         assert not np.any(image > 0.5) or not np.any(image < -0.5)
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@
 
 ## Implementation of task-aware image downscaling
 - [ ] Rebuild network architecture
-- [ ] Build image processing pipeline (downscaling for I_guidance bicubic with anti-alising, cropping to factor of 2, normalization)
+- [x] Build image processing pipeline (downscaling for I_guidance bicubic with anti-alising, cropping to factor of 2, normalization)
 - [ ] Build training pipeline (6 patches of 96 × 96 HR sub images, each coming from different HR image --> mini-batch, Adam Optimizer, guidance and SR L1 losses)
 
 ## Literature 
