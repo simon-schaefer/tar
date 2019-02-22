@@ -57,4 +57,20 @@ if [ ! -d "DIV2K_valid_HR" ]; then
     unzip DIV2K_valid_HR.zip
     rm DIV2K_valid_HR.zip
 fi
+# MNIST dataset. 
+echo "MNIST dataset ..."
+if [ ! -d "MNIST_train" ]; then
+    wget https://pjreddie.com/media/files/mnist_train.tar.gz
+    tar -xvf mnist_train.tar.gz
+    rm mnist_train.tar.gz
+    mv "train" "MNIST_train"
+fi
+if [ ! -d "MNIST_valid" ]; then
+    wget https://pjreddie.com/media/files/mnist_test.tar.gz
+    tar -xvf mnist_test.tar.gz
+    rm mnist_test.tar.gz
+    mv "test" "MNIST_valid"
+fi
+
 cd $SR_PROJECT_PROJECT_HOME
+echo $'\nSuccessfully set up project !'

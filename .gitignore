@@ -103,8 +103,11 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# Data. 
+# Data
 data/
 dataset/
 runs/
 outs/
+
+# Editor
+.vscode/

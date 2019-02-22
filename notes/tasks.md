@@ -9,12 +9,12 @@
 - [x] Read papers about image super resolution in general
 - [x] Read papers about video super resolution in general
 - [x] RNN and GAN training in pytorch tutorials
-- [ ] Read papers about task aware image superresolution
+- [x] Read papers about task aware image superresolution
 
 ## Implementation of task-aware image downscaling
 - [ ] Rebuild network architecture
-- [x] Build image processing pipeline (downscaling for I_guidance bicubic with anti-alising, cropping to factor of 2, normalization)
-- [ ] Build training pipeline (6 patches of 96 × 96 HR sub images, each coming from different HR image --> mini-batch, Adam Optimizer, guidance and SR L1 losses)
+- [x] Build image processing pipeline (downscaling for I_guidance bicubic with anti-alising, cropping to factor of 2, normalization to [-0.5, 0.5])
+- [ ] Build training pipeline (6 patches of 96 × 96 HR sub images each coming from different HR image --> mini-batch, Adam Optimizer, guidance and SR L1 losses)
 
 ## Literature 
 - [Paper: Task-Aware Image Downscaling (Kyoung Mu Lee)](http://openaccess.thecvf.com/content_ECCV_2018/papers/Heewon_Kim_Task-Aware_Image_Downscaling_ECCV_2018_paper.pdf)
