@@ -9,6 +9,11 @@ source "$SR_PROJECT_SCRIPTS_PATH/header.bash"
 # Setting for BIWI clusters. 
 echo $'\nBuilding BIWI cluster environment ...'
 source /home/sgeadmin/BIWICELL/common/settings.sh
+# Setting for CUDA. 
+echo "Building CUDA environment ..."
+CUDA_HOME=/scratch_net/biwidl211/sischaef/cuda-9.0
+export PATH=$CUDA_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 
 # Local language settings (suppressing local language error). 
 if [ ! -z "$LANGUAGE" ]

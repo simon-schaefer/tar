@@ -6,13 +6,13 @@
 
 # Training and validation datasets. 
 datasets_train: 
-  - "MNIST_train"
+  - "MNIST_train_x4"
 
 datasets_valid: 
   - "MNIST_valid"
 
 # Model (model name from model dictionary).  
-model: "AEMNIST_1D"
+model: "AETAD_1D"
 
 # Training parameters. 
 # - num_epochs:     Number of training iteration through training dataset.
@@ -21,12 +21,14 @@ model: "AEMNIST_1D"
 # - lr_decay_gamma: Factor to decrease learning rate (adaptive learning rate). 
 # - lr_decay_steps: Number of training steps with same learning rate. 
 # - weight_decay:   L2 parameters penalization. 
+# - loss_lambda:    Ratio of weighting LR vs HR loss. 
 num_epochs:  100
-batch_size:  128
+batch_size:  6
 learning_rate: 0.01
 lr_decay_gamma: 0.1
 lr_decay_steps: 40
 weight_decay: 0.00001
+loss_lambda: 1.0
 
 # Autoencoder parameters. 
 # - subsize:  To maintain a certain input image size for the model 
@@ -35,7 +37,7 @@ weight_decay: 0.00001
 #             dividable by scale factor).
 # - scale_guidance: Scale guidance determines the scale of the resulting LR image 
 #             w.r.t. the HR image (i.e. 2 = two times smaller). 
-scale_guidance: 4
-subsize       : 28
+scale_guidance: 2
+subsize       : 96
 
 ...

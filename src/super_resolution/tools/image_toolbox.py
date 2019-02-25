@@ -87,3 +87,20 @@ def save_image(data: np.ndarray, filename: str) -> None:
     ''' Save image with filename using PIL module, convert from numpy array. '''
     img = numpy_to_pil(data)
     img.save(filename)
+
+def upsample(image: np.ndarray, factor: int=2) -> typing.Tuple[np.ndarray, np.ndarray]: 
+    ''' Bicubic image upsampling using the PIL library imresize. Factor states 
+    the upsampling factor (has to be factor of 2 !). '''
+    assert factor % 2 == 0
+    assert factor >= 2
+    assert (len(image.shape) == 3 and (image.shape[0] == 3 or image.shape[0] == 1))
+    # Find current image size. 
+    w_current, h_current = image.shape[1], image.shape[2]
+    # Upsample image. 
+    image_up = numpy_to_pil(image)
+    w_target, h_target = int(w_current*factor), int(h_current*factor)
+    image_up = image_up.resize((h_target, w_target), 
+                                resample=Image.BICUBIC)
+    image_up = pil_to_numpy(image_up)
+    return image, image_up
+

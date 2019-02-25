@@ -10,11 +10,11 @@ VIRTUAL_ENV_PATH=$2
 ## Pass environment variables of workstation to GPU node 
 #$ -V
  
-## <= 1h is short queue, <= 6h is middle queue, <= 48 h is long queue
-#$ -q short.q@*
+### <= 1h is short queue, <= 6h is middle queue, <= 48 h is long queue
+### -q short.q@*
  
 ## the maximum memory usage of this job, (below 4G does not make much sense)
-#$ -l h_vmem=4G
+#$ -l h_vmem=8G
  
 ## stderr and stdout are merged together to stdout
 #$ -j y
@@ -24,10 +24,6 @@ VIRTUAL_ENV_PATH=$2
 
 ## send mail on job's end and abort
 #$ -m bea
- 
-# cuda paths
-#export PATH=$CUDA_HOME/bin:$PATH
-#export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 
 # python virtual environment
 export PATH="/home/sischaef/.pyenv/bin:$PATH"
@@ -41,7 +37,7 @@ source $VIRTUAL_ENV_PATH/bin/activate
 /bin/echo Starting on: `date`
 
 ## EXECUTION OF PYTHON CODE:
-python $PROJECT_HOME/$3
+python3 $PROJECT_HOME/$3 $4
 
 # logging
 /bin/echo finished at: `date`

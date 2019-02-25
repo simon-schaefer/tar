@@ -12,6 +12,12 @@ def load_files(directory: str, extension: str) -> typing.List[str]:
     given file extension (e.g. extension = "png"). The files are 
     returned by their absolute paths. '''
     files = []
+    # Standardize the input format. 
+    if not directory[-1] == "/": 
+        directory = directory + "/"
+    if extension[0] == ".": 
+        extension = extension[1:]    
+    # Find all files in given directory. 
     for filename in os.listdir(directory):
         if filename.endswith("." + extension): 
             files.append(os.path.join(directory, filename))

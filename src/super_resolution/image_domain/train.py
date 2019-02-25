@@ -40,7 +40,7 @@ data = dataloader.DataLoader(
 
 # Loading model.
 print("Building model ...") 
-model = models.models_by_name(params["model"])
+model = models.models_by_name(params["model"]).cuda()
 
 # Defining training optimization. 
 criterion = torch.nn.MSELoss()
@@ -54,23 +54,27 @@ scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
 print("Starting training loop ...")
 for epoch in range(params["num_epochs"]):
     epoch_is_over = False
+    iteration = 0
     while not epoch_is_over: 
         # Load and normalize batch. 
         batch_hr, batch_lr, epoch_is_over = data.next_batch()
         batch_hr = img_tools.normalize(batch_hr)
         batch_lr = img_tools.normalize(batch_lr)
         # Convert to torch tensors. 
-        batch_hr = torch.from_numpy(batch_hr).float()
-        batch_lr = torch.from_numpy(batch_lr).float()
-        batch_hr = torch.autograd.Variable(batch_hr)
+        batch_hr = torch.from_numpy(batch_hr).float().cuda()
+        batch_lr = torch.from_numpy(batch_lr).float().cuda()
+        batch_hr = torch.autograd.Variable(batch_hr).cuda()
         # Forward pass. 
         output_lr = model.encode(batch_hr)
         output_hr = model.forward(batch_hr)
-        loss = criterion(output_lr, batch_lr) + criterion(output_hr, batch_hr)
+        loss = criterion(output_hr, batch_hr) \
+             + params["loss_lambda"]*criterion(output_lr, batch_lr)
         # Backward pass. 
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
+        # Print progress. 
+        iteration = misc.progress_bar(iteration, data.num_train_samples)
     # Scheduling. 
     scheduler.step()
     # Logging loss results and epoch. 

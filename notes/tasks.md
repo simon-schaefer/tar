@@ -2,8 +2,8 @@
 
 ## Biwi Clusters
 - [x] Access Biwi clusters and do simple calculation (prime numbers)
-- [ ] Install CUDA on remote machine (https://git.ee.ethz.ch/baumgach/biwi_tensorflow_setup_instructions/tree/master)
-- [x] Install and execute torch training on cluster
+- [x] Install CUDA on remote machine (https://git.ee.ethz.ch/baumgach/biwi_tensorflow_setup_instructions/tree/master) -> Solve CUDA problem
+- [x] Install and execute torch training on cluster (https://git.ee.ethz.ch/baumgach/biwi_tensorflow_setup_instructions/tree/master)
 
 ## Knowledgebase
 - [x] Read papers about image super resolution in general
@@ -12,9 +12,9 @@
 - [x] Read papers about task aware image superresolution
 
 ## Implementation of task-aware image downscaling
-- [ ] Rebuild network architecture
+- [x] Rebuild network architecture
 - [x] Build image processing pipeline (downscaling for I_guidance bicubic with anti-alising, cropping to factor of 2, normalization to [-0.5, 0.5])
-- [ ] Build training pipeline (6 patches of 96 × 96 HR sub images each coming from different HR image --> mini-batch, Adam Optimizer, guidance and SR L1 losses)
+- [x] Build training pipeline (6 patches of 96 × 96 HR sub images each coming from different HR image --> mini-batch, Adam Optimizer, guidance and SR L1 losses)
 
 ## Literature 
 - [Paper: Task-Aware Image Downscaling (Kyoung Mu Lee)](http://openaccess.thecvf.com/content_ECCV_2018/papers/Heewon_Kim_Task-Aware_Image_Downscaling_ECCV_2018_paper.pdf)

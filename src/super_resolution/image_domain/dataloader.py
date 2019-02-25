@@ -32,22 +32,20 @@ class DataLoader(object):
         assert isinstance(train_datasets, (list,)) and len(train_datasets) > 0
         assert isinstance(valid_datasets, (list,)) and len(valid_datasets) > 0
         # Read in training datasets as overall array. 
+        self._train_datasets = train_datasets
         self.files_hr_train = self.load_dataset(train_datasets)
         random.shuffle(self.files_hr_train)
-        self._train_datasets = train_datasets
+        self.num_train_samples = len(self.files_hr_train)
         # Read in validation data. 
-        self.files_hr_valid = self.load_dataset(valid_datasets)
         self._valid_datasets = valid_datasets
+        self.files_hr_valid = self.load_dataset(valid_datasets)
+        self.num_valid_samples = len(self.files_hr_valid)
         # Check and store parameters. 
         kwargs = self.set_default_param(kwargs, "scale_guidance", 2)
         kwargs = self.set_default_param(kwargs, "batch_size", 6)
         kwargs = self.set_default_param(kwargs, "subsize", 96)
         assert kwargs["subsize"] % kwargs["scale_guidance"] == 0
         self._params = kwargs
-
-    def epoch_info(self) -> int: 
-        ''' Return number of remaining batches in current epoch. '''
-        return int(len(self.files_hr_train) / self._params["batch_size"])
 
     def next_batch(self) -> typing.Tuple[np.ndarray, np.ndarray, int]: 
         ''' Get next batch of training data. Return two arrays, the HR images
