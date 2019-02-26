@@ -11,7 +11,6 @@ def mp_worker(gpu):
 # Print CUDA versions information. 
 print('__Python VERSION:', sys.version)
 print('__pyTorch VERSION:', torch.__version__)
-print('__CUDA VERSION')
 print('__CUDNN VERSION:', torch.backends.cudnn.version())
 print('__Number CUDA Devices:', torch.cuda.device_count())
 print('__Devices')
