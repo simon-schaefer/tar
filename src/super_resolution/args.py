@@ -5,6 +5,7 @@
 # Description : Collection of input arguments. 
 # =============================================================================
 import argparse
+import os
 
 parser = argparse.ArgumentParser(description='super_resolution')
 parser.add_argument('--debug', action='store_true',
@@ -25,55 +26,32 @@ parser.add_argument('--seed', type=int, default=1,
 # =============================================================================
 # Data specifications.
 # =============================================================================
-parser.add_argument('--dir_data', type=str, default='../../../dataset',
+parser.add_argument('--dir_data', type=str, default=os.environ['SR_PROJECT_DATA_PATH'],
                     help='dataset directory')
-parser.add_argument('--dir_demo', type=str, default='../test',
-                    help='demo image directory')
-parser.add_argument('--data_train', type=str, default='DIV2K',
+parser.add_argument('--data_train', type=str, default='MNIST',
                     help='train dataset name')
-parser.add_argument('--data_test', type=str, default='DIV2K',
+parser.add_argument('--data_test', type=str, default='MNIST',
                     help='test dataset name')
 parser.add_argument('--data_range', type=str, default='1-800/801-810',
                     help='train/test data range')
-parser.add_argument('--ext', type=str, default='sep',
+parser.add_argument('--ext', type=str, default='img',
                     help='dataset file extension')
-parser.add_argument('--scale', type=str, default='4',
+parser.add_argument('--scale', type=str, default='2',
                     help='super resolution scale')
-parser.add_argument('--patch_size', type=int, default=192,
+parser.add_argument('--patch_size', type=int, default=6,
                     help='output patch size')
 parser.add_argument('--rgb_range', type=int, default=255,
                     help='maximum value of RGB')
 parser.add_argument('--n_colors', type=int, default=3,
                     help='number of color channels to use')
-parser.add_argument('--chop', action='store_true',
-                    help='enable memory-efficient forward')
 parser.add_argument('--no_augment', action='store_true',
                     help='do not use data augmentation')
 
 # =============================================================================
 # Model specifications.
 # =============================================================================
-parser.add_argument('--model', default='EDSR',
+parser.add_argument('--model', default='AETAD_1d',
                     help='model name')
-parser.add_argument('--act', type=str, default='relu',
-                    help='activation function')
-parser.add_argument('--pre_train', type=str, default='',
-                    help='pre-trained model directory')
-parser.add_argument('--extend', type=str, default='.',
-                    help='pre-trained model directory')
-parser.add_argument('--n_resblocks', type=int, default=16,
-                    help='number of residual blocks')
-parser.add_argument('--n_feats', type=int, default=64,
-                    help='number of feature maps')
-parser.add_argument('--res_scale', type=float, default=1,
-                    help='residual scaling')
-parser.add_argument('--shift_mean', default=True,
-                    help='subtract pixel mean from the input')
-parser.add_argument('--dilation', action='store_true',
-                    help='use dilated convolution')
-parser.add_argument('--precision', type=str, default='single',
-                    choices=('single', 'half'),
-                    help='FP precision for test (single | half)')
 
 # =============================================================================
 # Training specifications. 
@@ -86,10 +64,6 @@ parser.add_argument('--epochs', type=int, default=300,
                     help='number of epochs to train')
 parser.add_argument('--batch_size', type=int, default=16,
                     help='input batch size for training')
-parser.add_argument('--split_batch', type=int, default=1,
-                    help='split the batch into smaller chunks')
-parser.add_argument('--self_ensemble', action='store_true',
-                    help='use self-ensemble method for test')
 parser.add_argument('--test_only', action='store_true',
                     help='set this option to test the model')
 
@@ -121,8 +95,6 @@ parser.add_argument('--gclip', type=float, default=0,
 # =============================================================================
 parser.add_argument('--loss', type=str, default='1*L1',
                     help='loss function configuration')
-parser.add_argument('--skip_threshold', type=float, default='1e8',
-                    help='skipping batch that has large error')
 
 # =============================================================================
 # Log specifications.

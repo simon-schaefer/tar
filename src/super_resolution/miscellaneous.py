@@ -25,6 +25,10 @@ class _Checkpoint_(object):
 
     def __init__(self, args: argparse.Namespace):
         super(_Checkpoint_, self).__init__()
+        # Printing input arguments. 
+        print("Initializing with the following arguments ...")
+        print(vars(args))
+        # Initializing checkpoint module. 
         print("Building checkpoint module ...")
         self.args = args
         self.log = torch.Tensor()
@@ -70,9 +74,8 @@ class _Checkpoint_(object):
             label = 'SR on {}'.format(d)
             fig = plt.figure()
             plt.title(label)
-            for idx_scale, scale in enumerate(self.args.scale):
-                plt.plot(axis,self.log[:, idx_data, idx_scale].numpy(),
-                        label='Scale {}'.format(scale))
+            plt.plot(axis,self.log[:, 0, 0].numpy(),
+                     label='Scale {}'.format(scale))
             plt.legend()
             plt.xlabel('Epochs')
             plt.ylabel('PSNR')
