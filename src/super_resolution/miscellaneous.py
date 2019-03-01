@@ -25,11 +25,9 @@ class _Checkpoint_(object):
 
     def __init__(self, args: argparse.Namespace):
         super(_Checkpoint_, self).__init__()
-        # Printing input arguments. 
-        print("Initializing with the following arguments ...")
-        print(vars(args))
         # Initializing checkpoint module. 
         print("Building checkpoint module ...")
+        self.ready = False
         self.args = args
         self.log = torch.Tensor()
         # Building model directory based on name and time. 
@@ -57,6 +55,7 @@ class _Checkpoint_(object):
             f.write('\n')
         # Set number of logging threats. 
         self.n_processes = 8
+        self.ready = True
         print("... successfully built checkpoint module !")
 
     # =========================================================================
@@ -102,13 +101,13 @@ class _Checkpoint_(object):
         self.log = torch.cat([self.log, log])
 
     def write_log(self, log, refresh=False):
-        print(log)
         self.log_file.write(log + '\n')
         if refresh:
             self.log_file.close()
             self.log_file = open(self.get_path('log.txt'), 'a')
 
     def done(self):
+        self.ready = False
         self.log_file.close()
 
     # =========================================================================
@@ -161,7 +160,7 @@ class _Timer_(object):
 
     def release(self):
         ret = self.acc
-        self.acc = 0
+        self.reset()
         return ret
 
     def reset(self):

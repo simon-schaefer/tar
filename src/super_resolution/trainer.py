@@ -7,12 +7,13 @@
 import argparse
 import os
 import math
+import tqdm
 
 import torch
 
 import super_resolution.dataloader as dataloader
 import super_resolution.miscellaneous as misc
-import super_resolution.models as models
+import super_resolution.modules as modules
 import super_resolution.optimization as optimization
 
 class _Trainer_(object):
@@ -21,7 +22,7 @@ class _Trainer_(object):
 
     def __init__(self, args: argparse.Namespace, 
                  loader: dataloader._Data_, 
-                 model: models._Model_, 
+                 model: modules._Model_, 
                  loss: optimization._Loss_, 
                  ckp: misc._Checkpoint_):
     
@@ -46,16 +47,13 @@ class _Trainer_(object):
         optimizer and loss stated in the __init__ (their state is loaded
         and updated automatically). '''
         self.optimizer.schedule()
-        self.loss.step()
         epoch = self.optimizer.get_last_epoch() + 1
         lr = self.optimizer.get_lr()
-        self.ckp.write_log(
-            '[Epoch {}]\tLearning rate: {:.2e}'.format(epoch, Decimal(lr))
-        )
+        self.ckp.write_log('[Epoch {}]\tLearning rate: {}'.format(epoch, lr))
         self.loss.start_log()
         self.model.train()
         # Iterate over all batches in epoch. 
-        timer_data, timer_model = misc.timer(), misc.timer()
+        timer_data, timer_model = misc._Timer_(), misc._Timer_()
         for batch, (lr, hr, _) in enumerate(self.loader_train):
             # Load images. 
             lr, hr = self.prepare(lr, hr)
@@ -63,8 +61,7 @@ class _Trainer_(object):
             timer_model.tic()
             # Optimization core. 
             self.optimizer.zero_grad()
-            sr = self.model(lr)
-            loss = self.loss(sr, hr)
+            loss = self.optimization_core(lr, hr)
             loss.backward()
             if self.args.gclip > 0:
                 torch.nn.utils.clip_grad_value_(self.model.parameters(),self.args.gclip)
@@ -94,34 +91,36 @@ class _Trainer_(object):
         epoch = self.optimizer.get_last_epoch() + 1
         self.ckp.write_log('\nEvaluation:')
         self.ckp.add_log(
-            torch.zeros(1, len(self.loader_test), len(self.scale))
+            torch.zeros(1, len(self.loader_test))
         )
         self.model.eval()
         # Iterate over every testing dataset. 
-        timer_test = misc.timer()
+        timer_test = misc._Timer_()
         if self.args.save_results: self.ckp.begin_background()
         for idx_data, d in enumerate(self.loader_test):
-            for lr, hr, filename, _ in tqdm(d, ncols=80):
+            for lr, hr, filename in tqdm.tqdm(d, ncols=80):
                 lr, hr = self.prepare(lr, hr)
-                sr = self.model(lr)
-                sr = misc.discretize(sr, self.args.rgb_range)
-                save_list = [sr]
-                self.ckp.log[-1, idx_data, 0] += misc.calc_psnr(
-                    sr, hr, self.scale, self.args.rgb_range, dataset=d
+                hr_out = self.model(hr)
+                hr_out = misc.discretize(hr_out, self.args.rgb_range)
+                save_list = [hr_out]
+                self.ckp.log[-1, idx_data] += misc.calc_psnr(
+                    hr_out, hr, self.scale, self.args.rgb_range
                 )
                 if self.args.save_gt:
                     save_list.extend([lr, hr])
                 if self.args.save_results:
                     self.ckp.save_results(d, filename[0], save_list, scale)
-            self.ckp.log[-1, idx_data, 0] /= len(d)
+            self.ckp.log[-1, idx_data] /= len(d)
             best = self.ckp.log.max(0)
+            print(self.ckp.log.shape)
+            print(best)
             self.ckp.write_log(
                 '[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})'.format(
                     d.dataset.name,
                     self.scale,
-                    self.ckp.log[-1, idx_data, 0],
-                    best[0][idx_data, 0],
-                    best[1][idx_data, 0] + 1
+                    self.ckp.log[-1, idx_data],
+                    best[0][idx_data],
+                    best[1][idx_data] + 1
                 )
             )
         # Finalizing - Saving and logging. 
@@ -136,9 +135,15 @@ class _Trainer_(object):
         )
         torch.set_grad_enabled(True)
 
-    def prepare(self, *args):
+    def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor) -> optimization._Loss_: 
+        hr_out = self.model(hr)
+        loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out}
+        loss = self.loss(loss_kwargs)
+        return loss
+
+    def prepare(self, *kwargs):
         device = torch.device('cpu' if self.args.cpu else 'cuda')
-        return [tensor.to(device)(a) for a in args]
+        return [x.to(device) for x in kwargs]
 
     def terminate(self):
         if self.args.test_only:
@@ -147,4 +152,30 @@ class _Trainer_(object):
         else:
             epoch = self.optimizer.get_last_epoch() + 1
             return epoch >= self.args.epochs
+
+# =============================================================================
+# TASK-AWARE DOWNSCALING TRAINER. 
+# =============================================================================
+class _Trainer_TAD_(_Trainer_): 
+    ''' Trainer class for training the image super resolution using the task
+    aware downscaling method, i.e. downscale to scaled image in autoencoder
+    and include difference between encoded features and bicubic image to loss.
+    Therefore the trainer assumes the model to have an encoder() and decoder()
+    function. '''
+
+    def __init__(self, args: argparse.Namespace, 
+                 loader: dataloader._Data_, 
+                 model: modules._Model_, 
+                 loss: optimization._Loss_, 
+                 ckp: misc._Checkpoint_):
+
+        super(_Trainer_TAD_, self).__init__(args, loader, model, loss, ckp)
+    
+    def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor) -> optimization._Loss_: 
+        lr_out = self.model.model.encode(hr)
+        hr_out = self.model.model.decode(lr_out)
+        loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out, 'LR_GT': lr, 'LR_OUT': lr_out}
+        loss = self.loss(loss_kwargs)
+        return loss  
+
 

@@ -6,7 +6,6 @@
 # =============================================================================
 import torch
 from torch import nn
-import super_resolution.models as models
 
 def build_net():
     return AETRIAL_1D_NOSR()

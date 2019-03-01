@@ -59,13 +59,7 @@ def _ms_loop(dataset, index_queue, data_queue, done_event, collate_fn, scale, se
                 continue
             idx, batch_indices = r
             try:
-                idx_scale = 0
-                if len(scale) > 1 and dataset.train:
-                    idx_scale = random.randrange(0, len(scale))
-                    dataset.set_scale(idx_scale)
-
                 samples = collate_fn([dataset[i] for i in batch_indices])
-                samples.append(idx_scale)
             except Exception:
                 data_queue.put((idx, ExceptionWrapper(sys.exc_info())))
             else:
@@ -178,7 +172,3 @@ class MSConcatDataset(ConcatDataset):
     def __init__(self, datasets):
         super(MSConcatDataset, self).__init__(datasets)
         self.train = datasets[0].train
-
-    def set_scale(self, idx_scale):
-        for d in self.datasets:
-            if hasattr(d, 'set_scale'): d.set_scale(idx_scale)

@@ -6,7 +6,7 @@
 # =============================================================================
 from abc import abstractmethod
 import argparse
-from importlib import import_module
+import importlib
 
 import torch
 from torch import nn
@@ -28,9 +28,10 @@ class _Model_(nn.Module):
         self.device = torch.device('cpu' if args.cpu else 'cuda')
         self.n_gpus = torch.cuda.device_count()
         self.save_models = args.save_models
-        module = import_module('models.' + args.model.lower())
+        module = importlib.import_module('models.' + args.model.lower())
         self.model = module.build_net().to(self.device)
-        self.load(ckp.get_path('model'), resume=args.resume, cpu=args.cpu)
+        if not args.load == "": 
+            self.load(ckp.get_path('model'), resume=args.resume, cpu=args.cpu)
         print(self.model, file=ckp.log_file)
         print("... successfully built model module !")
 
@@ -125,18 +126,3 @@ class _ReversePixelShuffle_(nn.Module):
             height, width)
         shuffle_out = input_view.permute(0, 1, 4, 2, 5, 3).contiguous() 
         return shuffle_out.view(batch_size, out_channels, height, width)
-
-# =============================================================================
-# AutoEncoder model class - Adding encoding and decoding. 
-# =============================================================================
-class _AEModel_(_Model_):
- 
-    def __init__(self, args: argparse.Namespace, ckp: misc._Checkpoint_):
-        super(_AEAbstract_, self).__init__(args, ckp)
-
-    def encode(self, x: torch.Tensor) -> torch.Tensor: 
-        return self.model.encode(x)
-    
-    def decode(self, x: torch.Tensor) -> torch.Tensor: 
-        return self.model.decode(x)
-

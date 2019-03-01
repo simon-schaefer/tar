@@ -8,7 +8,7 @@ import argparse
 import torch
 from torch import nn
 
-import super_resolution.tools.miscellaneous as misc
+import super_resolution.miscellaneous as misc
 
 # =============================================================================
 # OPTIMIZER. 
@@ -113,7 +113,7 @@ class _Loss_(nn.modules.loss._Loss):
             )
         # Build logging and load previous log (if required).  
         self.log = torch.Tensor()
-        if args.load != '': self.load(ckp.dir, cpu=args.cpu)
+        if args.load != "": self.load(ckp.dir, cpu=args.cpu)
         print("... successfully built loss module !")
 
     def forward(self, kwargs):
@@ -126,16 +126,17 @@ class _Loss_(nn.modules.loss._Loss):
         '''
         # Search for required inputs for specific loss type.
         for l  in self.loss: 
-                input_type = l["desc"].split("-")[0]
-                if input_type == "HR" and \
-                (not "HR_GT" in kwargs.keys() or not "HR_OUT" in kwargs.keys()): 
-                    raise ValueError("Loss missing HR arguments !")
-                if input_type == "LR" and \
-                (not "LR_GT" in kwargs.keys() or not "LR_OUT" in kwargs.keys()): 
-                    raise ValueError("Loss missing LR arguments !")
+            input_type = l["desc"].split("-")[0]
+            if input_type == "HR" and \
+            (not "HR_GT" in kwargs.keys() or not "HR_OUT" in kwargs.keys()): 
+                raise ValueError("Loss missing HR arguments !")
+            if input_type == "LR" and \
+            (not "LR_GT" in kwargs.keys() or not "LR_OUT" in kwargs.keys()): 
+                raise ValueError("Loss missing LR arguments !")
         # Determine loss given loss function. 
         losses = []
         for i, l in enumerate(self.loss):
+            input_type = l["desc"].split("-")[0]
             if l["function"] is not None:
                 x, y = kwargs[input_type+"_OUT"], kwargs[input_type+"_GT"]
                 loss = l["function"](x, y)
@@ -151,14 +152,14 @@ class _Loss_(nn.modules.loss._Loss):
     # =========================================================================
     def save(self, directory: str):
         ''' Save internal state and logging in given directory. '''
-        torch.save(self.state_dict(), directory + "/loss.pt"))
-        torch.save(self.log, directory + "/loss.pt"))
+        torch.save(self.state_dict(), directory + "/loss.pt")
+        torch.save(self.log, directory + "/loss.pt")
 
     def load(self, directory: str, cpu: bool=False):
         ''' Load internal state and logging from given directory and redo  
         logging state (simulate previous steps). '''
         kwargs = {"map_location": lambda storage, loc: storage} if cpu else {}
-        self.load_state_dict(torch.load(directory + "/loss.pt"), **kwargs))
+        self.load_state_dict(torch.load(directory + "/loss.pt"), **kwargs)
         self.log = torch.load(directory + "/loss_log.pt")
 
     # =========================================================================
@@ -195,7 +196,7 @@ class _Loss_(nn.modules.loss._Loss):
             plt.savefig(directory + "/loss_{}.pdf".format(l['desc']))
             plt.close(fig)
 
-    def get_loss_module(self):
+    def get_loss_module(self) -> nn.ModuleList:
         ''' Return loss modules (depending on number of gpus they are either 
         stored as single instance or in parallel). '''
         if self.n_gpus == 1:

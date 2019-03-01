@@ -37,7 +37,7 @@ source $VIRTUAL_ENV_PATH/bin/activate
 /bin/echo Starting on: `date`
 
 ## EXECUTION OF PYTHON CODE:
-python3 $PROJECT_HOME/$3 $4
+python3 $PROJECT_HOME/$3 
 
 # logging
 /bin/echo finished at: `date`

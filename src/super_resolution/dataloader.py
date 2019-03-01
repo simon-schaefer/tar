@@ -6,6 +6,7 @@
 # =============================================================================
 import argparse
 import imageio
+import importlib
 import numpy as np
 import os
 import glob
@@ -16,44 +17,6 @@ import typing
 import torch
 
 from super_resolution.external import ms_data_loader as ms_loader
-
-class _Data_(object):
-    ''' Data loading class which allocates all given training and testing
-    dataset stated in the input arguments to a loader (and concatenates 
-    them for training). The resulting loader_test and loader_train can be 
-    used to load batches from the datasets. '''
-
-    def __init__(self, args: argparse.Namespace):
-        # Load testing dataset. In order to get seperated testing results, 
-        # from each dataset (due to comparability reasons) the testing 
-        # datasets are each loaded individually. 
-        self.loader_test = []
-        for dataset in args.data_test:
-            datasets.append(self.load_dataset(args, dataset, train=False))
-            self.loader_test.append(ms_loader.MSDataLoader(
-                args, testset,
-                batch_size=1, shuffle=False, pin_memory=not args.cpu
-            ))
-        if not args.test_only:
-            return
-        # Load training dataset, if not testing only. For training several
-        # datasets are trained in one process and therefore, each given 
-        # training dataset is concatinated to one large dataset. 
-        self.loader_train = None
-        datasets = []
-        for dataset in args.data_train:
-            datasets.append(self.load_dataset(args, dataset, train=True))
-        self.loader_train = ms_loader.MSDataLoader(
-            args, ms_loader.MSConcatDataset(datasets),
-            batch_size=args.batch_size, shuffle=True, pin_memory=not args.cpu
-        )
-
-    @staticmethod 
-    def load_dataset(args: argparse.Namespace, name: str, train: bool) -> _Dataset_: 
-        ''' Load dataset from module (in datasets directory). Every module loaded
-        should inherit from the _Dataset_ class defined below. '''
-        m = import_module('datasets.' + name.lower())
-        datasets.append(getattr(m, name)(args), train=train)
 
 # =============================================================================
 # DATASET EXTENSION. 
@@ -69,13 +32,15 @@ class _Dataset_(torch.utils.data.Dataset):
         self.split = 'train' if train else 'test'
         self.do_eval = True
         self.scale = args.scale
-        
-        self._set_filesystem(args.dir_data)
-        if args.ext.find('img') < 0:
-            path_bin = os.path.join(self.directory, 'bin')
-            os.makedirs(path_bin, exist_ok=True)
+        # Determining training/testing data range. 
+        data_range = [r.split('-') for r in args.data_range.split('/')]
+        if not train and len(data_range) > 1 and not args.test_only: 
+            data_range = data_range[1]
         else: 
-            raise ValueError("Invalid file extension %s !" % str(args.ext))    
+            data_range = data_range[0]
+        self.begin, self.end = list(map(lambda x: int(x), data_range))
+        # Scanning for files in given directories and loading images. 
+        self._set_filesystem(args.dir_data)   
         list_hr, list_lr = self._scan()
         if args.ext.find('img') >= 0:
             self.images_hr, self.images_lr = list_hr, list_lr
@@ -84,27 +49,21 @@ class _Dataset_(torch.utils.data.Dataset):
         if train:
             n_patches = args.batch_size * args.test_every
             n_images = len(args.data_train) * len(self.images_hr)
-            if n_images == 0:
-                self.repeat = 0
-            else:
-                self.repeat = max(n_patches // n_images, 1)
+            self.repeat = 0 if (n_images == 0) else max(n_patches // n_images, 1)
 
     # =========================================================================
     # Handling the filesystem 
     # =========================================================================
     def _scan(self) -> typing.Tuple[typing.List[str], typing.List[str]]:
         names_hr = sorted(
-            glob.glob(os.path.join(self.dir_hr, '*' + self.ext[0]))
+            glob.glob(self.dir_hr + "/*" + self.ext[0])
         )
-        names_lr = [[] for _ in self.scale]
+        names_lr = []
         for f in names_hr:
             filename, _ = os.path.splitext(os.path.basename(f))
-            for si, s in enumerate(self.scale):
-                names_lr[si].append(os.path.join(
-                    self.dir_lr, 'X{}/{}x{}{}'.format(
-                        s, filename, s, self.ext[1]
-                    )
-                ))
+            names_lr.append(self.dir_lr + "/{}x{}{}".format(
+                filename, self.scale, self.ext[1]
+            ))
         return names_hr, names_lr
     
     def _set_filesystem(self, directory: str):
@@ -121,13 +80,23 @@ class _Dataset_(torch.utils.data.Dataset):
     def _load_file(self, idx: int) -> typing.Tuple[np.ndarray, np.ndarray, str]:
         idx = self._get_index(idx)
         f_hr = self.images_hr[idx]
-        f_lr = self.images_lr[self.idx_scale][idx]
+        f_lr = self.images_lr[idx]
         filename, _ = os.path.splitext(os.path.basename(f_hr))
         if self.args.ext == 'img':
             hr = imageio.imread(f_hr)
             lr = imageio.imread(f_lr)
         else: 
             raise ValueError("Invalid file extension %s !" % str(self.args.ext))
+        assert hr.shape[0] == self.scale*lr.shape[0]
+        assert hr.shape[1] == self.scale*lr.shape[1]
+
+        def _expand_dimension(img: np.ndarray) -> np.ndarray: 
+            if img.ndim == 2:
+                img = np.expand_dims(img, axis=2)
+            return img
+
+        lr, hr = _expand_dimension(lr), _expand_dimension(hr)
+        assert hr.shape[2] == lr.shape[2]
         return lr, hr, filename
 
     # =========================================================================
@@ -137,12 +106,11 @@ class _Dataset_(torch.utils.data.Dataset):
         # Load image file. 
         lr, hr, filename = self._load_file(idx)
         # Cut patches from file. 
-        def _get_patch(self, lr, hr):
-            scale = self.scale
-            if self.train:
+        def _get_patch(lr: np.ndarray, hr: np.ndarray, 
+                       scale: int, patch_size: int, do_train: bool):
+            if do_train:
                 ih, iw = lr.shape[:2]
-                p = scale if multi else 1
-                tp = p * self.args.patch_size
+                tp = patch_size
                 ip = tp // scale
                 ix = random.randrange(0, iw - ip + 1)
                 iy = random.randrange(0, ih - ip + 1)
@@ -154,23 +122,25 @@ class _Dataset_(torch.utils.data.Dataset):
                 hr = hr[0:ih * scale, 0:iw * scale]
             return lr, hr
 
-        pair = _get_patch(lr, hr)
+        patch_size = self.args.patch_size
+        assert patch_size <= lr.shape[0] and patch_size <= lr.shape[1]
+        assert patch_size <= hr.shape[0] and patch_size <= hr.shape[1]
+        pair = _get_patch(lr, hr, self.scale, patch_size, self.train)
         # Augment patches (if flag is set). 
         if not self.args.no_augment: 
             hflip = random.random() < 0.5
             vflip = random.random() < 0.5
             rot90 = random.random() < 0.5
 
-            def _augment(img):
+            def _augment(img: np.ndarray) -> np.ndarray:
                 if hflip: img = img[:, ::-1, :]
                 if vflip: img = img[::-1, :, :]
                 if rot90: img = img.transpose(1, 0, 2)
-                
                 return img
 
             pair = [_augment(x) for x in pair]
         # Set right number of channels. 
-        def _set_channel(img):
+        def _set_channel(img, n_channels: int) -> np.ndarray:
             if img.ndim == 2:
                 img = np.expand_dims(img, axis=2)
             c = img.shape[2]
@@ -180,15 +150,15 @@ class _Dataset_(torch.utils.data.Dataset):
                 img = np.concatenate([img] * n_channels, 2)
             return img
 
-        pair_t = [_set_channel(x) for x in pair_t]
+        pair = [_set_channel(x, n_channels=self.args.n_colors) for x in pair]
         # Convert to torch tensor and return. 
-        def _np2Tensor(img, rgb_range=255):
+        def _np2Tensor(img, rgb_range=255) -> torch.Tensor:
             np_transpose = np.ascontiguousarray(img.transpose((2, 0, 1)))
             tensor = torch.from_numpy(np_transpose).float()
             tensor.mul_(rgb_range / 255)
             return tensor
 
-        pair_t = [_np2Tensor(x, rgb_range=self.args.rgb_range) for x in pair_t]
+        pair_t = [_np2Tensor(x, rgb_range=self.args.rgb_range) for x in pair]
         return pair_t[0], pair_t[1], filename
 
     # =========================================================================
@@ -205,3 +175,49 @@ class _Dataset_(torch.utils.data.Dataset):
             return idx % len(self.images_hr)
         else:
             return idx
+
+# =============================================================================
+# DATA LOADING CLASS. 
+# =============================================================================
+class _Data_(object):
+    ''' Data loading class which allocates all given training and testing
+    dataset stated in the input arguments to a loader (and concatenates 
+    them for training). The resulting loader_test and loader_train can be 
+    used to load batches from the datasets. '''
+
+    def __init__(self, args: argparse.Namespace):
+        # Load testing dataset. In order to get seperated testing results, 
+        # from each dataset (due to comparability reasons) the testing 
+        # datasets are each loaded individually. 
+        self.loader_test = []
+        datasets = []
+        if type(args.data_test) == str: 
+            args.data_test = [args.data_test]
+        for dataset in args.data_test:
+            testset = self.load_dataset(args, dataset, train=False)
+            self.loader_test.append(ms_loader.MSDataLoader(
+                args, testset,
+                batch_size=1, shuffle=False, pin_memory=not args.cpu
+            ))
+        if args.test_only:
+            return
+        # Load training dataset, if not testing only. For training several
+        # datasets are trained in one process and therefore, each given 
+        # training dataset is concatinated to one large dataset. 
+        self.loader_train = None
+        if type(args.data_train) == str: 
+            args.data_train = [args.data_train]
+        for dataset in args.data_train:
+            datasets.append(self.load_dataset(args, dataset, train=True))
+        self.loader_train = ms_loader.MSDataLoader(
+            args, ms_loader.MSConcatDataset(datasets),
+            batch_size=args.batch_size, shuffle=True, pin_memory=not args.cpu
+        )
+
+    @staticmethod 
+    def load_dataset(args: argparse.Namespace, name: str, train: bool) -> _Dataset_: 
+        ''' Load dataset from module (in datasets directory). Every module loaded
+        should inherit from the _Dataset_ class defined below. '''
+        m = importlib.import_module("super_resolution.datasets." + name.lower())
+        return getattr(m, name)(args, train=train)
+
