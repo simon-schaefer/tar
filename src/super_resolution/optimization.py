@@ -5,6 +5,12 @@
 # Description : Optimization and Loss implementations. 
 # =============================================================================
 import argparse
+import numpy as np
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 import torch
 from torch import nn
 
@@ -17,7 +23,6 @@ def make_optimizer(model: torch.nn.Module, args: argparse.Namespace):
     ''' Building the optimizer for model training purposes, given the 
     dictionary of input arguments (argparse). Also add functionalities like 
     saving/loading a optimizer state. '''
-    print("Building optimizer module ...")
     kwargs_optimizer = {'lr': args.lr, 'weight_decay': args.weight_decay}
     if args.optimizer == 'ADAM': 
         optimizer_class = torch.optim.Adam
@@ -63,7 +68,6 @@ def make_optimizer(model: torch.nn.Module, args: argparse.Namespace):
     trainable = filter(lambda x: x.requires_grad, model.parameters())
     optimizer = _Optimizer_(trainable, **kwargs_optimizer)
     optimizer._register_scheduler(scheduler_class, **kwargs_scheduler)
-    print("... successfully built optimizer module !")
     return optimizer
 
 # =============================================================================
@@ -80,7 +84,7 @@ class _Loss_(nn.modules.loss._Loss):
         # (e.g. L1, MSE) and its weight (i.e. lambda). Additionally, the argument
         # includes information about the to be compared elements, i.e. whether 
         # they are high or low resolution images (HR, LR).  
-        print("Building loss module ...")
+        ckp.write_log("Building loss module ...")
         self.loss = []
         self.loss_module = nn.ModuleList()
         for loss in args.loss.split('+'): 
@@ -98,7 +102,7 @@ class _Loss_(nn.modules.loss._Loss):
                 "desc"      : "{}-{}".format(input_type, loss_type), 
                 "function"  : loss_function})
             self.loss_module.append(loss_function)
-            print("... adding %s loss with weight=%f and input type=%s" \
+            ckp.write_log("... adding %s loss with weight=%f and input type=%s" \
                     % (loss_type, float(weight), input_type))
         # For logging purposes add additional element to loss 
         # containing the sum of all "sub-losses". 
@@ -114,7 +118,7 @@ class _Loss_(nn.modules.loss._Loss):
         # Build logging and load previous log (if required).  
         self.log = torch.Tensor()
         if args.load != "": self.load(ckp.dir, cpu=args.cpu)
-        print("... successfully built loss module !")
+        ckp.write_log("... successfully built loss module !")
 
     def forward(self, kwargs):
         ''' Given the required input arguments determine every single

@@ -8,6 +8,7 @@ import argparse
 import imageio
 import math
 from multiprocessing import Process, Queue
+import numpy as np
 import os
 import sys
 import time
@@ -26,7 +27,6 @@ class _Checkpoint_(object):
     def __init__(self, args: argparse.Namespace):
         super(_Checkpoint_, self).__init__()
         # Initializing checkpoint module. 
-        print("Building checkpoint module ...")
         self.ready = False
         self.args = args
         self.log = torch.Tensor()
@@ -40,7 +40,6 @@ class _Checkpoint_(object):
             if not os.path.exists(self.dir):
                 raise ValueError("Loading path %s does not exists !" % self.dir)
             self.log = torch.load(self.get_path('psnr_log.pt'))
-            print('Continue from epoch {}...'.format(len(self.log)))
         # Creating output directories for model, results, logging, config, etc. 
         os.makedirs(self.dir, exist_ok=True)
         os.makedirs(self.get_path('model'), exist_ok=True)
@@ -56,7 +55,9 @@ class _Checkpoint_(object):
         # Set number of logging threats. 
         self.n_processes = 8
         self.ready = True
-        print("... successfully built checkpoint module !")
+        self.write_log("Building model module ...")
+        self.write_log('Continue from epoch {}...'.format(len(self.log)))
+        self.write_log("... successfully built checkpoint module !")
 
     # =========================================================================
     # Saving 
@@ -73,8 +74,8 @@ class _Checkpoint_(object):
             label = 'SR on {}'.format(d)
             fig = plt.figure()
             plt.title(label)
-            plt.plot(axis,self.log[:, 0, 0].numpy(),
-                     label='Scale {}'.format(scale))
+            plt.plot(axis,self.log[:, 0].numpy(),
+                     label='Scale {}'.format(self.args.scale))
             plt.legend()
             plt.xlabel('Epochs')
             plt.ylabel('PSNR')

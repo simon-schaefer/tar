@@ -21,7 +21,7 @@ class _Model_(nn.Module):
 
     def __init__(self, args: argparse.Namespace, ckp: misc._Checkpoint_):
         super(_Model_, self).__init__()
-        print("Building model module ...")
+        ckp.write_log("Building model module ...")
         # Set parameters from input arguments. 
         self.scale = args.scale
         self.cpu = args.cpu
@@ -33,7 +33,7 @@ class _Model_(nn.Module):
         if not args.load == "": 
             self.load(ckp.get_path('model'), resume=args.resume, cpu=args.cpu)
         print(self.model, file=ckp.log_file)
-        print("... successfully built model module !")
+        ckp.write_log("... successfully built model module !")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if self.training: 

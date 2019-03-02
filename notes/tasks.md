@@ -17,7 +17,8 @@
 - [x] Build training pipeline (6 patches of 96 × 96 HR sub images each coming from different HR image --> mini-batch, Adam Optimizer, guidance and SR L1 losses)
 - [x] Restructuring project to be general use (yaml -> input arguments, "intelligent" checkpoints, 
 automated saving and easy loading of previous training iterations, block-loss-function, etc.)
-- [ ] Test using MNIST dataset
+- [x] Test implementation using MNIST dataset
+- [ ] Working version for MNIST dataset
 
 ## Literature 
 - [Paper: Task-Aware Image Downscaling (Kyoung Mu Lee)](http://openaccess.thecvf.com/content_ECCV_2018/papers/Heewon_Kim_Task-Aware_Image_Downscaling_ECCV_2018_paper.pdf)
