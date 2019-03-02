@@ -35,3 +35,5 @@ automated saving and easy loading of previous training iterations, block-loss-fu
 - [Tutorial: Keep Calm and train a GAN. Pitfalls and Tips on training Generative Adversarial Networks](https://medium.com/@utk.is.here/keep-calm-and-train-a-gan-pitfalls-and-tips-on-training-generative-adversarial-networks-edd529764aa9)
 - [Tutorial: Deepmind GAN introduction](http://www.gatsby.ucl.ac.uk/~balaji/Understanding-GANs.pdf)
 
+## References 
+Implementation inspired by EDSR code (https://github.com/thstkdgus35/EDSR-PyTorch). 

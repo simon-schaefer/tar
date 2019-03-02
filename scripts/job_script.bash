@@ -36,6 +36,11 @@ source $VIRTUAL_ENV_PATH/bin/activate
 /bin/echo In directory: `pwd`
 /bin/echo Starting on: `date`
 
+# cuda environment. 
+CUDA_HOME=$PROJECT_HOME/cuda-9.0
+export PATH=$CUDA_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/extras/CUPTI/lib64:$LD_LIBRARY_PATH
+
 ## EXECUTION OF PYTHON CODE:
 python3 $PROJECT_HOME/$3 
 

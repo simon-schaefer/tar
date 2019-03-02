@@ -7,7 +7,6 @@
 import argparse
 import os
 import math
-import tqdm
 
 import torch
 
@@ -79,6 +78,7 @@ class _Trainer_(object):
         # Finalizing - Save error and logging. 
         self.loss.end_log(len(self.loader_train))
         self.error_last = self.loss.log[-1, -1]
+        print("... finalizing epoch {}.".format(epoch))
 
     # =========================================================================
     # Testing
@@ -98,7 +98,7 @@ class _Trainer_(object):
         timer_test = misc._Timer_()
         if self.args.save_results: self.ckp.begin_background()
         for idx_data, d in enumerate(self.loader_test):
-            for lr, hr, filename in tqdm.tqdm(d, ncols=80):
+            for lr, hr, filename in d:
                 lr, hr = self.prepare(lr, hr)
                 hr_out = self.model(hr)
                 hr_out = misc.discretize(hr_out, self.args.rgb_range)
@@ -109,7 +109,7 @@ class _Trainer_(object):
                 if self.args.save_gt:
                     save_list.extend([lr, hr])
                 if self.args.save_results:
-                    self.ckp.save_results(d, filename[0], save_list, scale)
+                    self.ckp.save_results(d, filename[0], save_list, self.scale)
             self.ckp.log[-1, idx_data] /= len(d)
             best = self.ckp.log.max(0)
             self.ckp.write_log(

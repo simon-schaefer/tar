@@ -112,9 +112,9 @@ parser.add_argument("--save_models", action="store_true",
                     help="save all intermediate models")
 parser.add_argument("--print_every", type=int, default=100,
                     help="how many batches to wait before logging training status")
-parser.add_argument("--save_results", action="store_true",
+parser.add_argument("--save_results", action="store_false",
                     help="save output results")
-parser.add_argument("--save_gt", action="store_true",
+parser.add_argument("--save_gt", action="store_false",
                     help="save low-resolution and high-resolution images together")
 
 # =============================================================================

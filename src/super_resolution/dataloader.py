@@ -126,6 +126,11 @@ class _Dataset_(torch.utils.data.Dataset):
         assert patch_size <= lr.shape[0] and patch_size <= lr.shape[1]
         assert patch_size <= hr.shape[0] and patch_size <= hr.shape[1]
         pair = _get_patch(lr, hr, self.scale, patch_size, self.train)
+        # Normalize patches from rgb_range to [-0.5, 0.5].  
+        def _normalize(image):
+            return image/self.args.rgb_range - 0.5
+
+        pair = [_normalize(x) for x in pair]
         # Augment patches (if flag is set). 
         if not self.args.no_augment: 
             hflip = random.random() < 0.5
