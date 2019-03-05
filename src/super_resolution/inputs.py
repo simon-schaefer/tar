@@ -8,8 +8,6 @@ import argparse
 import os
 
 parser = argparse.ArgumentParser(description="super_resolution")
-parser.add_argument("--debug", action="store_true",
-                    help="Enables debug mode")
 parser.add_argument("--template", default=".",
                     help="You can set various templates in option.py")
 
@@ -19,7 +17,7 @@ parser.add_argument("--template", default=".",
 parser.add_argument("--n_threads", type=int, default=6,
                     help="number of threads for data loading")
 parser.add_argument("--cpu", action="store_true",
-                    help="use cpu only")
+                    help="use cpu only (default=False)")
 parser.add_argument("--seed", type=int, default=1,
                     help="random seed")
 
@@ -42,13 +40,15 @@ parser.add_argument("--ext", type=str, default="img",
 parser.add_argument("--scale", type=int, default=2,
                     help="super resolution scale")
 parser.add_argument("--patch_size", type=int, default=96,
-                    help="output patch size")
+                    help="input patch size")
 parser.add_argument("--rgb_range", type=int, default=255,
-                    help="maximum value of RGB")
+                    help="maximum pixel intensity value")
 parser.add_argument("--n_colors", type=int, default=3,
                     help="number of color channels to use")
+parser.add_argument("--no_normalize", action="store_true",
+                    help="not normalize inputs to [-0.5, 0.5] (default=False)")
 parser.add_argument("--no_augment", action="store_true",
-                    help="do not use data augmentation")
+                    help="not use data augmentation (default=False)")
 
 # =============================================================================
 # Model specifications.
@@ -60,7 +60,7 @@ parser.add_argument("--model", default="AETAD_1D",
 # Training specifications. 
 # =============================================================================
 parser.add_argument("--reset", action="store_true",
-                    help="reset the training")
+                    help="reset the training (default=False)")
 parser.add_argument("--test_every", type=int, default=1000,
                     help="do test per every N batches")
 parser.add_argument("--epochs", type=int, default=300,
@@ -68,20 +68,20 @@ parser.add_argument("--epochs", type=int, default=300,
 parser.add_argument("--batch_size", type=int, default=6,
                     help="input batch size for training")
 parser.add_argument("--test_only", action="store_true",
-                    help="set this option to test the model")
+                    help="set this option to test the model (default=False)")
 
 # =============================================================================
 # Optimization specifications.
 # =============================================================================
-parser.add_argument("--lr", type=float, default=1e-4,
+parser.add_argument("--lr", type=float, default=1e-2,
                     help="learning rate")
-parser.add_argument("--decay", type=str, default="200",
+parser.add_argument("--decay", type=str, default="100",
                     help="learning rate decay type")
-parser.add_argument("--gamma", type=float, default=0.5,
+parser.add_argument("--gamma", type=float, default=0.9,
                     help="learning rate decay factor for step decay")
 parser.add_argument("--optimizer", default="ADAM",
-                    choices=("SGD", "ADAM", "RMSprop"),
-                    help="optimizer to use (SGD | ADAM | RMSprop)")
+                    choices=("ADAM"),
+                    help="optimization class")
 parser.add_argument("--momentum", type=float, default=0.9,
                     help="SGD momentum")
 parser.add_argument("--betas", type=tuple, default=(0.9, 0.999),
@@ -109,13 +109,13 @@ parser.add_argument("--load", type=str, default="",
 parser.add_argument("--resume", type=int, default=0,
                     help="resume from specific checkpoint")
 parser.add_argument("--save_models", action="store_true",
-                    help="save all intermediate models")
+                    help="save all intermediate models (default=False)")
 parser.add_argument("--print_every", type=int, default=100,
                     help="how many batches to wait before logging training status")
 parser.add_argument("--save_results", action="store_false",
-                    help="save output results")
+                    help="save output results (default=True)")
 parser.add_argument("--save_gt", action="store_false",
-                    help="save low-resolution and high-resolution images together")
+                    help="save low-resolution and high-resolution images together (default=True)")
 
 # =============================================================================
 # TEMPLATES. 
@@ -126,6 +126,17 @@ def set_template(args):
         args.batch_size = 6
         args.scale      = 2
         args.loss       = "HR*1*L1+LR*1*L1"
+
+    if args.template.find("IM_AE_TEST") >= 0:
+        args.model      = "AETRIAL_NOSR"
+        args.scale      = 1
+        args.optimizer  = "ADAM"
+        args.batch_size = 64
+        args.data_train = "MNIST"
+        args.data_test  = "MNIST"
+        args.n_colors   = 1
+        args.patch_size = 28
+        args.loss       = "HR*1*MSE"
 
 # =============================================================================
 # MAIN. 

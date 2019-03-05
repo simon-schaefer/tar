@@ -12,7 +12,7 @@ import os
 import glob
 import random
 import skimage.color as sc
-import typing
+from typing import List, Tuple
 
 import torch
 
@@ -54,10 +54,16 @@ class _Dataset_(torch.utils.data.Dataset):
     # =========================================================================
     # Handling the filesystem 
     # =========================================================================
-    def _scan(self) -> typing.Tuple[typing.List[str], typing.List[str]]:
+    def _scan(self) -> Tuple[List[str], List[str]]:
+        ''' Scan given lists of directories for HR and LR images and return 
+        list of HR and LR absolute file paths. '''
         names_hr = sorted(
             glob.glob(self.dir_hr + "/*" + self.ext[0])
         )
+        # For testing issues check if scale == 1, then just return HR images. 
+        if self.scale == 1: 
+            return names_hr, names_hr
+        # Otherwise build LR image names for every HR image. 
         names_lr = []
         for f in names_hr:
             filename, _ = os.path.splitext(os.path.basename(f))
@@ -77,7 +83,7 @@ class _Dataset_(torch.utils.data.Dataset):
             with open(f, 'wb') as _f:
                 pickle.dump(imageio.imread(img), _f)
 
-    def _load_file(self, idx: int) -> typing.Tuple[np.ndarray, np.ndarray, str]:
+    def _load_file(self, idx: int) -> Tuple[np.ndarray, np.ndarray, str]:
         idx = self._get_index(idx)
         f_hr = self.images_hr[idx]
         f_lr = self.images_lr[idx]
@@ -102,7 +108,7 @@ class _Dataset_(torch.utils.data.Dataset):
     # =========================================================================
     # Getter for images
     # =========================================================================
-    def __getitem__(self, idx: int) -> typing.Tuple[torch.Tensor, torch.Tensor, str]:
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor, str]:
         # Load image file. 
         lr, hr, filename = self._load_file(idx)
         # Cut patches from file. 
@@ -127,10 +133,11 @@ class _Dataset_(torch.utils.data.Dataset):
         assert patch_size <= hr.shape[0] and patch_size <= hr.shape[1]
         pair = _get_patch(lr, hr, self.scale, patch_size, self.train)
         # Normalize patches from rgb_range to [-0.5, 0.5].  
-        def _normalize(image):
-            return image/self.args.rgb_range - 0.5
+        if not self.args.no_normalize: 
+            def _normalize(image):
+                return image/self.args.rgb_range - 0.5
 
-        pair = [_normalize(x) for x in pair]
+            pair = [_normalize(x) for x in pair]
         # Augment patches (if flag is set). 
         if not self.args.no_augment: 
             hflip = random.random() < 0.5

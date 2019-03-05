@@ -12,7 +12,7 @@ import numpy as np
 import os
 import sys
 import time
-import typing
+from typing import List
 
 import matplotlib
 matplotlib.use('Agg')
@@ -83,7 +83,8 @@ class _Checkpoint_(object):
             plt.savefig(self.get_path('test_{}.pdf'.format(d)))
             plt.close(fig)
         
-    def save_results(self, dataset, filename: str, save_list: typing.List[str], scale: int):
+    def save_results(self, save_list: List[torch.Tensor], 
+                     filename: str, dataset, scale: int):
         if self.args.save_results:
             filename = self.get_path(
                 'results-{}'.format(dataset.dataset.name),
@@ -91,7 +92,12 @@ class _Checkpoint_(object):
             )
             postfix = ('SR', 'LR', 'HR')
             for v, p in zip(save_list, postfix):
-                normalized = v[0].mul(255 / self.args.rgb_range)
+                normalized = v[0]
+                if not self.args.no_normalize: 
+                    normalized = normalized.add(0.5).mul(255)
+                else: 
+                    normalized = normalized.mul(255/self.args.rgb_range)
+                normalized = normalized.clamp(0, 255)
                 tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
                 self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
 
@@ -200,8 +206,11 @@ def calc_psnr(x: torch.Tensor, y: torch.Tensor, scale: int, rgb_range: float) ->
     mse = valid.pow(2).mean()
     return -10 * math.log10(mse)
 
-def discretize(img: torch.Tensor, rgb_range: float) -> torch.Tensor:
+def discretize(img: torch.Tensor, rgb_range: float, normalized: bool) -> torch.Tensor:
     ''' Discretize image (given as torch tensor) in defined range of
-    pixel values (e.g. 255 or 1.0). '''
+    pixel values (e.g. 255 or 1.0), i.e. smart rounding. '''
     pixel_range = 255 / rgb_range
-    return img.mul(pixel_range).clamp(0, 255).round().div(pixel_range)
+    img_dis = img if not normalized else img.add(0.5)
+    img_dis = img_dis.mul(pixel_range).clamp(0, 255).round().div(pixel_range)
+    img_dis = img_dis if not normalized else img_dis.add(-0.5)
+    return img_dis

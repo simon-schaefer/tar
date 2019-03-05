@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#CUDA_HOME=/scratch_net/bmicdl03/libs/cuda-8.0-bmic
 PROJECT_HOME=$1
 VIRTUAL_ENV_PATH=$2
+CUDA_HOME=$PROJECT_HOME/cuda-9.0
 
 ## otherwise the default shell would be used
 #$ -S /bin/bash
@@ -13,8 +13,8 @@ VIRTUAL_ENV_PATH=$2
 ### <= 1h is short queue, <= 6h is middle queue, <= 48 h is long queue
 ### -q short.q@*
  
-## the maximum memory usage of this job, (below 4G does not make much sense)
-#$ -l h_vmem=8G
+### the maximum memory usage of this job, (below 4G does not make much sense)
+### -l h_vmem=8G
  
 ## stderr and stdout are merged together to stdout
 #$ -j y
@@ -22,8 +22,8 @@ VIRTUAL_ENV_PATH=$2
 ## logging directory. preferrably on your scratch
 #$ -o /scratch_net/biwidl211/sischaef/outs
 
-## send mail on job's end and abort
-#$ -m bea
+### send mail on job's end and abort
+### -m bea
 
 # python virtual environment
 export PATH="/home/sischaef/.pyenv/bin:$PATH"
@@ -37,7 +37,6 @@ source $VIRTUAL_ENV_PATH/bin/activate
 /bin/echo Starting on: `date`
 
 # cuda environment. 
-CUDA_HOME=$PROJECT_HOME/cuda-9.0
 export PATH=$CUDA_HOME/bin:$PATH
 export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 

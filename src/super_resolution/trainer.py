@@ -101,7 +101,9 @@ class _Trainer_(object):
             for lr, hr, filename in d:
                 lr, hr = self.prepare(lr, hr)
                 hr_out = self.model(hr)
-                hr_out = misc.discretize(hr_out, self.args.rgb_range)
+                hr_out = misc.discretize(
+                    hr_out, self.args.rgb_range, not self.args.no_normalize
+                )
                 save_list = [hr_out]
                 self.ckp.log[-1, idx_data] += misc.calc_psnr(
                     hr_out, hr, self.scale, self.args.rgb_range
@@ -109,7 +111,7 @@ class _Trainer_(object):
                 if self.args.save_gt:
                     save_list.extend([lr, hr])
                 if self.args.save_results:
-                    self.ckp.save_results(d, filename[0], save_list, self.scale)
+                    self.ckp.save_results(save_list, filename[0], d, self.scale)
             self.ckp.log[-1, idx_data] /= len(d)
             best = self.ckp.log.max(0)
             self.ckp.write_log(
