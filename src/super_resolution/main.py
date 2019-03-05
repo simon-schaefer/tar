@@ -12,11 +12,11 @@ loader  = _sr_.dataloader._Data_(args)
 loss    = _sr_.optimization._Loss_(args, ckp) if not args.test_only else None
 model   = _sr_.modules._Model_(args, ckp)
 trainer = None
-if args.model.find("TAD") >= 0: 
-    trainer = _sr_.trainer._Trainer_TAD_(args, loader, model, loss, ckp)
+if args.model_type == "TAD": 
+   trainer = _sr_.trainer._Trainer_TAD_(args, loader, model, loss, ckp)
 else: 
-    trainer = _sr_.trainer._Trainer_(args, loader, model, loss, ckp)
-
+   trainer = _sr_.trainer._Trainer_(args, loader, model, loss, ckp)
+   
 while ckp.ready and not trainer.terminate(): 
     trainer.train()
     trainer.test()

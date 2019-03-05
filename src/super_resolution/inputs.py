@@ -55,6 +55,9 @@ parser.add_argument("--no_augment", action="store_true",
 # =============================================================================
 parser.add_argument("--model", default="AETAD_1D",
                     help="model name")
+parser.add_argument("--model_type", type=str, default="", 
+                    choices=("", "TAD"),
+                    help="kind of model specifying opt. core")
 
 # =============================================================================
 # Training specifications. 
@@ -121,17 +124,23 @@ parser.add_argument("--save_gt", action="store_false",
 # TEMPLATES. 
 # =============================================================================
 def set_template(args):
-    if args.template.find("IM_SR_TAD") >= 0:
+    if args.template.find("IM_AE_TAD_MNIST") >= 0:
+        args.model      = "AETAD_1D"
+        args.model_type = "TAD"
+        args.scale      = 2
         args.optimizer  = "ADAM"
         args.batch_size = 6
-        args.scale      = 2
+        args.data_train = "MNIST"
+        args.data_test  = "MNIST"
+        args.n_colors   = 1
+        args.patch_size = 28
         args.loss       = "HR*1*L1+LR*1*L1"
 
     if args.template.find("IM_AE_TEST") >= 0:
         args.model      = "AETRIAL_NOSR"
         args.scale      = 1
         args.optimizer  = "ADAM"
-        args.batch_size = 64
+        args.batch_size = 6
         args.data_train = "MNIST"
         args.data_test  = "MNIST"
         args.n_colors   = 1

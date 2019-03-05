@@ -129,7 +129,6 @@ class _Dataset_(torch.utils.data.Dataset):
             return lr, hr
 
         patch_size = self.args.patch_size
-        assert patch_size <= lr.shape[0] and patch_size <= lr.shape[1]
         assert patch_size <= hr.shape[0] and patch_size <= hr.shape[1]
         pair = _get_patch(lr, hr, self.scale, patch_size, self.train)
         # Normalize patches from rgb_range to [-0.5, 0.5].  
