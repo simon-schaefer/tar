@@ -115,14 +115,14 @@ class _Dataset_(torch.utils.data.Dataset):
         def _get_patch(lr: np.ndarray, hr: np.ndarray, 
                        scale: int, patch_size: int, do_train: bool):
             if do_train:
-                ih, iw = lr.shape[:2]
-                tp = patch_size
-                ip = tp // scale
-                ix = random.randrange(0, iw - ip + 1)
-                iy = random.randrange(0, ih - ip + 1)
-                tx, ty = scale * ix, scale * iy
-                lr = lr[iy:iy + ip, ix:ix + ip, :]
-                hr = hr[ty:ty + tp, tx:tx + tp, :]
+                lh, lw = lr.shape[:2]
+                hp = patch_size
+                lp = hp // scale
+                lx = random.randrange(0, lw - lp + 1)
+                ly = random.randrange(0, lh - lp + 1)
+                hx, hy = scale * lx, scale * ly
+                lr = lr[ly:ly + lp, lx:lx + lp, :]
+                hr = hr[hy:hy + hp, hx:hx + hp, :]
             else:
                 ih, iw = lr.shape[:2]
                 hr = hr[0:ih * scale, 0:iw * scale]

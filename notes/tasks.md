@@ -12,12 +12,14 @@
 - [x] Read papers about task aware image superresolution
 
 ## Implementation of task-aware image downscaling
-- [x] Rebuild network architecture
+- [x] Rebuild network architecture (inverse pixel shuffeling module incl. testing, resblock module, 
+general network architecture)
 - [x] Build image processing pipeline (downscaling for I_guidance bicubic with anti-alising, cropping to factor of 2, normalization to [-0.5, 0.5])
 - [x] Build training pipeline (6 patches of 96 × 96 HR sub images each coming from different HR image --> mini-batch, Adam Optimizer, guidance and SR L1 losses)
 - [x] Restructuring project to be general use (yaml -> input arguments, "intelligent" checkpoints, 
 automated saving and easy loading of previous training iterations, block-loss-function, etc.)
-- [x] Test implementation using MNIST dataset
+- [x] Test implementation using MNIST dataset (errors: no denormalization for saving, 
+downscaling did not preserve input pixel intensity range)
 - [ ] Working version for MNIST dataset
 
 ## Literature 

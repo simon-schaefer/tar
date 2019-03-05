@@ -17,6 +17,7 @@ if args.model_type == "TAD":
 else: 
    trainer = _sr_.trainer._Trainer_(args, loader, model, loss, ckp)
    
+_sr_.miscellaneous.print_header()
 while ckp.ready and not trainer.terminate(): 
     trainer.train()
     trainer.test()

@@ -84,11 +84,11 @@ class _Checkpoint_(object):
             plt.close(fig)
         
     def save_results(self, save_list: List[torch.Tensor], 
-                     filename: str, dataset, scale: int):
+                     filename: str, dataset, epoch: int, scale: int):
         if self.args.save_results:
             filename = self.get_path(
                 'results-{}'.format(dataset.dataset.name),
-                '{}_x{}_'.format(filename, scale)
+                '{}_{}_x{}_'.format(epoch, filename, scale)
             )
             postfix = ('SR', 'LR', 'HR')
             for v, p in zip(save_list, postfix):
@@ -196,15 +196,13 @@ def progress_bar(iteration: int, num_steps: int, bar_length: int=50) -> int:
     sys.stdout.flush()
     return iteration + 1
 
-def calc_psnr(x: torch.Tensor, y: torch.Tensor, scale: int, rgb_range: float) -> float:
+def calc_psnr(x: torch.Tensor, y: torch.Tensor, rgb_range: float) -> float:
     ''' Determine peak signal to noise ratio between to tensors 
-    (mostly images, given as torch tensors), based on scale. '''
+    (mostly images, given as torch tensors), according to the formula in 
+    https://www.mathworks.com/help/vision/ref/psnr.html. '''
     if x.nelement() == 1: return 0
-    diff = (x - y) / rgb_range
-    shave = scale + 6
-    valid = diff[..., shave:-shave, shave:-shave]
-    mse = valid.pow(2).mean()
-    return -10 * math.log10(mse)
+    mse = torch.dist(x, y, 2).pow(2).mean()
+    return 10 * math.log10(rgb_range**2/mse)
 
 def discretize(img: torch.Tensor, rgb_range: float, normalized: bool) -> torch.Tensor:
     ''' Discretize image (given as torch tensor) in defined range of

@@ -106,12 +106,12 @@ class _Trainer_(object):
                 )
                 save_list = [hr_out]
                 self.ckp.log[-1, idx_data] += misc.calc_psnr(
-                    hr_out, hr, self.scale, self.args.rgb_range
+                    hr_out, hr, self.args.rgb_range
                 )
                 if self.args.save_gt:
                     save_list.extend([lr, hr])
                 if self.args.save_results:
-                    self.ckp.save_results(save_list, filename[0], d, self.scale)
+                    self.ckp.save_results(save_list, filename[0], d, epoch, self.scale)
             self.ckp.log[-1, idx_data] /= len(d)
             best = self.ckp.log.max(0)
             self.ckp.write_log(
