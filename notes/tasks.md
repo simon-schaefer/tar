@@ -4,6 +4,7 @@
 - [x] Access Biwi clusters and do simple calculation (prime numbers)
 - [x] Install CUDA on remote machine (https://git.ee.ethz.ch/baumgach/biwi_tensorflow_setup_instructions/tree/master) -> Solve CUDA problem
 - [x] Install and execute torch training on cluster (https://git.ee.ethz.ch/baumgach/biwi_tensorflow_setup_instructions/tree/master)
+- [ ] Fix CUDA problem for qsub executions  
 
 ## Knowledgebase
 - [x] Read papers about image super resolution in general

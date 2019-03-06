@@ -100,7 +100,8 @@ class _Resblock_(nn.Module):
 
 class _ReversePixelShuffle_(nn.Module): 
     ''' Reverse pixel shuffeling module, i.e. rearranges elements in a tensor 
-    of shape (*, C, H*r, W*r) to (*, C*r^2, H, W). '''
+    of shape (*, C, H*r, W*r) to (*, C*r^2, H, W). Inverse implementation according
+    to https://pytorch.org/docs/0.3.1/_modules/torch/nn/functional.html#pixel_shuffle. '''
 
     __constants__ = ['downscale_factor']
 
@@ -109,6 +110,8 @@ class _ReversePixelShuffle_(nn.Module):
         self.downscale_factor = downscale_factor
 
     def forward(self, input):
+        _, c, h, w = input.shape
+        assert all([x % self.downscale_factor == 0 for x in [h, w]])
         return self.inv_pixel_shuffle(input, self.downscale_factor)
 
     def extra_repr(self):
@@ -122,7 +125,7 @@ class _ReversePixelShuffle_(nn.Module):
         width //= downscale_factor
         # Reshape input to new shape. 
         input_view = input.contiguous().view(
-            batch_size, in_channels, downscale_factor, downscale_factor,
-            height, width)
-        shuffle_out = input_view.permute(0, 1, 4, 2, 5, 3).contiguous() 
+            batch_size, in_channels, height, downscale_factor, 
+            width, downscale_factor)    
+        shuffle_out = input_view.permute(0,1,3,5,2,4).contiguous()
         return shuffle_out.view(batch_size, out_channels, height, width)
