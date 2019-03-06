@@ -108,7 +108,7 @@ class _Loss_(nn.modules.loss._Loss):
         # containing the sum of all "sub-losses". 
         self.loss.append({"desc": "TOTAL", "weight": 0.0, "function": None})
         # Load loss function to given device. 
-        self.n_gpus = torch.cuda.device_count()
+        self.n_gpus = args.n_gpus
         device = torch.device("cpu" if args.cpu else "cuda")
         self.loss_module.to(device)
         if not args.cpu and self.n_gpus > 1:
@@ -184,15 +184,22 @@ class _Loss_(nn.modules.loss._Loss):
             log.append('[{}: {:.4f}]'.format(l['desc'], c / n_samples))
         return "".join(log)
 
-    def plot_loss(self, directory: str, epoch: int):
+    def get_total_loss(self) -> float: 
+        return self.log[-1, -1]
+
+    def plot_loss(self, directory: str, epoch: int, threshold: float=1e3):
         ''' Plot loss curves of every internal loss function and store
-        the resulting figure in given directory. '''
+        the resulting figure in given directory. To avoid badly scaled 
+        loss plots the values are thresholded, i.e. every loss above the 
+        threshold value is set to the threshold value. '''
         axis = np.linspace(1, epoch, epoch)
         for i, l in enumerate(self.loss):
             label = l["desc"]
             fig = plt.figure()
             plt.title(label)
-            plt.plot(axis, self.log[:, i].numpy(), label=label)
+            losses = self.log[:, i].numpy()
+            losses[losses > threshold] = threshold
+            plt.plot(axis, losses, label=label)
             plt.legend()
             plt.xlabel('Epochs')
             plt.ylabel('Loss')

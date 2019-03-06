@@ -26,7 +26,7 @@ class _Model_(nn.Module):
         self.scale = args.scale
         self.cpu = args.cpu
         self.device = torch.device('cpu' if args.cpu else 'cuda')
-        self.n_gpus = torch.cuda.device_count()
+        self.n_gpus = args.n_gpus
         self.save_models = args.save_models
         module = importlib.import_module('models.' + args.model.lower())
         self.model = module.build_net().to(self.device)

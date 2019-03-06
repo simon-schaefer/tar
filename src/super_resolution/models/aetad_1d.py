@@ -45,18 +45,18 @@ class AETAD_1D(nn.Module):
         x = self._res_en1.forward(x)                                # b, 64, p/2, p/2 
         x = self._res_en2.forward(x)                                # b, 64, p/2, p/2 
         x = self._res_en3.forward(x)                                # b, 64, p/2, p/2 
-        x = self._conv_en1.forward(x)                               # b, 64, p/2, p/2 
+        x = self._conv_en1(x)                                       # b, 64, p/2, p/2 
         x = torch.add(residual, x)                                  # b, 64, p/2, p/2   
-        x = self._conv_en2.forward(x)                               # b, 1, p/2, p/2
+        x = self._conv_en2(x)                                       # b, 1, p/2, p/2
         return x                                                    
     
     def decode(self, x: torch.Tensor) -> torch.Tensor: 
-        x = self._conv_de1.forward(x)                               # b, 64, p/2, p/2
+        x = self._conv_de1(x)                                       # b, 64, p/2, p/2
         residual = x
         x = self._res_de1.forward(x)                                # b, 64, p/2, p/2 
         x = self._res_de2.forward(x)                                # b, 64, p/2, p/2 
         x = self._res_de3.forward(x)                                # b, 64, p/2, p/2 
-        x = self._conv_de2.forward(x)                               # b, 64, p/2, p/2 
+        x = self._conv_de2(x)                                       # b, 64, p/2, p/2 
         x = torch.add(residual, x)                                  # b, 64, p/2, p/2
         x = self._upscaling(x)                                      # b, 1, p, p
         return x

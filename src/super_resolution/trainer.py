@@ -7,6 +7,7 @@
 import argparse
 import os
 import math
+from typing import List
 
 import torch
 
@@ -78,7 +79,7 @@ class _Trainer_(object):
         # Finalizing - Save error and logging. 
         self.loss.end_log(len(self.loader_train))
         self.error_last = self.loss.log[-1, -1]
-        print("... finalizing epoch {}.".format(epoch))
+        print("... epoch {} with train loss {}".format(epoch, self.error_last))
 
     # =========================================================================
     # Testing
@@ -91,36 +92,43 @@ class _Trainer_(object):
         epoch = self.optimizer.get_last_epoch() + 1
         self.ckp.write_log('\nEvaluation:')
         self.ckp.add_log(
-            torch.zeros(1, len(self.loader_test))
+            torch.zeros(1, len(self.loader_test), 2)
         )
         self.model.eval()
         # Iterate over every testing dataset. 
         timer_test = misc._Timer_()
         if self.args.save_results: self.ckp.begin_background()
-        for idx_data, d in enumerate(self.loader_test):
+        for di, d in enumerate(self.loader_test):
+            # Determining PSNR and save example images. 
             for lr, hr, filename in d:
                 lr, hr = self.prepare(lr, hr)
-                hr_out = self.model(hr)
-                hr_out = misc.discretize(
-                    hr_out, self.args.rgb_range, not self.args.no_normalize
-                )
-                save_list = [hr_out]
-                self.ckp.log[-1, idx_data] += misc.calc_psnr(
-                    hr_out, hr, self.args.rgb_range
-                )
+                save_list = self.saving_core(lr, hr, di)
                 if self.args.save_gt:
                     save_list.extend([lr, hr])
                 if self.args.save_results:
-                    self.ckp.save_results(save_list, filename[0], d, epoch, self.scale)
-            self.ckp.log[-1, idx_data] /= len(d)
-            best = self.ckp.log.max(0)
+                    self.ckp.save_results(save_list, filename[0], d, self.scale)
+            # Logging LR PSNR values. 
+            self.ckp.log[-1, di, 1] /= len(d)
+            best = self.ckp.log[:,:,1].max(0)
             self.ckp.write_log(
-                '[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})'.format(
+                "LR\t[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})".format(
                     d.dataset.name,
                     self.scale,
-                    self.ckp.log[-1, idx_data],
-                    best[0][idx_data],
-                    best[1][idx_data] + 1
+                    self.ckp.log[-1, di, 1],
+                    best[0][di],
+                    best[1][di] + 1
+                )
+            )
+            # Logging HR PSNR values. 
+            self.ckp.log[-1, di, 0] /= len(d)
+            best = self.ckp.log[:,:,0].max(0)
+            self.ckp.write_log(
+                "HR\t[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})".format(
+                    d.dataset.name,
+                    self.scale,
+                    self.ckp.log[-1, di, 0],
+                    best[0][di],
+                    best[1][di] + 1
                 )
             )
         # Finalizing - Saving and logging. 
@@ -140,6 +148,17 @@ class _Trainer_(object):
         loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out}
         loss = self.loss(loss_kwargs)
         return loss
+
+    def saving_core(self, lr: torch.Tensor, hr: torch.Tensor, 
+                    di: int) -> List[torch.Tensor]: 
+        hr_out = self.model(hr)
+        hr_out = misc.discretize(
+            hr_out, self.args.rgb_range, not self.args.no_normalize
+        )
+        self.ckp.log[-1, di, 0] += misc.calc_psnr(
+            hr_out, hr, self.args.rgb_range
+        )
+        return [hr_out]
 
     def prepare(self, *kwargs):
         device = torch.device('cpu' if self.args.cpu else 'cuda')
@@ -173,9 +192,27 @@ class _Trainer_TAD_(_Trainer_):
     
     def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor) -> optimization._Loss_: 
         lr_out = self.model.model.encode(hr)
+        lr_out = lr_out + lr
+        lr_out = misc.discretize(
+            lr_out, self.args.rgb_range, not self.args.no_normalize
+        )
         hr_out = self.model.model.decode(lr_out)
         loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out, 'LR_GT': lr, 'LR_OUT': lr_out}
         loss = self.loss(loss_kwargs)
         return loss  
+
+    def saving_core(self, lr: torch.Tensor, hr: torch.Tensor, 
+                    di: int) -> List[torch.Tensor]: 
+        save_list = super(_Trainer_TAD_, self).saving_core(lr, hr, di)
+        lr_out = self.model.model.encode(hr)
+        lr_out = torch.add(lr_out, lr)
+        lr_out = misc.discretize(
+            lr_out, self.args.rgb_range, not self.args.no_normalize
+        )
+        self.ckp.log[-1, di, 1] += misc.calc_psnr(
+            lr_out, lr, self.args.rgb_range
+        )
+        save_list.extend([lr_out])
+        return save_list
 
 

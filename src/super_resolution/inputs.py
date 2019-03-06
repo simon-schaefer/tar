@@ -18,6 +18,8 @@ parser.add_argument("--n_threads", type=int, default=6,
                     help="number of threads for data loading")
 parser.add_argument("--cpu", action="store_true",
                     help="use cpu only (default=False)")
+parser.add_argument("--n_gpus", type=int, default=1, 
+                    help="number of GPUs (unblocked device_count gives error)")
 parser.add_argument("--seed", type=int, default=1,
                     help="random seed")
 
@@ -66,7 +68,7 @@ parser.add_argument("--reset", action="store_true",
                     help="reset the training (default=False)")
 parser.add_argument("--test_every", type=int, default=1000,
                     help="do test per every N batches")
-parser.add_argument("--epochs", type=int, default=300,
+parser.add_argument("--epochs", type=int, default=1000,
                     help="number of epochs to train")
 parser.add_argument("--batch_size", type=int, default=6,
                     help="input batch size for training")
@@ -76,11 +78,11 @@ parser.add_argument("--test_only", action="store_true",
 # =============================================================================
 # Optimization specifications.
 # =============================================================================
-parser.add_argument("--lr", type=float, default=1e-2,
+parser.add_argument("--lr", type=float, default=1e-3,
                     help="learning rate")
 parser.add_argument("--decay", type=str, default="100",
                     help="learning rate decay type")
-parser.add_argument("--gamma", type=float, default=0.9,
+parser.add_argument("--gamma", type=float, default=0.6,
                     help="learning rate decay factor for step decay")
 parser.add_argument("--optimizer", default="ADAM",
                     choices=("ADAM"),

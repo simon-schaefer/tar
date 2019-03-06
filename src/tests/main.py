@@ -165,13 +165,9 @@ class ModulesTest(unittest.TestCase):
         model = self.PixelShuffle_Forward_Backward(factor=2)
         x = torch.arange(4).view(1,1,2,2)
         y = model(x)
-        print(x)
-        print(y)
         assert torch.all(torch.eq(x, y))
         x = torch.arange(16).view(1,1,4,4)
         y = model(x)
-        print(x)
-        print(y)
         assert torch.all(torch.eq(x, y))
 
 

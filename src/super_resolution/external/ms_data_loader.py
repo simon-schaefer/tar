@@ -163,7 +163,7 @@ class MSDataLoader(DataLoader):
             worker_init_fn=worker_init_fn
         )
 
-        self.scale = args.scale
+        self.scale  = args.scale
 
     def __iter__(self):
         return _MSDataLoaderIter(self)

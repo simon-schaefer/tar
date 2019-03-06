@@ -70,27 +70,36 @@ class _Checkpoint_(object):
         torch.save(self.log, self.get_path('psnr_log.pt'))
         # Plot peak signal-to-noise ratio (PSNR) plot. 
         axis = np.linspace(1, epoch, epoch)
-        for idx_data, d in enumerate(self.args.data_test):
-            label = 'SR on {}'.format(d)
+        labels = ("HR", "LR")
+        for id, d in enumerate(self.args.data_test):
             fig = plt.figure()
+            label = "PSNR on {}".format(d)
             plt.title(label)
-            plt.plot(axis,self.log[:, 0].numpy(),
-                     label='Scale {}'.format(self.args.scale))
+            for i in range(self.log.shape[2]):             
+                plt.plot(axis,self.log[:, id, i].numpy(),
+                        label="{}: scale {}".format(labels[i], self.args.scale))
             plt.legend()
             plt.xlabel('Epochs')
             plt.ylabel('PSNR')
             plt.grid(True)
-            plt.savefig(self.get_path('test_{}.pdf'.format(d)))
+            plt.savefig(self.get_path("test_{}.pdf".format(d)))
             plt.close(fig)
         
     def save_results(self, save_list: List[torch.Tensor], 
-                     filename: str, dataset, epoch: int, scale: int):
+                     filename: str, dataset, scale: int):
         if self.args.save_results:
             filename = self.get_path(
                 'results-{}'.format(dataset.dataset.name),
-                '{}_{}_x{}_'.format(epoch, filename, scale)
+                '{}_x{}_'.format(filename, scale)
             )
-            postfix = ('SR', 'LR', 'HR')
+            if len(save_list) == 2: 
+                postfix = ('SHR', 'LR')
+            elif len(save_list) == 3: 
+                postfix = ('SHR', 'LR', 'HR')
+            elif len(save_list) == 4: 
+                postfix = ('SHR', 'SLR', 'LR', 'HR')
+            else: 
+                raise ValueError("Invalid number of savable images !")
             for v, p in zip(save_list, postfix):
                 normalized = v[0]
                 if not self.args.no_normalize: 
