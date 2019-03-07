@@ -1,19 +1,20 @@
 #!/bin/bash
 
+export SR_PROJECT_NAME="super_resolution"
+
+export SR_PROJECT_HOME="/scratch_net/biwidl211/sischaef"
+export SR_PROJECT_PROJECT_HOME="$SR_PROJECT_HOME/$SR_PROJECT_NAME"
+export SR_PROJECT_SCRIPTS_PATH="$SR_PROJECT_PROJECT_HOME/scripts"
+export SR_PROJECT_DATA_PATH="$SR_PROJECT_HOME/data"
+export SR_PROJECT_OUTS_PATH="$SR_PROJECT_HOME/outs"
+export SR_PROJECT_VIRTUAL_ENV_PATH="$SR_PROJECT_HOME/venv"
+
 # Source environment (create env. variables).
-REAL_PATH="$(cd "$(dirname "$BASH_SOURCE")"; pwd)/$(basename "$BASH_SOURCE")"
-REAL_PATH=`dirname "$REAL_PATH"`
-source "$REAL_PATH/parameters.bash"
 source "$SR_PROJECT_SCRIPTS_PATH/header.bash"
 
 # Setting for BIWI clusters. 
 echo $'\nBuilding BIWI cluster environment ...'
 source /home/sgeadmin/BIWICELL/common/settings.sh
-# Setting for CUDA. 
-echo "Building CUDA environment ..."
-CUDA_HOME=$SR_PROJECT_HOME/cuda-9.0
-export PATH=$CUDA_HOME/bin:$PATH
-export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 
 # Local language settings (suppressing local language error). 
 if [ ! -z "$LANGUAGE" ]
@@ -31,6 +32,12 @@ git fetch
 git pull --rebase
 
 # Login to virtual environment.
+cd $SR_PROJECT_HOME
+if [ ! -d "venv" ]; then
+    echo "Creating virtual environment ..."
+    mkdir venv
+    virtualenv -p python3 venv
+fi
 echo "Sourcing virtual environment ..."
 source $SR_PROJECT_VIRTUAL_ENV_PATH/bin/activate
 

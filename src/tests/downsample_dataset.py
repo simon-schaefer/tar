@@ -46,7 +46,7 @@ directory_out = directory.split("/")[-2].replace("HR", "LR_bicubic")
 directory_out = os.path.dirname(directory[:-1]) + "/" + directory_out
 os.makedirs(directory_out, exist_ok=True)
 print("Starting downscaling to {} ...".format(directory_out))
-image_files = glob.iglob(directory + "*.png")
+image_files = glob.glob(directory + "*.png")
 num_files   = len(image_files)
 for i, filepath in enumerate(image_files):
     hr = imageio.imread(filepath)
