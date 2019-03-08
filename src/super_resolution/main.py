@@ -5,6 +5,7 @@
 # Description : Main function for superresolution.
 # =============================================================================
 import super_resolution as _sr_
+import torch
 
 args    = _sr_.inputs.args
 ckp     = _sr_.miscellaneous._Checkpoint_(args)
@@ -18,6 +19,8 @@ else:
    trainer = _sr_.trainer._Trainer_(args, loader, model, loss, ckp)
    
 _sr_.miscellaneous.print_header()
+device = torch.device('cpu' if args.cpu else args.cuda_device)
+ckp.write_log("Machine: {}".format(torch.cuda.get_device_name(None)))
 while ckp.ready and not trainer.terminate(): 
     trainer.train()
     trainer.test()

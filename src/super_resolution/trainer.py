@@ -161,8 +161,12 @@ class _Trainer_(object):
         return [hr_out]
 
     def prepare(self, *kwargs):
-        device = torch.device('cpu' if self.args.cpu else 'cuda')
-        return [x.to(device) for x in kwargs]
+        device = torch.device('cpu' if self.args.cpu else self.args.cuda_device)
+
+        def _prepare(tensor):
+            if self.args.precision == 'half': tensor = tensor.half()
+            return tensor.to(device)
+        return [_prepare(a) for a in kwargs]
 
     def terminate(self):
         if self.args.test_only:

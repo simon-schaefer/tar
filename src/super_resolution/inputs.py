@@ -18,6 +18,8 @@ parser.add_argument("--n_threads", type=int, default=6,
                     help="number of threads for data loading")
 parser.add_argument("--cpu", action="store_true",
                     help="use cpu only (default=False)")
+parser.add_argument("--cuda_device", type=str, default="cuda:0", 
+                    help="index name of used GPU")
 parser.add_argument("--n_gpus", type=int, default=1, 
                     help="number of GPUs (unblocked device_count gives error)")
 parser.add_argument("--seed", type=int, default=1,
@@ -74,6 +76,9 @@ parser.add_argument("--batch_size", type=int, default=6,
                     help="input batch size for training")
 parser.add_argument("--test_only", action="store_true",
                     help="set this option to test the model (default=False)")
+parser.add_argument("--precision", type=str, default="single",
+                    choices=("single", "half"),
+                    help="floating point precision(single | half)")
 
 # =============================================================================
 # Optimization specifications.

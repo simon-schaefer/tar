@@ -109,8 +109,10 @@ class _Loss_(nn.modules.loss._Loss):
         self.loss.append({"desc": "TOTAL", "weight": 0.0, "function": None})
         # Load loss function to given device. 
         self.n_gpus = args.n_gpus
-        device = torch.device("cpu" if args.cpu else "cuda")
+        device = torch.device("cpu" if args.cpu else args.cuda_device)
         self.loss_module.to(device)
+        if args.precision == "half": 
+            self.loss_module.half()
         if not args.cpu and self.n_gpus > 1:
             self.loss_module = nn.DataParallel(
                 self.loss_module, range(self.n_GPUs)
