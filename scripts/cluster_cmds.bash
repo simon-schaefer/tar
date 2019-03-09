@@ -9,8 +9,10 @@ grep -h $(whoami) /tmp/lock-gpu*/info.txt
 # Queue information. 
 qstat
 
-# Background calculation. 
-screen
+# Background calculation (https://www.rackaid.com/blog/linux-screen-tutorial-and-how-to/). 
+screen              # start session (CRTL+A+D to detach). 
+screen -ls          # list running sessions. 
+screen -r "id"      # reattach session. 
 
 ### Example Jobs ####
 # bash scripts/job_submission.bash src/super_resolution/main.py --template IM_AE_TAD_MNIST --no_augment

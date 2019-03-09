@@ -70,7 +70,7 @@ parser.add_argument("--reset", action="store_true",
                     help="reset the training (default=False)")
 parser.add_argument("--test_every", type=int, default=1000,
                     help="do test per every N batches")
-parser.add_argument("--epochs", type=int, default=1000,
+parser.add_argument("--epochs", type=int, default=3000,
                     help="number of epochs to train")
 parser.add_argument("--batch_size", type=int, default=6,
                     help="input batch size for training")
@@ -141,6 +141,18 @@ def set_template(args):
         args.data_test  = "MNIST"
         args.n_colors   = 1
         args.patch_size = 28
+        args.loss       = "HR*1*L1+LR*1*L1"
+
+    if args.template.find("IM_AE_TAD_DIV2K") >= 0:
+        args.model      = "AETAD_3D"
+        args.model_type = "TAD"
+        args.scale      = 2
+        args.optimizer  = "ADAM"
+        args.batch_size = 6
+        args.data_train = "DIV2K"
+        args.data_test  = "DIV2K"
+        args.n_colors   = 3
+        args.patch_size = 96
         args.loss       = "HR*1*L1+LR*1*L1"
 
     if args.template.find("IM_AE_TEST") >= 0:
