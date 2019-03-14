@@ -7,7 +7,6 @@
 import argparse
 import os
 import math
-import sys
 from typing import List
 
 import torch
@@ -55,13 +54,9 @@ class _Trainer_(object):
         self.model.train()
         # Iterate over all batches in epoch. 
         timer_data, timer_model = misc._Timer_(), misc._Timer_()
-        data_size = 0.0
         for batch, (lr, hr, _) in enumerate(self.loader_train):
             # Load images. 
             lr, hr = self.prepare(lr, hr)
-            
-            data_size += float(sys.getsizeof(lr)) + float(sys.getsizeof(hr))
-
             timer_data.hold()
             timer_model.tic()
             # Optimization core. 
@@ -80,7 +75,6 @@ class _Trainer_(object):
                     self.loss.display_loss(batch),
                     timer_model.release(),
                     timer_data.release()))
-                print("Storage yet: {}".format(data_size/10**6))
             timer_data.tic()
         # Finalizing - Save error and logging. 
         self.loss.end_log(len(self.loader_train))
@@ -101,13 +95,16 @@ class _Trainer_(object):
             torch.zeros(1, len(self.loader_test), 2)
         )
         self.model.eval()
+        print("after evaluation")
         # Iterate over every testing dataset. 
         timer_test = misc._Timer_()
         if self.args.save_results: self.ckp.begin_background()
+        print("after begin background")
         for di, d in enumerate(self.loader_test):
             # Determining PSNR and save example images. 
             for lr, hr, filename in d:
                 lr, hr = self.prepare(lr, hr)
+                print("after preparation")
                 save_list = self.saving_core(lr, hr, di)
                 if self.args.save_gt:
                     save_list.extend([lr, hr])

@@ -157,6 +157,18 @@ def set_template(args):
         args.patch_size = 96
         args.loss       = "HR*1*L1+LR*1*L1"
 
+    if args.template.find("IM_AE_TAD_DIV2K_SMALL") >= 0:
+        args.model      = "AETAD_3D_SMALL"
+        args.model_type = "TAD"
+        args.scale      = 2
+        args.optimizer  = "ADAM"
+        args.batch_size = 6
+        args.data_train = "DIV2K"
+        args.data_test  = "DIV2K"
+        args.n_colors   = 3
+        args.patch_size = 24
+        args.loss       = "HR*1*L1+LR*1*L1"
+
     if args.template.find("IM_AE_TEST") >= 0:
         args.model      = "AETRIAL_NOSR"
         args.scale      = 1

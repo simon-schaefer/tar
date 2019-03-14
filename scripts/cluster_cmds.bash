@@ -15,6 +15,7 @@ screen -ls          # list running sessions.
 screen -r "id"      # reattach session. 
 
 ### Example Jobs ####
+# src/super_resolution/main.py --template IM_AE_TAD_DIV2K_SMALL --no_augment --verbose --print_every 10
 # src/super_resolution/main.py --template IM_AE_TAD_DIV2K --no_augment --verbose --print_every 10
 # src/super_resolution/main.py --template IM_AE_TAD_MNIST --no_augment
 # src/super_resolution/main.py --template IM_AE_TAD_MNIST --data_range "1-20/21-25" --no_augment

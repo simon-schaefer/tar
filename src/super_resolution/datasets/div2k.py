@@ -16,6 +16,9 @@ class DIV2K(_Dataset_):
         names_hr, names_lr = super(DIV2K, self)._scan()
         names_hr = names_hr[self.begin:self.end]
         names_lr = names_lr[self.begin:self.end]
+        print("DIV2D")
+        print(self.begin, self.end)
+        print(len(names_hr), len(names_lr))
         return names_hr, names_lr
 
     def _set_filesystem(self, dir_data):
