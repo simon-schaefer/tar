@@ -2,7 +2,7 @@
 
 export SR_PROJECT_NAME="super_resolution"
 
-export SR_PROJECT_HOME="/scratch_net/biwidl211/sischaef"
+export SR_PROJECT_HOME="/scratch_net/biwidl215/sischaef"
 export SR_PROJECT_PROJECT_HOME="$SR_PROJECT_HOME/$SR_PROJECT_NAME"
 export SR_PROJECT_SCRIPTS_PATH="$SR_PROJECT_PROJECT_HOME/scripts"
 export SR_PROJECT_DATA_PATH="$SR_PROJECT_HOME/data"

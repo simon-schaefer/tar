@@ -1,4 +1,4 @@
 #!/bin/bash
 
 # Login to remote computer. 
-ssh sischaef@biwidl211
+ssh sischaef@biwidl215
