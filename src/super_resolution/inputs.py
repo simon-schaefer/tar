@@ -141,7 +141,7 @@ def set_template(args):
         args.data_test  = "MNIST"
         args.n_colors   = 1
         args.patch_size = 28
-        args.loss       = "HR*1*L1+LR*1*L1"
+        args.loss       = "HR*10*L1+LR*1*L1"
 
     if args.template.find("IM_AE_TAD_DIV2K") >= 0:
         args.model      = "AETAD_3D"
