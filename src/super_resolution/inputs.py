@@ -34,7 +34,7 @@ parser.add_argument("--dir_data", type=str, default=os.environ["SR_PROJECT_DATA_
                     help="dataset directory")
 parser.add_argument("--data_train", type=str, default="DIV2K",
                     choices=("DIV2K", "MNIST"), 
-                    help="training datasets name i.e. either str or list")
+                    help="training dataset name (= 1 dataset!)")
 parser.add_argument("--data_test", type=str, default="DIV2K", 
                     choices=("DIV2K", "MNIST"), 
                     help="testing datasets name i.e. either str or list")
@@ -70,8 +70,6 @@ parser.add_argument("--model_type", type=str, default="",
 # =============================================================================
 parser.add_argument("--reset", action="store_true",
                     help="reset the training (default=False)")
-parser.add_argument("--test_every", type=int, default=1000,
-                    help="do test per every N batches")
 parser.add_argument("--epochs", type=int, default=3000,
                     help="number of epochs to train")
 parser.add_argument("--batch_size", type=int, default=6,

@@ -16,8 +16,6 @@ from typing import List, Tuple
 
 import torch
 
-from super_resolution.external import ms_data_loader as ms_loader
-
 # =============================================================================
 # DATASET EXTENSION. 
 # =============================================================================
@@ -46,10 +44,6 @@ class _Dataset_(torch.utils.data.Dataset):
             self.images_hr, self.images_lr = list_hr, list_lr
         else: 
             raise ValueError("Invalid file extension %s !" % str(args.ext))
-        if train:
-            n_patches = args.batch_size * args.test_every
-            n_images = len(args.data_train) * len(self.images_hr)
-            self.repeat = 0 if (n_images == 0) else max(n_patches // n_images, 1)
 
     # =========================================================================
     # Handling the filesystem 
@@ -176,10 +170,7 @@ class _Dataset_(torch.utils.data.Dataset):
     # Miscellaneous
     # =========================================================================
     def __len__(self) -> int:
-        if self.train:
-            return len(self.images_hr) * self.repeat
-        else:
-            return len(self.images_hr)
+        return len(self.images_hr)
 
     def _get_index(self, idx: int) -> int:
         if self.train:
@@ -201,29 +192,17 @@ class _Data_(object):
         # from each dataset (due to comparability reasons) the testing 
         # datasets are each loaded individually. 
         self.loader_test = []
-        datasets = []
         if type(args.data_test) == str: 
             args.data_test = [args.data_test]
         for dataset in args.data_test:
             testset = self.load_dataset(args, dataset, train=False)
-            self.loader_test.append(ms_loader.MSDataLoader(
-                args, testset,
-                batch_size=1, shuffle=False, pin_memory=not args.cpu
-            ))
+            self.loader_test.append(testset)
         if args.test_only:
             return
         # Load training dataset, if not testing only. For training several
         # datasets are trained in one process and therefore, each given 
         # training dataset is concatinated to one large dataset. 
-        self.loader_train = None
-        if type(args.data_train) == str: 
-            args.data_train = [args.data_train]
-        for dataset in args.data_train:
-            datasets.append(self.load_dataset(args, dataset, train=True))
-        self.loader_train = ms_loader.MSDataLoader(
-            args, ms_loader.MSConcatDataset(datasets),
-            batch_size=args.batch_size, shuffle=True, pin_memory=not args.cpu
-        )
+        self.loader_train = self.load_dataset(args, dataset, train=True)
 
     @staticmethod 
     def load_dataset(args: argparse.Namespace, name: str, train: bool) -> _Dataset_: 
