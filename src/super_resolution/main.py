@@ -7,6 +7,7 @@
 import super_resolution as _sr_
 import torch
 
+_sr_.miscellaneous.print_header()
 args    = _sr_.inputs.args
 ckp     = _sr_.miscellaneous._Checkpoint_(args)
 loader  = _sr_.dataloader._Data_(args)
@@ -18,7 +19,6 @@ if args.model_type == "TAD":
 else: 
    trainer = _sr_.trainer._Trainer_(args, loader, model, loss, ckp)
    
-_sr_.miscellaneous.print_header()
 device = torch.device('cpu' if args.cpu else args.cuda_device)
 ckp.write_log("Machine: {}".format(torch.cuda.get_device_name(None)))
 while ckp.ready and not trainer.terminate(): 

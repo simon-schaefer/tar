@@ -7,6 +7,7 @@
 import argparse
 import os
 import math
+import sys
 from typing import List
 
 import torch
@@ -54,9 +55,13 @@ class _Trainer_(object):
         self.model.train()
         # Iterate over all batches in epoch. 
         timer_data, timer_model = misc._Timer_(), misc._Timer_()
+        data_size = 0.0
         for batch, (lr, hr, _) in enumerate(self.loader_train):
             # Load images. 
             lr, hr = self.prepare(lr, hr)
+            
+            data_size += float(sys.getsizeof(lr)) + float(sys.getsizeof(hr))
+
             timer_data.hold()
             timer_model.tic()
             # Optimization core. 
@@ -75,6 +80,7 @@ class _Trainer_(object):
                     self.loss.display_loss(batch),
                     timer_model.release(),
                     timer_data.release()))
+                print("Storage yet: {}".format(data_size/10**6))
             timer_data.tic()
         # Finalizing - Save error and logging. 
         self.loss.end_log(len(self.loader_train))

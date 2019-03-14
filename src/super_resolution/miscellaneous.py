@@ -121,6 +121,7 @@ class _Checkpoint_(object):
         if refresh:
             self.log_file.close()
             self.log_file = open(self.get_path('log.txt'), 'a')
+        if self.args.verbose: print(log)
 
     def done(self):
         self.ready = False

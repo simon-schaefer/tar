@@ -9,7 +9,9 @@ import os
 
 parser = argparse.ArgumentParser(description="super_resolution")
 parser.add_argument("--template", default=".",
-                    help="You can set various templates in option.py")
+                    help="set various templates in option.py")
+parser.add_argument("--verbose", action="store_true",
+                    help="print in log file and terminal")
 
 # =============================================================================
 # Hardware specifications.  
