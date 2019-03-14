@@ -14,16 +14,20 @@ import random
 import skimage.color as sc
 from typing import List, Tuple
 
-import torch
+from torch import from_numpy, Tensor
+from torch.utils.data import Dataset, DataLoader
 
 # =============================================================================
 # DATASET EXTENSION. 
 # =============================================================================
-class _Dataset_(torch.utils.data.Dataset):
+class _Dataset_(Dataset):
     ''' Extension class for torch dataset module, in order to find, search, 
     load, preprocess and batch data from datasets. '''
 
     def __init__(self, args: argparse.Namespace, name: str="", train: bool=True):
+        # Initialize super dataset class. 
+        super(_Dataset_, self).__init__()
+        # Set input parameters. 
         self.args = args
         self.name = name
         self.train = train
@@ -102,7 +106,7 @@ class _Dataset_(torch.utils.data.Dataset):
     # =========================================================================
     # Getter for images
     # =========================================================================
-    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor, str]:
+    def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor, str]:
         # Load image file. 
         lr, hr, filename = self._load_file(idx)
         # Cut patches from file. 
@@ -157,9 +161,9 @@ class _Dataset_(torch.utils.data.Dataset):
 
         pair = [_set_channel(x, n_channels=self.args.n_colors) for x in pair]
         # Convert to torch tensor and return. 
-        def _np2Tensor(img, rgb_range=255) -> torch.Tensor:
+        def _np2Tensor(img, rgb_range=255) -> Tensor:
             np_transpose = np.ascontiguousarray(img.transpose((2, 0, 1)))
-            tensor = torch.from_numpy(np_transpose).float()
+            tensor = from_numpy(np_transpose).float()
             tensor.mul_(rgb_range / 255)
             return tensor
 
@@ -181,6 +185,19 @@ class _Dataset_(torch.utils.data.Dataset):
 # =============================================================================
 # DATA LOADING CLASS. 
 # =============================================================================
+class _DataLoader_(DataLoader): 
+
+    def __init__(self, dataset, args: argparse.Namespace): 
+        super(_DataLoader_, self).__init__(
+            dataset, 
+            batch_size=args.batch_size, 
+            shuffle=True, 
+            num_workers=args.n_threads
+        )
+
+# =============================================================================
+# DATA HANDLING CLASS. 
+# =============================================================================
 class _Data_(object):
     ''' Data loading class which allocates all given training and testing
     dataset stated in the input arguments to a loader (and concatenates 
@@ -196,13 +213,14 @@ class _Data_(object):
             args.data_test = [args.data_test]
         for dataset in args.data_test:
             testset = self.load_dataset(args, dataset, train=False)
-            self.loader_test.append(testset)
+            self.loader_test.append(_DataLoader_(testset, args))
         if args.test_only:
             return
         # Load training dataset, if not testing only. For training several
         # datasets are trained in one process and therefore, each given 
         # training dataset is concatinated to one large dataset. 
-        self.loader_train = self.load_dataset(args, dataset, train=True)
+        trainset = self.load_dataset(args, dataset, train=True)
+        self.loader_train = _DataLoader_(trainset, args)
 
     @staticmethod 
     def load_dataset(args: argparse.Namespace, name: str, train: bool) -> _Dataset_: 

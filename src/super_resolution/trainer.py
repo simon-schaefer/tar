@@ -95,16 +95,13 @@ class _Trainer_(object):
             torch.zeros(1, len(self.loader_test), 2)
         )
         self.model.eval()
-        print("after evaluation")
         # Iterate over every testing dataset. 
         timer_test = misc._Timer_()
         if self.args.save_results: self.ckp.begin_background()
-        print("after begin background")
         for di, d in enumerate(self.loader_test):
             # Determining PSNR and save example images. 
             for lr, hr, filename in d:
                 lr, hr = self.prepare(lr, hr)
-                print("after preparation")
                 save_list = self.saving_core(lr, hr, di)
                 if self.args.save_gt:
                     save_list.extend([lr, hr])
