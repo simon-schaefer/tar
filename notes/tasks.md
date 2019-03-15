@@ -2,8 +2,9 @@
 
 ## Biwi Clusters
 - [x] Access Biwi clusters and do simple calculation (prime numbers)
-- [x] Install CUDA on remote machine (https://git.ee.ethz.ch/baumgach/biwi_tensorflow_setup_instructions/tree/master) -> Solve CUDA problem
+- [x] Install CUDA (https://git.ee.ethz.ch/baumgach/biwi_tensorflow_setup_instructions/tree/master)
 - [x] Install and execute torch training on cluster (https://git.ee.ethz.ch/baumgach/biwi_tensorflow_setup_instructions/tree/master) 
+- [x] Install specific torch version as specified in BIWI wiki 
 
 ## Knowledgebase
 - [x] Read papers about image super resolution in general
@@ -21,7 +22,7 @@ automated saving and easy loading of previous training iterations, block-loss-fu
 - [x] Test implementation using MNIST dataset (errors: no denormalization for saving, 
 downscaling did not preserve input pixel intensity range)
 - [x] Working version for MNIST dataset (GPU training --> custom dataloader, num_workers=0 for test)
-- [ ] Training of TAD network on DIV2K dataset for scale=2
+- [ ] Training of TAD network on DIV2K dataset for scale=2 on small set (overfitting)
 
 ## Literature 
 - [Paper: Task-Aware Image Downscaling (Kyoung Mu Lee)](http://openaccess.thecvf.com/content_ECCV_2018/papers/Heewon_Kim_Task-Aware_Image_Downscaling_ECCV_2018_paper.pdf)

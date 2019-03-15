@@ -142,8 +142,8 @@ class _Trainer_(object):
                 )
             )
         # Finalizing - Saving and logging. 
-        self.ckp.write_log("Mean network applying time: {:.2f}s".format(
-            np.mean(net_applying_times)
+        self.ckp.write_log("Mean network applying time: {:.2f}ms".format(
+            np.mean(net_applying_times)*1000
         ))
         if save: self.ckp.end_background()
         if not self.args.test_only:
@@ -211,7 +211,7 @@ class _Trainer_TAD_(_Trainer_):
     
     def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor) -> optimization._Loss_: 
         lr_out = self.model.model.encode(hr)
-        lr_out = lr_out + lr
+        lr_out = torch.add(lr_out, lr)
         lr_out = misc.discretize(
             lr_out, self.args.rgb_range, not self.args.no_normalize
         )
