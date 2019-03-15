@@ -97,9 +97,9 @@ class _Trainer_(object):
         self.model.eval()
         # Iterate over every testing dataset. 
         timer_test = misc._Timer_()
-        save = self.args.save_results and self.test_iter%self.args.save_every == 0
+        save = self.args.save_results and self.test_iter%self.args.save_every==0
         self.ckp.write_log(
-            "Evaluation {}(saving results={}) ...".format(self.test_iter, save)
+            "\nEvaluation {}(saving results={}) ...".format(self.test_iter, save)
         )
         if save: self.ckp.begin_background()
         for di, d in enumerate(self.loader_test):
@@ -112,7 +112,7 @@ class _Trainer_(object):
                     if self.args.save_gt:
                         save_list.extend([lr, hr])
                     if self.args.save_results:
-                        self.ckp.save_results(save_list, filename[0], d, self.scale)
+                        self.ckp.save_results(save_list,filename[0],d,self.scale)
                 misc.progress_bar(i, num_test_samples)
             # Logging LR PSNR values. 
             self.ckp.log[-1, di, 1] /= len(d)

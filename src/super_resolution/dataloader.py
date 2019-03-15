@@ -108,6 +108,9 @@ class _Dataset_(Dataset):
     def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor, str]:
         # Load image file. 
         lr, hr, filename = self._load_file(idx)
+        print("shapes")
+        print(lr.shape)
+        print(hr.shape)
         # Cut patches from file. 
         def _get_patch(lr: np.ndarray, hr: np.ndarray, 
                        scale: int, patch_size: int, do_train: bool):
@@ -128,6 +131,8 @@ class _Dataset_(Dataset):
         patch_size = self.args.patch_size
         assert patch_size <= hr.shape[0] and patch_size <= hr.shape[1]
         pair = _get_patch(lr, hr, self.scale, patch_size, self.train)
+        print(pair[0].shape)
+        print(pair[1].shape)
         # Normalize patches from rgb_range to [-0.5, 0.5].  
         if not self.args.no_normalize: 
             def _normalize(image):
@@ -179,13 +184,20 @@ class _Dataset_(Dataset):
 # DATA LOADING CLASS. 
 # =============================================================================
 class _DataLoader_(DataLoader): 
+    ''' Pytorch data loader to load dataset with the following input arguments: 
+    - batch_size: number of samples in a batch
+    - shuffle: should the dataset be shuffled before loading ?
+    - num_workers:  how many subprocesses to use for data loading. 
+                    0 means that the data will be loaded in the main process.
+    - collate_fn: merges a list of samples to form a mini-batch. '''
 
-    def __init__(self, dataset, batch_size, num_workers): 
+    def __init__(self, dataset, batch_size, num_workers=0, collate_fn=False): 
         super(_DataLoader_, self).__init__(
             dataset, 
             batch_size=batch_size, 
             shuffle=True, 
             num_workers=num_workers, 
+            collate_fn=collate_fn,
         )
 
 # =============================================================================
@@ -206,14 +218,16 @@ class _Data_(object):
             args.data_test = [args.data_test]
         for dataset in args.data_test:
             testset = self.load_dataset(args, dataset, train=False)
-            self.loader_test.append(_DataLoader_(testset, 1, 0))
+            self.loader_test.append(_DataLoader_(testset, 1))
         if args.test_only:
             return
         # Load training dataset, if not testing only. For training several
         # datasets are trained in one process and therefore, each given 
         # training dataset is concatinated to one large dataset. 
         trainset = self.load_dataset(args, dataset, train=True)
-        self.loader_train = _DataLoader_(trainset, args.batch_size, args.n_threads)
+        self.loader_train = _DataLoader_(
+            trainset, args.batch_size, num_workers=args.n_threads, collate_fn=True
+        )
 
     @staticmethod 
     def load_dataset(args: argparse.Namespace, name: str, train: bool) -> _Dataset_: 
