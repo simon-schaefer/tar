@@ -163,10 +163,10 @@ class ModulesTest(unittest.TestCase):
 
     def test_inv_pixel_shuffle(self): 
         model = self.PixelShuffle_Forward_Backward(factor=2)
-        x = torch.arange(4).view(1,1,2,2)
+        x = torch.arange(16).view(1,1,4,4)
         y = model(x)
         assert torch.all(torch.eq(x, y))
-        x = torch.arange(16).view(1,1,4,4)
+        x = torch.arange(48).view(1,3,4,4)
         y = model(x)
         assert torch.all(torch.eq(x, y))
 
