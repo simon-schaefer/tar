@@ -82,7 +82,6 @@ class _Dataset_(Dataset):
                 pickle.dump(imageio.imread(img), _f)
 
     def _load_file(self, idx: int) -> Tuple[np.ndarray, np.ndarray, str]:
-        idx = self._get_index(idx)
         f_hr = self.images_hr[idx]
         f_lr = self.images_lr[idx]
         filename, _ = os.path.splitext(os.path.basename(f_hr))
@@ -175,24 +174,18 @@ class _Dataset_(Dataset):
     # =========================================================================
     def __len__(self) -> int:
         return len(self.images_hr)
-
-    def _get_index(self, idx: int) -> int:
-        if self.train:
-            return idx % len(self.images_hr)
-        else:
-            return idx
-
+    
 # =============================================================================
 # DATA LOADING CLASS. 
 # =============================================================================
 class _DataLoader_(DataLoader): 
 
-    def __init__(self, dataset, args: argparse.Namespace): 
+    def __init__(self, dataset, batch_size, num_workers): 
         super(_DataLoader_, self).__init__(
             dataset, 
-            batch_size=args.batch_size, 
+            batch_size=batch_size, 
             shuffle=True, 
-            num_workers=args.n_threads
+            num_workers=num_workers, 
         )
 
 # =============================================================================
@@ -213,14 +206,14 @@ class _Data_(object):
             args.data_test = [args.data_test]
         for dataset in args.data_test:
             testset = self.load_dataset(args, dataset, train=False)
-            self.loader_test.append(_DataLoader_(testset, args))
+            self.loader_test.append(_DataLoader_(testset, 1, 0))
         if args.test_only:
             return
         # Load training dataset, if not testing only. For training several
         # datasets are trained in one process and therefore, each given 
         # training dataset is concatinated to one large dataset. 
         trainset = self.load_dataset(args, dataset, train=True)
-        self.loader_train = _DataLoader_(trainset, args)
+        self.loader_train = _DataLoader_(trainset, args.batch_size, args.n_threads)
 
     @staticmethod 
     def load_dataset(args: argparse.Namespace, name: str, train: bool) -> _Dataset_: 

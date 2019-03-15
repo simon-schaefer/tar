@@ -26,23 +26,24 @@ then
 fi
 
 # Update github repository. 
-echo "Updating GitHub repository ..."
+echo $'\nUpdating GitHub repository ...'
 cd $SR_PROJECT_PROJECT_HOME/
 git fetch
 git pull --rebase
+git status
 
 # Login to virtual environment.
+echo $'\nSourcing virtual environment ...'
 cd $SR_PROJECT_HOME
 if [ ! -d "venv" ]; then
     echo "Creating virtual environment ..."
     mkdir venv
     virtualenv -p python3 venv
 fi
-echo "Sourcing virtual environment ..."
 source $SR_PROJECT_VIRTUAL_ENV_PATH/bin/activate
 
 # Install self-python-package. 
-echo "Installing package ..."
+echo $'\nInstalling package ...'
 cd $SR_PROJECT_PROJECT_HOME
 pip install -r requirements.txt
 pip install .

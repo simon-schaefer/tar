@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser(description="super_resolution")
 parser.add_argument("--template", default=".",
                     help="set various templates in option.py")
 parser.add_argument("--verbose", action="store_true",
-                    help="print in log file and terminal")
+                    help="print in log file and terminal (default=False)")
 
 # =============================================================================
 # Hardware specifications.  
@@ -126,6 +126,8 @@ parser.add_argument("--save_results", action="store_false",
                     help="save output results (default=True)")
 parser.add_argument("--save_gt", action="store_false",
                     help="save low-resolution and high-resolution images together (default=True)")
+parser.add_argument("--save_every", type=int, default=10, 
+                    help="save output/models every x steps if save_result flag is set")
 
 # =============================================================================
 # TEMPLATES. 
