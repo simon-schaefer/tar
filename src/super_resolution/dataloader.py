@@ -16,6 +16,7 @@ from typing import List, Tuple
 
 from torch import from_numpy, Tensor
 from torch.utils.data import Dataset, DataLoader
+from torch.utils.data.dataloader import default_collate
 
 # =============================================================================
 # DATASET EXTENSION. 
@@ -191,7 +192,10 @@ class _DataLoader_(DataLoader):
                     0 means that the data will be loaded in the main process.
     - collate_fn: merges a list of samples to form a mini-batch. '''
 
-    def __init__(self, dataset, batch_size, num_workers=0, collate_fn=False): 
+    def __init__(self, dataset, 
+                 batch_size, 
+                 num_workers=0, 
+                 collate_fn=default_collate): 
         super(_DataLoader_, self).__init__(
             dataset, 
             batch_size=batch_size, 
@@ -226,7 +230,7 @@ class _Data_(object):
         # training dataset is concatinated to one large dataset. 
         trainset = self.load_dataset(args, dataset, train=True)
         self.loader_train = _DataLoader_(
-            trainset, args.batch_size, num_workers=args.n_threads, collate_fn=True
+            trainset, args.batch_size, num_workers=args.n_threads
         )
 
     @staticmethod 
