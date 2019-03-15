@@ -38,6 +38,7 @@ class _Trainer_(object):
         if self.args.load != '':
             self.optimizer.load(ckp.dir, epoch=len(ckp.log))
         self.error_last = 1e8
+        self.test_iter = 1
 
     # =========================================================================
     # Training
@@ -97,16 +98,21 @@ class _Trainer_(object):
         self.model.eval()
         # Iterate over every testing dataset. 
         timer_test = misc._Timer_()
-        if self.args.save_results: self.ckp.begin_background()
+        save = self.args.save_results and self.test_iter%self.args.save_every
+        self.ckp.write_log("Saving results: {}".format(save))
+        if save: self.ckp.begin_background()
         for di, d in enumerate(self.loader_test):
             # Determining PSNR and save example images. 
-            for (lr, hr, filename) in d:
+            num_test_samples = len(d.dataset)
+            for i, (lr, hr, filename) in enumerate(d):
                 lr, hr = self.prepare(lr, hr)
-                save_list = self.saving_core(lr, hr, di)
-                if self.args.save_gt:
-                    save_list.extend([lr, hr])
-                if self.args.save_results:
-                    self.ckp.save_results(save_list, filename[0], d, self.scale)
+                if save: 
+                    save_list = self.saving_core(lr, hr, di)
+                    if self.args.save_gt:
+                        save_list.extend([lr, hr])
+                    if self.args.save_results:
+                        self.ckp.save_results(save_list, filename[0], d, self.scale)
+                misc.progress_bar(i, num_test_samples)
             # Logging LR PSNR values. 
             self.ckp.log[-1, di, 1] /= len(d)
             best = self.ckp.log[:,:,1].max(0)
@@ -132,15 +138,15 @@ class _Trainer_(object):
                 )
             )
         # Finalizing - Saving and logging. 
-        self.ckp.write_log("Forward: {:.2f}s".format(timer_test.toc()))
-        if self.args.save_results:
-            self.ckp.end_background()
+        self.ckp.write_log("Testing Forward: {:.2f}s".format(timer_test.toc()))
+        if save: self.ckp.end_background()
         if not self.args.test_only:
             self.ckp.write_log("Saving states ...")
             self.ckp.save(self, epoch, is_best=(best[1][0] + 1 == epoch))
         self.ckp.write_log(
-            'Total: {:.2f}s\n'.format(timer_test.toc()), refresh=True
+            "Testing Total: {:.2f}s\n".format(timer_test.toc()), refresh=True
         )
+        self.test_iter += 1
         torch.set_grad_enabled(True)
 
     def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor) -> optimization._Loss_: 
