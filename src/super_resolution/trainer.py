@@ -101,7 +101,7 @@ class _Trainer_(object):
         net_applying_times = []
         save = self.args.save_results and self.test_iter%self.args.save_every==0
         self.ckp.write_log(
-            "\nEvaluation {}(saving results={}) ...".format(self.test_iter, save)
+            "\nEvaluation {} (saving_results={}) ...".format(self.test_iter,save)
         )
         if save: self.ckp.begin_background()
         for di, d in enumerate(self.loader_test):

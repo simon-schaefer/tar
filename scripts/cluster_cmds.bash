@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Login to cluster environment. 
-qrsh -l gpu -l h_vmem=20G -q gpu.middle.q@*
+qrsh -l gpu=1 -l h_vmem=20G -q gpu.middle.q@*
+qrsh -l gpu=0 -q "*@biwirenderXX"
 
 # Check gpu and user. 
 grep -h $(whoami) /tmp/lock-gpu*/info.txt
@@ -16,6 +17,7 @@ screen -ls          # list running sessions.
 screen -r "id"      # reattach session. 
 
 ### Example Jobs ####
+# src/super_resolution/main.py --template IM_AE_TAD_DIV2K --no_augment --verbose --data_range "3-4/3-4" --batch_size 1 --loss "HR*100*L1+LR*1*L1" --lr 1e-4
 # src/super_resolution/main.py --template IM_AE_TAD_DIV2K_SMALL --no_augment --verbose --print_every 10
 # src/super_resolution/main.py --template IM_AE_TAD_DIV2K --no_augment --verbose --print_every 10
 # src/super_resolution/main.py --template IM_AE_TAD_MNIST --no_augment
