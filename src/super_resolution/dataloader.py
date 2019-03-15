@@ -109,9 +109,6 @@ class _Dataset_(Dataset):
     def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor, str]:
         # Load image file. 
         lr, hr, filename = self._load_file(idx)
-        print("shapes")
-        print(lr.shape)
-        print(hr.shape)
         # Cut patches from file. 
         def _get_patch(lr: np.ndarray, hr: np.ndarray, 
                        scale: int, patch_size: int, do_train: bool):
@@ -132,8 +129,6 @@ class _Dataset_(Dataset):
         patch_size = self.args.patch_size
         assert patch_size <= hr.shape[0] and patch_size <= hr.shape[1]
         pair = _get_patch(lr, hr, self.scale, patch_size, self.train)
-        print(pair[0].shape)
-        print(pair[1].shape)
         # Normalize patches from rgb_range to [-0.5, 0.5].  
         if not self.args.no_normalize: 
             def _normalize(image):
