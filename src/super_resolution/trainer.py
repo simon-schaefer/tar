@@ -7,7 +7,8 @@
 import argparse
 import os
 import math
-from typing import List
+import numpy as np
+from typing import List, Tuple
 
 import torch
 
@@ -97,6 +98,7 @@ class _Trainer_(object):
         self.model.eval()
         # Iterate over every testing dataset. 
         timer_test = misc._Timer_()
+        net_applying_times = []
         save = self.args.save_results and self.test_iter%self.args.save_every==0
         self.ckp.write_log(
             "\nEvaluation {}(saving results={}) ...".format(self.test_iter, save)
@@ -107,13 +109,14 @@ class _Trainer_(object):
             num_test_samples = len(d.dataset)
             for i, (lr, hr, filename) in enumerate(d):
                 lr, hr = self.prepare(lr, hr)
-                save_list = self.saving_core(lr, hr, di)
+                save_list, apply_time = self.saving_core(lr, hr, di)
+                net_applying_times.append(apply_time)
                 if save: 
                     if self.args.save_gt:
                         save_list.extend([lr, hr])
                     if self.args.save_results:
                         self.ckp.save_results(save_list,filename[0],d,self.scale)
-                misc.progress_bar(i, num_test_samples)
+                misc.progress_bar(i+1, num_test_samples)
             # Logging LR PSNR values. 
             self.ckp.log[-1, di, 1] /= len(d)
             best = self.ckp.log[:,:,1].max(0)
@@ -139,7 +142,9 @@ class _Trainer_(object):
                 )
             )
         # Finalizing - Saving and logging. 
-        self.ckp.write_log("Testing Forward: {:.2f}s".format(timer_test.toc()))
+        self.ckp.write_log("Mean network applying time: {:.2f}s".format(
+            np.mean(net_applying_times)
+        ))
         if save: self.ckp.end_background()
         if not self.args.test_only:
             self.ckp.write_log("Saving states ...")
@@ -150,22 +155,25 @@ class _Trainer_(object):
         self.test_iter += 1
         torch.set_grad_enabled(True)
 
-    def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor) -> optimization._Loss_: 
+    def optimization_core(self, lr: torch.Tensor, 
+                          hr: torch.Tensor) -> optimization._Loss_: 
         hr_out = self.model(hr)
         loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out}
         loss = self.loss(loss_kwargs)
         return loss
 
     def saving_core(self, lr: torch.Tensor, hr: torch.Tensor, 
-                    di: int) -> List[torch.Tensor]: 
+                    di: int) -> Tuple[List[torch.Tensor], float]: 
+        timer_apply = misc._Timer_()
         hr_out = self.model(hr)
+        apply_time = timer_apply.toc()
         hr_out = misc.discretize(
             hr_out, self.args.rgb_range, not self.args.no_normalize
         )
         self.ckp.log[-1, di, 0] += misc.calc_psnr(
             hr_out, hr, self.args.rgb_range
         )
-        return [hr_out]
+        return [hr_out], apply_time
 
     def prepare(self, *kwargs):
         device = torch.device('cpu' if self.args.cpu else self.args.cuda_device)
@@ -213,8 +221,8 @@ class _Trainer_TAD_(_Trainer_):
         return loss  
 
     def saving_core(self, lr: torch.Tensor, hr: torch.Tensor, 
-                    di: int) -> List[torch.Tensor]: 
-        save_list = super(_Trainer_TAD_, self).saving_core(lr, hr, di)
+                    di: int) -> Tuple[List[torch.Tensor], float]: 
+        save_list, apply_time = super(_Trainer_TAD_, self).saving_core(lr, hr, di)
         lr_out = self.model.model.encode(hr)
         lr_out = torch.add(lr_out, lr)
         lr_out = misc.discretize(
@@ -224,6 +232,6 @@ class _Trainer_TAD_(_Trainer_):
             lr_out, lr, self.args.rgb_range
         )
         save_list.extend([lr_out])
-        return save_list
+        return save_list, apply_time
 
 

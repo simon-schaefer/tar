@@ -189,12 +189,13 @@ class _DataLoader_(DataLoader):
 
     def __init__(self, dataset, 
                  batch_size, 
+                 shuffle=False, 
                  num_workers=0, 
                  collate_fn=default_collate): 
         super(_DataLoader_, self).__init__(
             dataset, 
             batch_size=batch_size, 
-            shuffle=True, 
+            shuffle=shuffle, 
             num_workers=num_workers, 
             collate_fn=collate_fn,
         )
@@ -225,7 +226,8 @@ class _Data_(object):
         # training dataset is concatinated to one large dataset. 
         trainset = self.load_dataset(args, dataset, train=True)
         self.loader_train = _DataLoader_(
-            trainset, args.batch_size, num_workers=args.n_threads
+            trainset, args.batch_size, 
+            shuffle=True, num_workers=args.n_threads
         )
 
     @staticmethod 

@@ -5,6 +5,7 @@ qrsh -l gpu -l h_vmem=20G -q gpu.middle.q@*
 
 # Check gpu and user. 
 grep -h $(whoami) /tmp/lock-gpu*/info.txt
+nvidia-smi
 
 # Queue information. 
 qstat
