@@ -76,7 +76,7 @@ parser.add_argument("--reset", action="store_true",
                     help="reset the training (default=False)")
 parser.add_argument("--epochs", type=int, default=3000,
                     help="number of epochs to train")
-parser.add_argument("--batch_size", type=int, default=6,
+parser.add_argument("--batch_size", type=int, default=16,
                     help="input batch size for training")
 parser.add_argument("--test_only", action="store_true",
                     help="set this option to test the model (default=False)")
@@ -91,7 +91,7 @@ parser.add_argument("--lr", type=float, default=1e-3,
                     help="learning rate")
 parser.add_argument("--decay", type=str, default="100",
                     help="learning rate decay type")
-parser.add_argument("--gamma", type=float, default=0.6,
+parser.add_argument("--gamma", type=float, default=0.9,
                     help="learning rate decay factor for step decay")
 parser.add_argument("--optimizer", default="ADAM",
                     choices=("ADAM"),
@@ -142,45 +142,29 @@ def set_template(args):
         args.model_type = "TAD"
         args.scale      = 2
         args.optimizer  = "ADAM"
-        args.batch_size = 6
         args.data_train = "MNIST"
         args.data_test  = "MNIST"
         args.n_colors   = 1
         args.patch_size = 28
-        args.loss       = "HR*10*L1+LR*1*L1"
 
     if args.template.find("IM_AE_TAD_DIV2K") >= 0:
         args.model      = "AETAD_3D"
         args.model_type = "TAD"
         args.scale      = 2
         args.optimizer  = "ADAM"
-        args.batch_size = 6
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
         args.n_colors   = 3
         args.patch_size = 96
 
-    if args.template.find("IM_AE_TAD_DIV2K_SMALL") >= 0:
-        args.model      = "AETAD_3D_SMALL"
-        args.model_type = "TAD"
-        args.scale      = 2
-        args.optimizer  = "ADAM"
-        args.batch_size = 6
-        args.data_train = "DIV2K"
-        args.data_test  = "DIV2K"
-        args.n_colors   = 3
-        args.patch_size = 24
-
     if args.template.find("IM_AE_TEST") >= 0:
         args.model      = "AETRIAL_NOSR"
         args.scale      = 1
         args.optimizer  = "ADAM"
-        args.batch_size = 6
         args.data_train = "MNIST"
         args.data_test  = "MNIST"
         args.n_colors   = 1
         args.patch_size = 28
-        args.loss       = "HR*1*MSE"
 
 # =============================================================================
 # MAIN. 
