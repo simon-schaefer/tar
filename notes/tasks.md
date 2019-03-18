@@ -24,7 +24,7 @@ automated saving and easy loading of previous training iterations, block-loss-fu
 downscaling did not preserve input pixel intensity range, GPU training --> custom dataloader, 
 num_workers=0 for test))
 - [ ] Training of TAD network on DIV2K dataset for scale=2 on small set (overfitting) --> fix wrongly 
-colored SR images bug 
+colored SR images bug (renormalization to [0,1], image saving integer division)
 
 ## Literature 
 - [Paper: Task-Aware Image Downscaling (Kyoung Mu Lee)](http://openaccess.thecvf.com/content_ECCV_2018/papers/Heewon_Kim_Task-Aware_Image_Downscaling_ECCV_2018_paper.pdf)

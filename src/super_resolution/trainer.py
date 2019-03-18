@@ -168,7 +168,8 @@ class _Trainer_(object):
         hr_out = self.model(hr)
         apply_time = timer_apply.toc()
         hr_out = misc.discretize(
-            hr_out, self.args.rgb_range, not self.args.no_normalize
+            hr_out, self.args.rgb_range, not self.args.no_normalize, 
+            [self.args.norm_min, self.args.norm_max]
         )
         self.ckp.log[-1, di, 0] += misc.calc_psnr(
             hr_out, hr, self.args.rgb_range
@@ -213,7 +214,8 @@ class _Trainer_TAD_(_Trainer_):
         lr_out = self.model.model.encode(hr)
         lr_out = torch.add(lr_out, lr)
         lr_out = misc.discretize(
-            lr_out, self.args.rgb_range, not self.args.no_normalize
+            lr_out, self.args.rgb_range, not self.args.no_normalize, 
+            [self.args.norm_min, self.args.norm_max]
         )
         hr_out = self.model.model.decode(lr_out)
         loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out, 'LR_GT': lr, 'LR_OUT': lr_out}
@@ -226,7 +228,8 @@ class _Trainer_TAD_(_Trainer_):
         lr_out = self.model.model.encode(hr)
         lr_out = torch.add(lr_out, lr)
         lr_out = misc.discretize(
-            lr_out, self.args.rgb_range, not self.args.no_normalize
+            lr_out, self.args.rgb_range, not self.args.no_normalize, 
+            [self.args.norm_min, self.args.norm_max]
         )
         self.ckp.log[-1, di, 1] += misc.calc_psnr(
             lr_out, lr, self.args.rgb_range

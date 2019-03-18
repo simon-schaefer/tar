@@ -107,7 +107,7 @@ class _Checkpoint_(object):
                     normalized = normalized.add(-self.args.norm_min).mul(r)
                 else: 
                     normalized = normalized.mul(255/self.args.rgb_range)
-                normalized = normalized.clamp(0, 255)
+                normalized = normalized.clamp(0, 255).round()
                 tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
                 self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
 
@@ -216,11 +216,12 @@ def calc_psnr(x: torch.Tensor, y: torch.Tensor, rgb_range: float) -> float:
     mse = torch.dist(x, y, 2).pow(2).mean()
     return 10 * math.log10(rgb_range**2/mse)
 
-def discretize(img: torch.Tensor, rgb_range: float, normalized: bool) -> torch.Tensor:
+def discretize(img: torch.Tensor, rgb_range: float, 
+               normalized: bool, norm_range: List[float]) -> torch.Tensor:
     ''' Discretize image (given as torch tensor) in defined range of
     pixel values (e.g. 255 or 1.0), i.e. smart rounding. '''
-    pixel_range = 255 / rgb_range * (self.args.norm_max - self.args.norm_min)
-    img_dis = img if not normalized else img.add(-self.args.norm_min)
+    pixel_range = 255 * (norm_range[1] - norm_range[0])
+    img_dis = img if not normalized else img.add(-norm_range[0])
     img_dis = img_dis.mul(pixel_range).clamp(0, 255).round().div(pixel_range)
-    img_dis = img_dis if not normalized else img_dis.add(self.args.norm_min)
+    img_dis = img_dis if not normalized else img_dis.add(norm_range[0])
     return img_dis
