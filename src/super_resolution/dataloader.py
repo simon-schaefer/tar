@@ -129,10 +129,13 @@ class _Dataset_(Dataset):
         patch_size = self.args.patch_size
         assert patch_size <= hr.shape[0] and patch_size <= hr.shape[1]
         pair = _get_patch(lr, hr, self.scale, patch_size, self.train)
-        # Normalize patches from rgb_range to [-0.5, 0.5].  
-        if not self.args.no_normalize: 
+        # Normalize patches from rgb_range to [norm_min, norm_max].  
+        if not self.args.no_normalize:
+            assert self.args.norm_max > self.args.norm_min 
+            norm_range = self.args.norm_max - self.args.norm_min
+
             def _normalize(image):
-                return image/self.args.rgb_range - 0.5
+                return image/self.args.rgb_range*norm_range+self.args.norm_min
 
             pair = [_normalize(x) for x in pair]
         # Augment patches (if flag is set). 

@@ -52,7 +52,11 @@ parser.add_argument("--rgb_range", type=int, default=255,
 parser.add_argument("--n_colors", type=int, default=3,
                     help="number of color channels to use")
 parser.add_argument("--no_normalize", action="store_true",
-                    help="not normalize inputs to [-0.5, 0.5] (default=False)")
+                    help="not normalize inputs to [norm_min, norm_max] (default=False)")
+parser.add_argument("--norm_min", type=float, default=0.0, 
+                    help="normalization lower border")
+parser.add_argument("--norm_max", type=float, default=1.0, 
+                    help="normalization upper border")
 parser.add_argument("--no_augment", action="store_true",
                     help="not use data augmentation (default=False)")
 

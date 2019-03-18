@@ -8,8 +8,9 @@ qrsh -l gpu=0 -q "*@biwirenderXX"
 grep -h $(whoami) /tmp/lock-gpu*/info.txt
 nvidia-smi
 
-# Queue information. 
-qstat
+# Queue handling. 
+qstat 
+qdel -u sischaef
 
 # Background calculation (https://www.rackaid.com/blog/linux-screen-tutorial-and-how-to/). 
 screen              # start session (CRTL+A+D to detach). 

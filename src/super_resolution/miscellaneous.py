@@ -103,7 +103,8 @@ class _Checkpoint_(object):
             for v, p in zip(save_list, postfix):
                 normalized = v[0]
                 if not self.args.no_normalize: 
-                    normalized = normalized.add(0.5).mul(255)
+                    r = 255/(self.args.norm_max - self.args.norm_min)
+                    normalized = normalized.add(-self.args.norm_min).mul(r)
                 else: 
                     normalized = normalized.mul(255/self.args.rgb_range)
                 normalized = normalized.clamp(0, 255)
@@ -218,8 +219,8 @@ def calc_psnr(x: torch.Tensor, y: torch.Tensor, rgb_range: float) -> float:
 def discretize(img: torch.Tensor, rgb_range: float, normalized: bool) -> torch.Tensor:
     ''' Discretize image (given as torch tensor) in defined range of
     pixel values (e.g. 255 or 1.0), i.e. smart rounding. '''
-    pixel_range = 255 / rgb_range
-    img_dis = img if not normalized else img.add(0.5)
+    pixel_range = 255 / rgb_range * (self.args.norm_max - self.args.norm_min)
+    img_dis = img if not normalized else img.add(-self.args.norm_min)
     img_dis = img_dis.mul(pixel_range).clamp(0, 255).round().div(pixel_range)
-    img_dis = img_dis if not normalized else img_dis.add(-0.5)
+    img_dis = img_dis if not normalized else img_dis.add(self.args.norm_min)
     return img_dis

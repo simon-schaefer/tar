@@ -4,7 +4,7 @@
 - [x] Access Biwi clusters and do simple calculation (prime numbers)
 - [x] Install CUDA (https://git.ee.ethz.ch/baumgach/biwi_tensorflow_setup_instructions/tree/master)
 - [x] Install and execute torch training on cluster (https://git.ee.ethz.ch/baumgach/biwi_tensorflow_setup_instructions/tree/master) 
-- [x] Install specific torch version as specified in BIWI wiki 
+- [x] Install specific torch version as specified in BIWI wiki (Biwi wiki)
 
 ## Knowledgebase
 - [x] Read papers about image super resolution in general
@@ -13,15 +13,16 @@
 - [x] Read papers about task aware image superresolution
 
 ## Implementation of task-aware image downscaling
-- [x] Rebuild network architecture (inverse pixel shuffeling module incl. testing, resblock module, 
+- [x] Build image processing, training pipeline and network architecture (downscaling for 
+I_guidance bicubic with anti-alising, cropping to factor of 2, normalization, 6 patches of 
+96 × 96 HR sub images each coming from different HR image --> mini-batch, Adam Optimizer, 
+guidance and SR L1 losses, inverse pixel shuffeling module incl. testing, resblock module, 
 general network architecture)
-- [x] Build image processing pipeline (downscaling for I_guidance bicubic with anti-alising, cropping to factor of 2, normalization to [-0.5, 0.5])
-- [x] Build training pipeline (6 patches of 96 × 96 HR sub images each coming from different HR image --> mini-batch, Adam Optimizer, guidance and SR L1 losses)
 - [x] Restructuring project to be general use (yaml -> input arguments, "intelligent" checkpoints, 
 automated saving and easy loading of previous training iterations, block-loss-function, etc.)
 - [x] Test implementation using MNIST dataset (errors: no denormalization for saving, 
-downscaling did not preserve input pixel intensity range)
-- [x] Working version for MNIST dataset (GPU training --> custom dataloader, num_workers=0 for test)
+downscaling did not preserve input pixel intensity range, GPU training --> custom dataloader, 
+num_workers=0 for test))
 - [ ] Training of TAD network on DIV2K dataset for scale=2 on small set (overfitting) --> fix wrongly 
 colored SR images bug 
 
