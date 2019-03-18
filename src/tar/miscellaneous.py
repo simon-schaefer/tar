@@ -10,6 +10,7 @@ import math
 from multiprocessing import Process, Queue
 import numpy as np
 import os
+import random
 import sys
 import time
 from typing import List
@@ -208,12 +209,25 @@ def progress_bar(iteration: int, num_steps: int, bar_length: int=50) -> int:
     sys.stdout.flush()
     return iteration + 1
 
-def calc_psnr(x: torch.Tensor, y: torch.Tensor, rgb_range: float) -> float:
+def calc_psnr(x: torch.Tensor, y: torch.Tensor, 
+              patch_size: int=None, rgb_range: float=255.0) -> float:
     ''' Determine peak signal to noise ratio between to tensors 
     (mostly images, given as torch tensors), according to the formula in 
-    https://www.mathworks.com/help/vision/ref/psnr.html. '''
+    https://www.mathworks.com/help/vision/ref/psnr.html. If patch size 
+    is None the PSNR will be determined over the full tensors, otherwise
+    a random patch of give patch size is determined and the PSNR is calculated
+    with respect to this patch. The tensors have an expected shape of (b,c,h,w). '''
     if x.nelement() == 1: return 0
-    mse = torch.dist(x, y, 2).pow(2).mean()
+    px, py = None, None
+    if patch_size is None: px, py = x, y
+    else: 
+        h, w = x.shape[2:4]
+        lp = int(patch_size)
+        lx = random.randrange(0, w - lp + 1)
+        ly = random.randrange(0, h - lp + 1)    
+        px = x[:, :, ly:ly + lp, lx:lx + lp]
+        py = y[:, :, ly:ly + lp, lx:lx + lp]
+    mse = torch.dist(px, py, 2).pow(2).mean()
     return 10 * math.log10(rgb_range**2/mse)
 
 def discretize(img: torch.Tensor, rgb_range: float, 

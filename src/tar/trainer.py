@@ -172,7 +172,7 @@ class _Trainer_(object):
             [self.args.norm_min, self.args.norm_max]
         )
         self.ckp.log[-1, di, 0] += misc.calc_psnr(
-            hr_out, hr, self.args.rgb_range
+            hr_out, hr, self.args.patch_size, self.args.rgb_range
         )
         return [hr_out], apply_time
 
@@ -232,7 +232,7 @@ class _Trainer_TAD_(_Trainer_):
             [self.args.norm_min, self.args.norm_max]
         )
         self.ckp.log[-1, di, 1] += misc.calc_psnr(
-            lr_out, lr, self.args.rgb_range
+            lr_out, lr, self.args.patch_size/self.scale, self.args.rgb_range
         )
         save_list.extend([lr_out])
         return save_list, apply_time

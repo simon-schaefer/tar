@@ -110,7 +110,7 @@ parser.add_argument("--gclip", type=float, default=0,
 # =============================================================================
 # Loss specifications.
 # =============================================================================
-parser.add_argument("--loss", type=str, default="HR*1*L1",
+parser.add_argument("--loss", type=str, default="HR*1*L1+LR*1*L1",
                     help="loss function configuration")
 
 # =============================================================================
@@ -159,7 +159,6 @@ def set_template(args):
         args.data_test  = "DIV2K"
         args.n_colors   = 3
         args.patch_size = 96
-        args.loss       = "HR*1*L1+LR*1*L1"
 
     if args.template.find("IM_AE_TAD_DIV2K_SMALL") >= 0:
         args.model      = "AETAD_3D_SMALL"
@@ -171,7 +170,6 @@ def set_template(args):
         args.data_test  = "DIV2K"
         args.n_colors   = 3
         args.patch_size = 24
-        args.loss       = "HR*1*L1+LR*1*L1"
 
     if args.template.find("IM_AE_TEST") >= 0:
         args.model      = "AETRIAL_NOSR"

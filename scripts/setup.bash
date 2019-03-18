@@ -94,28 +94,28 @@ if [ ! -d "DIV2K_valid_LR_bicubic" ]; then
 fi
 cd $SR_PROJECT_DATA_PATH
 # MNIST dataset. 
-echo "MNIST dataset ..."
-if [ ! -d "MNIST" ]; then
-    mkdir MNIST
-fi
-cd MNIST
-if [ ! -d "MNIST_train_HR" ]; then
-    wget https://pjreddie.com/media/files/mnist_train.tar.gz
-    tar -xvf mnist_train.tar.gz
-    rm mnist_train.tar.gz
-    mv "train" "MNIST_train_HR"
-fi
-if [ ! -d "MNIST_valid_HR" ]; then
-    wget https://pjreddie.com/media/files/mnist_test.tar.gz
-    tar -xvf mnist_test.tar.gz
-    rm mnist_test.tar.gz
-    mv "test" "MNIST_valid_HR"
-    cp MNIST_valid_HR/* MNIST_train_HR/
-fi
-if [ ! -d "MNIST_train_LR_bicubic" ]; then
-    python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/MNIST/MNIST_train_HR 2 False
-fi
-cd $SR_PROJECT_DATA_PATH
+# echo "MNIST dataset ..."
+# if [ ! -d "MNIST" ]; then
+#     mkdir MNIST
+# fi
+# cd MNIST
+# if [ ! -d "MNIST_train_HR" ]; then
+#     wget https://pjreddie.com/media/files/mnist_train.tar.gz
+#     tar -xvf mnist_train.tar.gz
+#     rm mnist_train.tar.gz
+#     mv "train" "MNIST_train_HR"
+# fi
+# if [ ! -d "MNIST_valid_HR" ]; then
+#     wget https://pjreddie.com/media/files/mnist_test.tar.gz
+#     tar -xvf mnist_test.tar.gz
+#     rm mnist_test.tar.gz
+#     mv "test" "MNIST_valid_HR"
+#     cp MNIST_valid_HR/* MNIST_train_HR/
+# fi
+# if [ ! -d "MNIST_train_LR_bicubic" ]; then
+#     python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/MNIST/MNIST_train_HR 2 False
+# fi
+# cd $SR_PROJECT_DATA_PATH
 
 # Build outs directory.
 echo $'\nBuilding output directory ...'
