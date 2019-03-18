@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export SR_PROJECT_NAME="super_resolution"
+export SR_PROJECT_NAME="tar"
 
 export SR_PROJECT_HOME="/scratch_net/biwidl215/sischaef"
 export SR_PROJECT_PROJECT_HOME="$SR_PROJECT_HOME/$SR_PROJECT_NAME"

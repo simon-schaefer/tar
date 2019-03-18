@@ -6,7 +6,7 @@
 # =============================================================================
 import os
 
-from super_resolution.dataloader import _Dataset_
+from tar.dataloader import _Dataset_
 
 class MNIST(_Dataset_):
     def __init__(self, args, name='MNIST', train=True):

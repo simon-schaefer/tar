@@ -4,7 +4,7 @@
 # Created By  : Simon Schaefer
 # Description : Main function for superresolution.
 # =============================================================================
-import super_resolution as _sr_
+import tar as _sr_
 import torch
 
 _sr_.miscellaneous.print_header()

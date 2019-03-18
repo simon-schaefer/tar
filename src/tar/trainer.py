@@ -12,10 +12,10 @@ from typing import List, Tuple
 
 import torch
 
-import super_resolution.dataloader as dataloader
-import super_resolution.miscellaneous as misc
-import super_resolution.modules as modules
-import super_resolution.optimization as optimization
+import tar.dataloader as dataloader
+import tar.miscellaneous as misc
+import tar.modules as modules
+import tar.optimization as optimization
 
 class _Trainer_(object):
     ''' Training front end including training and testing functions according 

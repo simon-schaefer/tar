@@ -11,11 +11,11 @@ import unittest
 import torch
 from torch import nn
 
-import super_resolution.inputs as argus
-import super_resolution.dataloader as dataloader
-import super_resolution.optimization as optimization
-import super_resolution.miscellaneous as miscellaneous
-import super_resolution.modules as modules
+import tar.inputs as argus
+import tar.dataloader as dataloader
+import tar.optimization as optimization
+import tar.miscellaneous as miscellaneous
+import tar.modules as modules
 
 class DataLoaderTest(unittest.TestCase): 
     

@@ -237,6 +237,6 @@ class _Data_(object):
     def load_dataset(args: argparse.Namespace, name: str, train: bool) -> _Dataset_: 
         ''' Load dataset from module (in datasets directory). Every module loaded
         should inherit from the _Dataset_ class defined below. '''
-        m = importlib.import_module("super_resolution.datasets." + name.lower())
+        m = importlib.import_module("tar.datasets." + name.lower())
         return getattr(m, name)(args, train=train)
 

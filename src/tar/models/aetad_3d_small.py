@@ -7,7 +7,7 @@
 import torch
 from torch import nn
 
-from super_resolution.modules import _Resblock_, _ReversePixelShuffle_
+from tar.modules import _Resblock_, _ReversePixelShuffle_
 
 def build_net():
     return AETAD_3D_SMALL()

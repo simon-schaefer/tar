@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import torch
 from torch import nn
 
-import super_resolution.miscellaneous as misc
+import tar.miscellaneous as misc
 
 # =============================================================================
 # OPTIMIZER. 

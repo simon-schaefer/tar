@@ -7,7 +7,7 @@
 import argparse
 import os
 
-parser = argparse.ArgumentParser(description="super_resolution")
+parser = argparse.ArgumentParser(description="tar")
 parser.add_argument("--template", default=".",
                     help="set various templates in option.py")
 parser.add_argument("--verbose", action="store_true",

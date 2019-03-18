@@ -12,7 +12,7 @@ import torch
 from torch import nn
 import torch.utils.model_zoo
 
-import super_resolution.miscellaneous as misc
+import tar.miscellaneous as misc
 
 class _Model_(nn.Module):
     ''' Model front end module including parallization (adapting to available
