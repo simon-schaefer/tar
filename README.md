@@ -1,4 +1,4 @@
-# VideoSuperResolution
+# TAR
 
-Image and Video Super Resolution Using Autoencoders
+Task-Aware image and video super resolution using unsupervised learning (autoencoders)
 
