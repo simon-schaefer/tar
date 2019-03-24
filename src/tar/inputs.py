@@ -74,8 +74,10 @@ parser.add_argument("--model_type", type=str, default="",
 # =============================================================================
 parser.add_argument("--reset", action="store_true",
                     help="reset the training (default=False)")
-parser.add_argument("--epochs", type=int, default=3000,
+parser.add_argument("--epochs", type=int, default=500,
                     help="number of epochs to train")
+parser.add_argument("--fine_tuning", type=int, default=400,
+                    help="start fine tuning model at epoch")
 parser.add_argument("--batch_size", type=int, default=16,
                     help="input batch size for training")
 parser.add_argument("--test_only", action="store_true",

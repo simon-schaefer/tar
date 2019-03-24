@@ -50,8 +50,12 @@ class _Trainer_(object):
         and updated automatically). '''
         self.optimizer.schedule()
         epoch = self.optimizer.get_last_epoch() + 1
+        finetuning = epoch >= self.args.fine_tuning
         lr = self.optimizer.get_lr()
-        self.ckp.write_log('[Epoch {}]\tLearning rate: {}'.format(epoch, lr))
+        self.ckp.write_log(
+            "[Epoch {}]\tLearning rate: {}\tFinetuning: {}".format(
+                epoch, lr, finetuning
+        ))
         self.loss.start_log()
         self.model.train()
         # Iterate over all batches in epoch. 
@@ -63,15 +67,17 @@ class _Trainer_(object):
             timer_model.tic()
             # Optimization core. 
             self.optimizer.zero_grad()
-            loss = self.optimization_core(lr, hr)
+            loss = self.optimization_core(lr, hr, finetuning)
             loss.backward()
             if self.args.gclip > 0:
-                torch.nn.utils.clip_grad_value_(self.model.parameters(),self.args.gclip)
+                torch.nn.utils.clip_grad_value_(
+                    self.model.parameters(),self.args.gclip
+                )
             self.optimizer.step()
             timer_model.hold()
             # Logging (if printable epoch).
             if (batch + 1) % self.args.print_every == 0:
-                self.ckp.write_log('[{}/{}]\t{}\t{:.1f}+{:.1f}s'.format(
+                self.ckp.write_log("[{}/{}]\t{}\t{:.1f}+{:.1f}s".format(
                     (batch + 1) * self.args.batch_size,
                     len(self.loader_train.dataset),
                     self.loss.display_loss(batch),
@@ -92,6 +98,7 @@ class _Trainer_(object):
         results and save model at the end. '''
         torch.set_grad_enabled(False)
         epoch = self.optimizer.get_last_epoch() + 1
+        finetuning = epoch >= self.args.fine_tuning
         self.ckp.add_log(
             torch.zeros(1, len(self.loader_test), 2)
         )
@@ -109,7 +116,7 @@ class _Trainer_(object):
             num_test_samples = len(d.dataset)
             for i, (lr, hr, filename) in enumerate(d):
                 lr, hr = self.prepare(lr, hr)
-                save_list, apply_time = self.saving_core(lr, hr, di)
+                save_list, apply_time = self.saving_core(lr, hr, di, finetuning)
                 net_applying_times.append(apply_time)
                 if save: 
                     if self.args.save_gt:
@@ -155,15 +162,15 @@ class _Trainer_(object):
         self.test_iter += 1
         torch.set_grad_enabled(True)
 
-    def optimization_core(self, lr: torch.Tensor, 
-                          hr: torch.Tensor) -> optimization._Loss_: 
+    def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor, 
+                          finetuning: bool) -> optimization._Loss_: 
         hr_out = self.model(hr)
         loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out}
         loss = self.loss(loss_kwargs)
         return loss
 
     def saving_core(self, lr: torch.Tensor, hr: torch.Tensor, 
-                    di: int) -> Tuple[List[torch.Tensor], float]: 
+                    di: int, finetuning: bool) -> Tuple[List[torch.Tensor], float]: 
         timer_apply = misc._Timer_()
         hr_out = self.model(hr)
         apply_time = timer_apply.toc()
@@ -210,31 +217,50 @@ class _Trainer_TAD_(_Trainer_):
 
         super(_Trainer_TAD_, self).__init__(args, loader, model, loss, ckp)
     
-    def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor) -> optimization._Loss_: 
+    def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor, 
+                          finetuning: bool) -> optimization._Loss_: 
         lr_out = self.model.model.encode(hr)
+        if finetuning: 
+            lr_out = misc.discretize(
+                lr_out, self.args.rgb_range, not self.args.no_normalize, 
+                [self.args.norm_min, self.args.norm_max]
+            )
         lr_out = torch.add(lr_out, lr)
-        lr_out = misc.discretize(
-            lr_out, self.args.rgb_range, not self.args.no_normalize, 
-            [self.args.norm_min, self.args.norm_max]
-        )
         hr_out = self.model.model.decode(lr_out)
         loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out, 'LR_GT': lr, 'LR_OUT': lr_out}
         loss = self.loss(loss_kwargs)
         return loss  
 
     def saving_core(self, lr: torch.Tensor, hr: torch.Tensor, 
-                    di: int) -> Tuple[List[torch.Tensor], float]: 
-        save_list, apply_time = super(_Trainer_TAD_, self).saving_core(lr, hr, di)
+                    di: int, finetuning: bool) -> Tuple[List[torch.Tensor], float]: 
+        # Apply model once (depending on training phase with/without 
+        # discretization of the low-resoluted image). 
+        timer_apply = misc._Timer_()
         lr_out = self.model.model.encode(hr)
-        lr_out = torch.add(lr_out, lr)
-        lr_out = misc.discretize(
-            lr_out, self.args.rgb_range, not self.args.no_normalize, 
+        if finetuning: 
+            lr_out = misc.discretize(
+                lr_out, self.args.rgb_range, not self.args.no_normalize, 
+                [self.args.norm_min, self.args.norm_max]
+            ) 
+        lr_out2 = torch.add(lr_out,lr)
+        hr_out = self.model.model.decode(lr_out2)
+        apply_time = timer_apply.toc()
+        # Determine psnr values for logging procedure. 
+        self.ckp.log[-1, di, 1] += misc.calc_psnr(
+            lr_out2, lr, self.args.patch_size/self.scale, self.args.rgb_range
+        )
+        self.ckp.log[-1, di, 0] += misc.calc_psnr(
+            hr_out, hr, self.args.patch_size, self.args.rgb_range
+        )
+        # Save discretized output images for logging. 
+        lr_out2 = misc.discretize(
+            lr_out2, self.args.rgb_range, not self.args.no_normalize, 
             [self.args.norm_min, self.args.norm_max]
         )
-        self.ckp.log[-1, di, 1] += misc.calc_psnr(
-            lr_out, lr, self.args.patch_size/self.scale, self.args.rgb_range
+        hr_out = misc.discretize(
+            hr_out, self.args.rgb_range, not self.args.no_normalize, 
+            [self.args.norm_min, self.args.norm_max]
         )
-        save_list.extend([lr_out])
-        return save_list, apply_time
+        return [hr_out, lr_out2], apply_time
 
 
