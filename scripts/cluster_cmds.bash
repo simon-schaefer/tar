@@ -8,6 +8,9 @@ qrsh -l gpu=0 -q "*@biwirenderXX"
 grep -h $(whoami) /tmp/lock-gpu*/info.txt
 nvidia-smi
 
+# Job submission. 
+qsub scripts/job.bash 
+
 # Queue handling. 
 qstat 
 qdel -u sischaef
@@ -26,3 +29,4 @@ screen -r "id"      # reattach session.
 # --template=IM_AE_TAD_MNIST --no_augment
 # --template=IM_AE_TAD_MNIST --data_range="1-20/21-25" --no_augment --verbose
 # --template=IM_AE_TEST --no_augment
+# --template=IM_AE_SIMPLE --verbose --data_range="1-100/1-10" --loss=HR*10*MSE+LR*1*L1 --print_every=10 --gamma=0.99 --lr=1e-4

@@ -166,6 +166,16 @@ def set_template(args):
         args.n_colors   = 1
         args.patch_size = 28
 
+    if args.template.find("IM_AE_SIMPLE") >= 0:
+        args.model      = "AETAD_3D"
+        args.model_type = "TAD"
+        args.scale      = 2
+        args.optimizer  = "ADAM"
+        args.data_train = "SIMPLE"
+        args.data_test  = "SIMPLE"
+        args.n_colors   = 3
+        args.patch_size = 96
+
 # =============================================================================
 # MAIN. 
 # =============================================================================

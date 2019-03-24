@@ -93,6 +93,7 @@ if [ ! -d "DIV2K_valid_LR_bicubic" ]; then
     cp DIV2K_valid_LR_bicubic/* DIV2K_train_LR_bicubic/
 fi
 cd $SR_PROJECT_DATA_PATH
+
 # MNIST dataset. 
 # echo "MNIST dataset ..."
 # if [ ! -d "MNIST" ]; then
@@ -116,6 +117,14 @@ cd $SR_PROJECT_DATA_PATH
 #     python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/MNIST/MNIST_train_HR 2 False
 # fi
 # cd $SR_PROJECT_DATA_PATH
+
+# SIMPLE dataset. 
+echo "SIMPLE dataset ..."
+if [ ! -d "SIMPLE" ]; then
+    python3 $SR_PROJECT_PROJECT_HOME/src/tests/create_simple_dataset.py
+    python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/SIMPLE/HR 2 True
+fi
+cd $SR_PROJECT_DATA_PATH
 
 # Build outs directory.
 echo $'\nBuilding output directory ...'
