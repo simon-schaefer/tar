@@ -45,8 +45,8 @@ source $SR_PROJECT_VIRTUAL_ENV_PATH/bin/activate
 # Install self-python-package. 
 echo $'\nInstalling package ...'
 cd $SR_PROJECT_PROJECT_HOME
-pip install -r requirements.txt
-pip install .
+pip install -r requirements.txt --user
+pip install -e . --user
 
 # Set environment set flag. 
 export SR_PROJECT_IS_SET="True"
