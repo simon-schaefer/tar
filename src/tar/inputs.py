@@ -130,8 +130,8 @@ parser.add_argument("--print_every", type=int, default=100,
                     help="how many batches to wait before logging training status")
 parser.add_argument("--save_results", action="store_false",
                     help="save output results (default=True)")
-parser.add_argument("--save_gt", action="store_false",
-                    help="save low-resolution and high-resolution images together (default=True)")
+parser.add_argument("--save_gt", action="store_true",
+                    help="save low-resolution and high-resolution images together (default=False)")
 parser.add_argument("--save_every", type=int, default=10, 
                     help="save output/models every x steps if save_result flag is set")
 

@@ -15,9 +15,9 @@ import sys
 import skimage
 
 def progress_bar(iteration: int, num_steps: int, bar_length: int=50) -> int: 
-    ''' Draws progress bar showing the number of executed 
+    """ Draws progress bar showing the number of executed 
     iterations over the overall number of iterations. 
-    Increments the iteration and returns it. '''
+    Increments the iteration and returns it. """
     status = ""
     progress = float(iteration) / float(num_steps)
     if progress >= 1.0:

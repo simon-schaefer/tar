@@ -22,8 +22,8 @@ from torch.utils.data.dataloader import default_collate
 # DATASET EXTENSION. 
 # =============================================================================
 class _Dataset_(Dataset):
-    ''' Extension class for torch dataset module, in order to find, search, 
-    load, preprocess and batch data from datasets. '''
+    """ Extension class for torch dataset module, in order to find, search, 
+    load, preprocess and batch data from datasets. """
 
     def __init__(self, args: argparse.Namespace, name: str="", train: bool=True):
         # Initialize super dataset class. 
@@ -54,8 +54,8 @@ class _Dataset_(Dataset):
     # Handling the filesystem 
     # =========================================================================
     def _scan(self) -> Tuple[List[str], List[str]]:
-        ''' Scan given lists of directories for HR and LR images and return 
-        list of HR and LR absolute file paths. '''
+        """ Scan given lists of directories for HR and LR images and return 
+        list of HR and LR absolute file paths. """
         names_hr = sorted(
             glob.glob(self.dir_hr + "/*" + self.ext[0])
         )
@@ -183,12 +183,12 @@ class _Dataset_(Dataset):
 # DATA LOADING CLASS. 
 # =============================================================================
 class _DataLoader_(DataLoader): 
-    ''' Pytorch data loader to load dataset with the following input arguments: 
+    """ Pytorch data loader to load dataset with the following input arguments: 
     - batch_size: number of samples in a batch
     - shuffle: should the dataset be shuffled before loading ?
     - num_workers:  how many subprocesses to use for data loading. 
                     0 means that the data will be loaded in the main process.
-    - collate_fn: merges a list of samples to form a mini-batch. '''
+    - collate_fn: merges a list of samples to form a mini-batch. """
 
     def __init__(self, dataset, 
                  batch_size, 
@@ -207,10 +207,10 @@ class _DataLoader_(DataLoader):
 # DATA HANDLING CLASS. 
 # =============================================================================
 class _Data_(object):
-    ''' Data loading class which allocates all given training and testing
+    """ Data loading class which allocates all given training and testing
     dataset stated in the input arguments to a loader (and concatenates 
     them for training). The resulting loader_test and loader_train can be 
-    used to load batches from the datasets. '''
+    used to load batches from the datasets. """
 
     def __init__(self, args: argparse.Namespace):
         # Load testing dataset. In order to get seperated testing results, 
@@ -235,8 +235,8 @@ class _Data_(object):
 
     @staticmethod 
     def load_dataset(args: argparse.Namespace, name: str, train: bool) -> _Dataset_: 
-        ''' Load dataset from module (in datasets directory). Every module loaded
-        should inherit from the _Dataset_ class defined below. '''
+        """ Load dataset from module (in datasets directory). Every module loaded
+        should inherit from the _Dataset_ class defined below. """
         m = importlib.import_module("tar.datasets." + name.lower())
         return getattr(m, name)(args, train=train)
 

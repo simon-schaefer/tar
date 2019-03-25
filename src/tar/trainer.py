@@ -18,8 +18,8 @@ import tar.modules as modules
 import tar.optimization as optimization
 
 class _Trainer_(object):
-    ''' Training front end including training and testing functions according 
-    to the input arguments. Also includes automated logging. '''
+    """ Training front end including training and testing functions according 
+    to the input arguments. Also includes automated logging. """
 
     def __init__(self, args: argparse.Namespace, 
                  loader: dataloader._Data_, 
@@ -45,9 +45,9 @@ class _Trainer_(object):
     # Training
     # =========================================================================
     def train(self):
-        ''' Training function for one epoch. Automated logging, using
+        """ Training function for one epoch. Automated logging, using
         optimizer and loss stated in the __init__ (their state is loaded
-        and updated automatically). '''
+        and updated automatically). """
         self.optimizer.schedule()
         epoch = self.optimizer.get_last_epoch() + 1
         finetuning = epoch >= self.args.fine_tuning
@@ -93,9 +93,9 @@ class _Trainer_(object):
     # Testing
     # =========================================================================
     def test(self):
-        ''' Testing function. In parallel (background) evaluate every 
+        """ Testing function. In parallel (background) evaluate every 
         testing dataset stated in the input arguments (args). Log 
-        results and save model at the end. '''
+        results and save model at the end. """
         torch.set_grad_enabled(False)
         epoch = self.optimizer.get_last_epoch() + 1
         finetuning = epoch >= self.args.fine_tuning
@@ -203,11 +203,11 @@ class _Trainer_(object):
 # TASK-AWARE DOWNSCALING TRAINER. 
 # =============================================================================
 class _Trainer_TAD_(_Trainer_): 
-    ''' Trainer class for training the image super resolution using the task
+    """ Trainer class for training the image super resolution using the task
     aware downscaling method, i.e. downscale to scaled image in autoencoder
     and include difference between encoded features and bicubic image to loss.
     Therefore the trainer assumes the model to have an encoder() and decoder()
-    function. '''
+    function. """
 
     def __init__(self, args: argparse.Namespace, 
                  loader: dataloader._Data_, 

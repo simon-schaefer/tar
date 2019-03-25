@@ -22,8 +22,8 @@ import matplotlib.pyplot as plt
 import torch
 
 class _Checkpoint_(object):
-    ''' Logging class for model training, including saving the model, 
-    optimizer state and loss curve (in a parallel threat). '''
+    """ Logging class for model training, including saving the model, 
+    optimizer state and loss curve (in a parallel threat). """
 
     def __init__(self, args: argparse.Namespace):
         super(_Checkpoint_, self).__init__()
@@ -66,7 +66,8 @@ class _Checkpoint_(object):
     def save(self, trainer, epoch: int, is_best: bool=False):
         trainer.model.save(self.get_path('model'), epoch, is_best=is_best)
         trainer.loss.save(self.dir)
-        trainer.loss.plot_loss(self.dir, epoch)
+        trainer.loss.plot_loss(self.dir, epoch, scale="linear")
+        trainer.loss.plot_loss(self.dir, epoch, scale="logarithmic")
         trainer.optimizer.save(self.dir)
         torch.save(self.log, self.get_path('psnr_log.pt'))
         # Plot peak signal-to-noise ratio (PSNR) plot. 
@@ -160,7 +161,7 @@ class _Checkpoint_(object):
 # Timer class. 
 # =============================================================================
 class _Timer_(object):
-    ''' Time logging class based on time library. '''
+    """ Time logging class based on time library. """
 
     def __init__(self):
         super(_Timer_, self).__init__()
@@ -194,9 +195,9 @@ def print_header() -> None:
     os.system("bash " + header_file)
 
 def progress_bar(iteration: int, num_steps: int, bar_length: int=50) -> int: 
-    ''' Draws progress bar showing the number of executed 
+    """ Draws progress bar showing the number of executed 
     iterations over the overall number of iterations. 
-    Increments the iteration and returns it. '''
+    Increments the iteration and returns it. """
     status = ""
     progress = float(iteration) / float(num_steps)
     if progress >= 1.0:
@@ -211,12 +212,12 @@ def progress_bar(iteration: int, num_steps: int, bar_length: int=50) -> int:
 
 def calc_psnr(x: torch.Tensor, y: torch.Tensor, 
               patch_size: int=None, rgb_range: float=255.0) -> float:
-    ''' Determine peak signal to noise ratio between to tensors 
+    """ Determine peak signal to noise ratio between to tensors 
     (mostly images, given as torch tensors), according to the formula in 
     https://www.mathworks.com/help/vision/ref/psnr.html. If patch size 
     is None the PSNR will be determined over the full tensors, otherwise
     a random patch of give patch size is determined and the PSNR is calculated
-    with respect to this patch. The tensors have an expected shape of (b,c,h,w). '''
+    with respect to this patch. The tensors have an expected shape of (b,c,h,w). """
     if x.nelement() == 1: return 0
     px, py = None, None
     if patch_size is None: px, py = x, y
@@ -232,8 +233,8 @@ def calc_psnr(x: torch.Tensor, y: torch.Tensor,
 
 def discretize(img: torch.Tensor, rgb_range: float, 
                normalized: bool, norm_range: List[float]) -> torch.Tensor:
-    ''' Discretize image (given as torch tensor) in defined range of
-    pixel values (e.g. 255 or 1.0), i.e. smart rounding. '''
+    """ Discretize image (given as torch tensor) in defined range of
+    pixel values (e.g. 255 or 1.0), i.e. smart rounding. """
     pixel_range = 255 * (norm_range[1] - norm_range[0])
     img_dis = img if not normalized else img.add(-norm_range[0])
     img_dis = img_dis.mul(pixel_range).clamp(0, 255).round().div(pixel_range)

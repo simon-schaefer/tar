@@ -15,9 +15,9 @@ import torch.utils.model_zoo
 import tar.miscellaneous as misc
 
 class _Model_(nn.Module):
-    ''' Model front end module including parallization (adapting to available
+    """ Model front end module including parallization (adapting to available
     hardware) as well as saving/loading functions. 
-    All models should inherit from this (abstract) model class. '''
+    All models should inherit from this (abstract) model class. """
 
     def __init__(self, args: argparse.Namespace, ckp: misc._Checkpoint_):
         super(_Model_, self).__init__()
@@ -52,8 +52,8 @@ class _Model_(nn.Module):
     # Saving and Loading 
     # =========================================================================
     def save(self, directory: str, epoch: int, is_best: bool=False):
-        ''' Save model as latest version, as epoch version and (if is_best flag
-        is set to True) as best version. '''
+        """ Save model as latest version, as epoch version and (if is_best flag
+        is set to True) as best version. """
         save_dirs = [directory + "/model_latest.pt"]
         if is_best:
             save_dirs.append(directory + "/model_best.pt")
@@ -64,8 +64,8 @@ class _Model_(nn.Module):
             torch.save(self.model.state_dict(), s)
 
     def load(self, directory: str, resume: int=-1, cpu: bool=False):
-        ''' Load model from directory, either the latest version (resume = -1)
-        or from a specific epoch (resume = epoch) to device. '''
+        """ Load model from directory, either the latest version (resume = -1)
+        or from a specific epoch (resume = epoch) to device. """
         load_from = None
         kwargs = {'map_location': lambda storage, loc: storage} if cpu else {}
         if resume == -1:
@@ -78,10 +78,10 @@ class _Model_(nn.Module):
 # Customly implemented building blocks (nn.Modules). 
 # =============================================================================
 class _Resblock_(nn.Module): 
-    ''' Residual convolutional block consisting of two convolutional 
+    """ Residual convolutional block consisting of two convolutional 
     layers, a RELU activation in between and a residual connection from 
     start to end. The inputs size (=s) is therefore contained. The number 
-    of channels is contained as well, but can be adapted (=c). '''
+    of channels is contained as well, but can be adapted (=c). """
 
     __constants__ = ['channels']
 
@@ -101,9 +101,9 @@ class _Resblock_(nn.Module):
         return 'channels={}'.format(self.channels)
 
 class _ReversePixelShuffle_(nn.Module): 
-    ''' Reverse pixel shuffeling module, i.e. rearranges elements in a tensor 
+    """ Reverse pixel shuffeling module, i.e. rearranges elements in a tensor 
     of shape (*, C, H*r, W*r) to (*, C*r^2, H, W). Inverse implementation according
-    to https://pytorch.org/docs/0.3.1/_modules/torch/nn/functional.html#pixel_shuffle. '''
+    to https://pytorch.org/docs/0.3.1/_modules/torch/nn/functional.html#pixel_shuffle. """
 
     __constants__ = ['downscale_factor']
 

@@ -20,9 +20,9 @@ import tar.miscellaneous as misc
 # OPTIMIZER. 
 # =============================================================================
 def make_optimizer(model: torch.nn.Module, args: argparse.Namespace): 
-    ''' Building the optimizer for model training purposes, given the 
+    """ Building the optimizer for model training purposes, given the 
     dictionary of input arguments (argparse). Also add functionalities like 
-    saving/loading a optimizer state. '''
+    saving/loading a optimizer state. """
     kwargs_optimizer = {'lr': args.lr, 'weight_decay': args.weight_decay}
     if args.optimizer == 'ADAM': 
         optimizer_class = torch.optim.Adam
@@ -37,9 +37,9 @@ def make_optimizer(model: torch.nn.Module, args: argparse.Namespace):
 
     # Building optimizer front end class based on chosen optimizer class. 
     class _Optimizer_(optimizer_class): 
-        ''' Optimizer front end class appending the chosen optimizer class 
+        """ Optimizer front end class appending the chosen optimizer class 
         by utility functions as saving/loading the internal state and also 
-        adding an automatic scheduler (adaptive learning rate). '''
+        adding an automatic scheduler (adaptive learning rate). """
 
         def __init__(self, *args, **kwargs):
             super(_Optimizer_, self).__init__(*args, **kwargs)
@@ -74,8 +74,8 @@ def make_optimizer(model: torch.nn.Module, args: argparse.Namespace):
 # LOSS. 
 # =============================================================================
 class _Loss_(nn.modules.loss._Loss):
-    ''' Building loss front end module that is creating a loss function based 
-    on the argument list (argparse) and adapting it to the available devices. '''
+    """ Building loss front end module that is creating a loss function based 
+    on the argument list (argparse) and adapting it to the available devices. """
 
     def __init__(self, args: argparse.Namespace, ckp: misc._Checkpoint_):
         super(_Loss_, self).__init__()
@@ -123,13 +123,13 @@ class _Loss_(nn.modules.loss._Loss):
         ckp.write_log("... successfully built loss module !")
 
     def forward(self, kwargs):
-        ''' Given the required input arguments determine every single
+        """ Given the required input arguments determine every single
         loss as well as the total loss, return and add to logging. 
         Expected inputs: {"LR_GT": low resolution ground truth, 
                           "LR_OUT": low resolution output
                           "HR_GT": high resolution ground truth, 
                           "HR_OUT": high resolution }
-        '''
+        """
         # Search for required inputs for specific loss type.
         for l  in self.loss: 
             input_type = l["desc"].split("-")[0]
@@ -157,13 +157,13 @@ class _Loss_(nn.modules.loss._Loss):
     # Saving and Loading 
     # =========================================================================
     def save(self, directory: str):
-        ''' Save internal state and logging in given directory. '''
+        """ Save internal state and logging in given directory. """
         torch.save(self.state_dict(), directory + "/loss.pt")
         torch.save(self.log, directory + "/loss.pt")
 
     def load(self, directory: str, cpu: bool=False):
-        ''' Load internal state and logging from given directory and redo  
-        logging state (simulate previous steps). '''
+        """ Load internal state and logging from given directory and redo  
+        logging state (simulate previous steps). """
         kwargs = {"map_location": lambda storage, loc: storage} if cpu else {}
         self.load_state_dict(torch.load(directory + "/loss.pt"), **kwargs)
         self.log = torch.load(directory + "/loss_log.pt")
@@ -178,8 +178,8 @@ class _Loss_(nn.modules.loss._Loss):
         self.log[-1].div_(n_batches)
 
     def display_loss(self, batch: int) -> str:
-        ''' Build loss description string containing a list of all losses
-        and their according normalized tensor. '''
+        """ Build loss description string containing a list of all losses
+        and their according normalized tensor. """
         n_samples = batch + 1
         log = []
         for l, c in zip(self.loss, self.log[-1]):
@@ -189,11 +189,13 @@ class _Loss_(nn.modules.loss._Loss):
     def get_total_loss(self) -> float: 
         return self.log[-1, -1]
 
-    def plot_loss(self, directory: str, epoch: int, threshold: float=1e3):
-        ''' Plot loss curves of every internal loss function and store
+    def plot_loss(self, directory: str, epoch: int, 
+                  threshold: float=1e3, scale: str="linear"):
+        """ Plot loss curves of every internal loss function and store
         the resulting figure in given directory. To avoid badly scaled 
         loss plots the values are thresholded, i.e. every loss above the 
-        threshold value is set to the threshold value. '''
+        threshold value is set to the threshold value. 
+        Loss axis either in "logarithmic" or "linear" scale. """
         axis = np.linspace(1, epoch, epoch)
         for i, l in enumerate(self.loss):
             label = l["desc"]
@@ -201,17 +203,23 @@ class _Loss_(nn.modules.loss._Loss):
             plt.title(label)
             losses = self.log[:, i].numpy()
             losses[losses > threshold] = threshold
+            if scale == "linear": 
+                pass
+            elif scale == "logarthmic": 
+                losses = [np.log10(x) for x in losses]
+            else: 
+                raise ValueError("Invalid loss plot scale {}".format(scale))
             plt.plot(axis, losses, label=label)
             plt.legend()
-            plt.xlabel('Epochs')
-            plt.ylabel('Loss')
+            plt.xlabel("Epochs")
+            plt.ylabel("Loss - {}".format(scale.capitalize()))
             plt.grid(True)
-            plt.savefig(directory + "/loss_{}.pdf".format(l['desc']))
+            plt.savefig(directory + "/loss_{}_{}.pdf".format(l['desc'],scale))
             plt.close(fig)
 
     def get_loss_module(self) -> nn.ModuleList:
-        ''' Return loss modules (depending on number of gpus they are either 
-        stored as single instance or in parallel). '''
+        """ Return loss modules (depending on number of gpus they are either 
+        stored as single instance or in parallel). """
         if self.n_gpus == 1:
             return self.loss_module
         else:
