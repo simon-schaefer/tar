@@ -37,7 +37,7 @@ class _Dataset_(Dataset):
         self.scale = args.scale
         # Determining training/testing data range. 
         data_range = [r.split('-') for r in args.data_range.split('/')]
-        if not train and len(data_range) > 1 and not args.test_only: 
+        if not train and len(data_range) > 1 and not args.valid_only: 
             data_range = data_range[1]
         else: 
             data_range = data_range[0]
@@ -213,17 +213,24 @@ class _Data_(object):
     used to load batches from the datasets. """
 
     def __init__(self, args: argparse.Namespace):
-        # Load testing dataset. In order to get seperated testing results, 
+        # Load validation dataset. In order to get seperated testing results, 
         # from each dataset (due to comparability reasons) the testing 
         # datasets are each loaded individually. 
+        self.loader_valid = []
+        if type(args.data_valid) == str: 
+            args.data_valid = [args.data_valid]
+        for dataset in args.data_valid: 
+            validset = self.load_dataset(args, dataset, train=False)
+            self.loader_valid.append(_DataLoader_(validset, 1))            
+        if self.args.valid_only: 
+            return
+        # Load testing dataset(s). 
         self.loader_test = []
         if type(args.data_test) == str: 
             args.data_test = [args.data_test]
         for dataset in args.data_test:
             testset = self.load_dataset(args, dataset, train=False)
             self.loader_test.append(_DataLoader_(testset, 1))
-        if args.test_only:
-            return
         # Load training dataset, if not testing only. For training several
         # datasets are trained in one process and therefore, each given 
         # training dataset is concatinated to one large dataset. 

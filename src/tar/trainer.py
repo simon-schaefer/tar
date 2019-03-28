@@ -32,7 +32,8 @@ class _Trainer_(object):
         self.scale = args.scale
         self.ckp = ckp
         self.loader_train = loader.loader_train
-        self.loader_test = loader.loader_test
+        self.loader_test  = loader.loader_test
+        self.loader_valid = loader.loader_valid
         self.model = model
         self.loss = loss
         self.optimizer = optimization.make_optimizer(model, args)
@@ -116,7 +117,10 @@ class _Trainer_(object):
             num_test_samples = len(d.dataset)
             for i, (lr, hr, filename) in enumerate(d):
                 lr, hr = self.prepare(lr, hr)
-                save_list, apply_time = self.saving_core(lr, hr, di, finetuning)
+                save_list, psnr_array, apply_time = self.saving_core(
+                    lr, hr, di, finetuning
+                )
+                self.ckp.log[-1, di, :] += psnr_array
                 net_applying_times.append(apply_time)
                 if save: 
                     if self.args.save_gt:
@@ -124,36 +128,29 @@ class _Trainer_(object):
                     if self.args.save_results:
                         self.ckp.save_results(save_list,filename[0],d,self.scale)
                 misc.progress_bar(i+1, num_test_samples)
-            # Logging LR PSNR values. 
-            self.ckp.log[-1, di, 1] /= len(d)
-            best = self.ckp.log[:,:,1].max(0)
-            self.ckp.write_log(
-                "\nLR\t[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})".format(
-                    d.dataset.name,
-                    self.scale,
-                    self.ckp.log[-1, di, 1],
-                    best[0][di],
-                    best[1][di] + 1
+            # Logging PSNR values. 
+            self.ckp.log[-1, di, :] /= len(d)
+            psnr_descs = self.psnr_description()
+            assert len(psnr_descs) == self.ckp.log.shape[-1]
+            self.ckp.write_log("\n")
+            for ip, desc in enumerate(psnr_descs): 
+                best = self.ckp.log[:,:,ip].max(0)
+                self.ckp.write_log(
+                    "{}\t[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})".format(
+                        desc, 
+                        d.dataset.name,
+                        self.scale,
+                        self.ckp.log[-1, di, ip],
+                        best[0][di],
+                        best[1][di] + 1
+                    )
                 )
-            )
-            # Logging HR PSNR values. 
-            self.ckp.log[-1, di, 0] /= len(d)
-            best = self.ckp.log[:,:,0].max(0)
-            self.ckp.write_log(
-                "HR\t[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})".format(
-                    d.dataset.name,
-                    self.scale,
-                    self.ckp.log[-1, di, 0],
-                    best[0][di],
-                    best[1][di] + 1
-                )
-            )
         # Finalizing - Saving and logging. 
         self.ckp.write_log("Mean network applying time: {:.2f}ms".format(
             np.mean(net_applying_times)*1000
         ))
         if save: self.ckp.end_background()
-        if not self.args.test_only:
+        if not self.args.valid_only:
             self.ckp.write_log("Saving states ...")
             self.ckp.save(self, epoch, is_best=(best[1][0] + 1 == epoch))
         self.ckp.write_log(
@@ -161,6 +158,50 @@ class _Trainer_(object):
         )
         self.test_iter += 1
         torch.set_grad_enabled(True)
+
+    # =========================================================================
+    # Validation
+    # =========================================================================
+    def validation(self): 
+        """ Validation function for validate model after training on several
+        (independent) datasets. Determine several metrics as PSNR and runtime
+        for different scale factors and visualize them. """
+        torch.set_grad_enabled(False)
+        self.model.eval()
+        # Iterate over every validation dataset. 
+        self.ckp.write_log( "\nValidating model ...")
+        self.ckp.begin_background()
+        for di, d in enumerate(self.loader_valid):
+            # Determining PSNR and save example images. 
+            num_valid_samples = len(d.dataset)
+            pnsrs = np.array((num_valid_samples, self.ckp.log.shape[-1]))
+            for i, (lr, hr, filename) in enumerate(d):
+                lr, hr = self.prepare(lr, hr)
+                save_list, pnsr_array, _ = self.saving_core(lr, hr, di, True)
+                pnsrs[i,:] = pnsr_array
+                save_list.extend([lr, hr])
+                self.ckp.save_results(save_list,filename[0],d,self.scale)
+                misc.progress_bar(i+1, num_valid_samples)
+            # Logging PSNR values. 
+            pnsrs[-1,:] /= len(d)
+            psnr_descs = self.psnr_description()
+            assert len(psnr_descs) == pnsrs.shape[-1]
+            self.ckp.write_log("\n")
+            for ip, desc in enumerate(psnr_descs): 
+                pnsrs_i = pnsrs[:,ip]
+                pnsrs_i.sort()
+                self.ckp.write_log(
+                    "{}\t[{} x{}]\tPSNR: {:.3f} (1st) {:.3f} (2nd))".format(
+                        desc, 
+                        d.dataset.name,
+                        self.scale,
+                        pnsrs_i[-1], 
+                        pnsrs_i[-2]
+                    )
+                )  
+        # Finalizing. 
+        self.ckp.end_background()
+        torch.set_grad_enabled(True)        
 
     def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor, 
                           finetuning: bool) -> optimization._Loss_: 
@@ -178,10 +219,13 @@ class _Trainer_(object):
             hr_out, self.args.rgb_range, not self.args.no_normalize, 
             [self.args.norm_min, self.args.norm_max]
         )
-        self.ckp.log[-1, di, 0] += misc.calc_psnr(
+        hr_psnr = misc.calc_psnr(
             hr_out, hr, self.args.patch_size, self.args.rgb_range
         )
-        return [hr_out], apply_time
+        return [hr_out], np.asarray([hr_psnr]), apply_time
+
+    def psnr_description(self): 
+        return ["HR"]
 
     def prepare(self, *kwargs):
         device = torch.device('cpu' if self.args.cpu else self.args.cuda_device)
@@ -192,12 +236,17 @@ class _Trainer_(object):
         return [_prepare(a) for a in kwargs]
 
     def terminate(self):
-        if self.args.test_only:
-            self.test()
+        if self.args.valid_only:
+            self.validation()
             return True
         else:
             epoch = self.optimizer.get_last_epoch() + 1
-            return epoch >= self.args.epochs
+            training_over = epoch >= self.args.epochs
+            if training_over: 
+                self.validation()
+                return True
+            else: 
+                return False
 
 # =============================================================================
 # TASK-AWARE DOWNSCALING TRAINER. 
@@ -246,10 +295,10 @@ class _Trainer_TAD_(_Trainer_):
         hr_out = self.model.model.decode(lr_out2)
         apply_time = timer_apply.toc()
         # Determine psnr values for logging procedure. 
-        self.ckp.log[-1, di, 1] += misc.calc_psnr(
+        lr_pnsr = misc.calc_psnr(
             lr_out2, lr, self.args.patch_size/self.scale, self.args.rgb_range
         )
-        self.ckp.log[-1, di, 0] += misc.calc_psnr(
+        hr_psnr = misc.calc_psnr(
             hr_out, hr, self.args.patch_size, self.args.rgb_range
         )
         # Save discretized output images for logging. 
@@ -261,6 +310,7 @@ class _Trainer_TAD_(_Trainer_):
             hr_out, self.args.rgb_range, not self.args.no_normalize, 
             [self.args.norm_min, self.args.norm_max]
         )
-        return [hr_out, lr_out2], apply_time
+        return [hr_out, lr_out2], np.asarray([hr_psnr, lr_psnr]), apply_time
 
-
+    def psnr_description(self): 
+        return ["HR", "LR"]

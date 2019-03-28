@@ -89,29 +89,28 @@ class _Checkpoint_(object):
         
     def save_results(self, save_list: List[torch.Tensor], 
                      filename: str, dataset, scale: int):
-        if self.args.save_results:
-            filename = self.get_path(
-                'results-{}'.format(dataset.dataset.name),
-                '{}_x{}_'.format(filename, scale)
-            )
-            if len(save_list) == 2: 
-                postfix = ('SHR', 'LR')
-            elif len(save_list) == 3: 
-                postfix = ('SHR', 'LR', 'HR')
-            elif len(save_list) == 4: 
-                postfix = ('SHR', 'SLR', 'LR', 'HR')
+        filename = self.get_path(
+            'results-{}'.format(dataset.dataset.name),
+            '{}_x{}_'.format(filename, scale)
+        )
+        if len(save_list) == 2: 
+            postfix = ('SHR', 'LR')
+        elif len(save_list) == 3: 
+            postfix = ('SHR', 'LR', 'HR')
+        elif len(save_list) == 4: 
+            postfix = ('SHR', 'SLR', 'LR', 'HR')
+        else: 
+            raise ValueError("Invalid number of savable images !")
+        for v, p in zip(save_list, postfix):
+            normalized = v[0]
+            if not self.args.no_normalize: 
+                r = 255/(self.args.norm_max - self.args.norm_min)
+                normalized = normalized.add(-self.args.norm_min).mul(r)
             else: 
-                raise ValueError("Invalid number of savable images !")
-            for v, p in zip(save_list, postfix):
-                normalized = v[0]
-                if not self.args.no_normalize: 
-                    r = 255/(self.args.norm_max - self.args.norm_min)
-                    normalized = normalized.add(-self.args.norm_min).mul(r)
-                else: 
-                    normalized = normalized.mul(255/self.args.rgb_range)
-                normalized = normalized.clamp(0, 255).round()
-                tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
-                self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
+                normalized = normalized.mul(255/self.args.rgb_range)
+            normalized = normalized.clamp(0, 255).round()
+            tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
+            self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
 
     # =========================================================================
     # Logging.  

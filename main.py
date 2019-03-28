@@ -11,7 +11,7 @@ _sr_.miscellaneous.print_header()
 args    = _sr_.inputs.args
 ckp     = _sr_.miscellaneous._Checkpoint_(args)
 loader  = _sr_.dataloader._Data_(args)
-loss    = _sr_.optimization._Loss_(args, ckp) if not args.test_only else None
+loss    = _sr_.optimization._Loss_(args, ckp) if not args.valid_only else None
 model   = _sr_.modules._Model_(args, ckp)
 trainer = None
 if args.model_type == "TAD": 

@@ -37,7 +37,10 @@ parser.add_argument("--data_train", type=str, default="DIV2K",
                     help="training dataset name (= 1 dataset!)")
 parser.add_argument("--data_test", type=str, default="DIV2K", 
                     choices=("DIV2K", "MNIST"), 
-                    help="testing datasets name i.e. either str or list")
+                    help="testing datasets name (>= 1 dataset!)")
+parser.add_argument("--data_valid", default=["URBAN100","SET5","SET14","BSDS100"], 
+                    choices=("URBAN100","SET5","SET14","BSDS100"), 
+                    help="validation datasets names (>= 1 dataset!)")
 parser.add_argument("--data_range", type=str, default="1-700/701-800",
                     help="train/test data range")
 parser.add_argument("--ext", type=str, default="img",
@@ -80,8 +83,8 @@ parser.add_argument("--fine_tuning", type=int, default=400,
                     help="start fine tuning model at epoch")
 parser.add_argument("--batch_size", type=int, default=16,
                     help="input batch size for training")
-parser.add_argument("--test_only", action="store_true",
-                    help="set this option to test the model (default=False)")
+parser.add_argument("--valid_only", action="store_true",
+                    help="validate only, no training (default=False)")
 parser.add_argument("--precision", type=str, default="single",
                     choices=("single", "half"),
                     help="floating point precision(single | half)")

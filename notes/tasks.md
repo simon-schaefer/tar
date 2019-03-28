@@ -28,9 +28,12 @@ num_workers=0 for test))
 --> fix dark, one-channel-only SR images bug (discretization in fine-tuning only)
 - [x] Loss graph in logarithmic and linear scale
 - [x] Training of TAD network on whole DIV2K dataset 
+- [x] Trainer generalizen (HR, LR print dependent on self.ckp.log.shape[-1] and descriptions, 
+which depends on self.args.model_type argument)
 - [ ] Testing framwork for multiple datasets at the end of training with several dataset 
 (input argument, Set5, Set14, B100, Urban100, DIV2K) and listing several information
 (for several scales: PSNR -> best, second best; runtime;; extreme downscaling)
+(save SHR images next to bicubic downsampled image)
 
 ## Literature 
 - [Paper: Task-Aware Image Downscaling (Kyoung Mu Lee)](http://openaccess.thecvf.com/content_ECCV_2018/papers/Heewon_Kim_Task-Aware_Image_Downscaling_ECCV_2018_paper.pdf)

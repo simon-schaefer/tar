@@ -126,6 +126,23 @@ if [ ! -d "SIMPLE" ]; then
 fi
 cd $SR_PROJECT_DATA_PATH
 
+# Validation datasets. 
+echo "Validation datasets ..."
+if [ ! -d "Urban100" ] || [ ! -d "Set5" ] || [ ! -d "Set14" ] || [ ! -d "BSDS100" ]; then
+    wget http://vllab.ucmerced.edu/wlai24/LapSRN/results/SR_testing_datasets.zip
+    unzip SR_testing_datasets.zip
+    rm SR_testing_datasets.zip
+    for dir in "Urban100" "Set5" "Set14" "BSDS100"; do
+        dir=${dir%*/} 
+        cd $SR_PROJECT_DATA_PATH/$dir
+        mkdir HR
+        mv *.png HR/
+        python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/$dir/HR 2 True
+        cd $SR_PROJECT_DATA_PATH
+    done
+fi
+cd $SR_PROJECT_DATA_PATH
+
 # Build outs directory.
 echo $'\nBuilding output directory ...'
 cd $SR_PROJECT_HOME
