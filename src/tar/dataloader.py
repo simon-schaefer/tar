@@ -16,13 +16,14 @@ from typing import List, Tuple
 
 from torch import from_numpy, Tensor
 from torch.utils.data import Dataset, DataLoader
+from torch.utils.data.dataloader import default_collate
 
 # =============================================================================
 # DATASET EXTENSION. 
 # =============================================================================
 class _Dataset_(Dataset):
-    ''' Extension class for torch dataset module, in order to find, search, 
-    load, preprocess and batch data from datasets. '''
+    """ Extension class for torch dataset module, in order to find, search, 
+    load, preprocess and batch data from datasets. """
 
     def __init__(self, args: argparse.Namespace, name: str="", train: bool=True):
         # Initialize super dataset class. 
@@ -36,7 +37,7 @@ class _Dataset_(Dataset):
         self.scale = args.scale
         # Determining training/testing data range. 
         data_range = [r.split('-') for r in args.data_range.split('/')]
-        if not train and len(data_range) > 1 and not args.test_only: 
+        if not train and len(data_range) > 1 and not args.valid_only: 
             data_range = data_range[1]
         else: 
             data_range = data_range[0]
@@ -53,8 +54,8 @@ class _Dataset_(Dataset):
     # Handling the filesystem 
     # =========================================================================
     def _scan(self) -> Tuple[List[str], List[str]]:
-        ''' Scan given lists of directories for HR and LR images and return 
-        list of HR and LR absolute file paths. '''
+        """ Scan given lists of directories for HR and LR images and return 
+        list of HR and LR absolute file paths. """
         names_hr = sorted(
             glob.glob(self.dir_hr + "/*" + self.ext[0])
         )
@@ -128,10 +129,13 @@ class _Dataset_(Dataset):
         patch_size = self.args.patch_size
         assert patch_size <= hr.shape[0] and patch_size <= hr.shape[1]
         pair = _get_patch(lr, hr, self.scale, patch_size, self.train)
-        # Normalize patches from rgb_range to [-0.5, 0.5].  
-        if not self.args.no_normalize: 
+        # Normalize patches from rgb_range to [norm_min, norm_max].  
+        if not self.args.no_normalize:
+            assert self.args.norm_max > self.args.norm_min 
+            norm_range = self.args.norm_max - self.args.norm_min
+
             def _normalize(image):
-                return image/self.args.rgb_range - 0.5
+                return image/self.args.rgb_range*norm_range+self.args.norm_min
 
             pair = [_normalize(x) for x in pair]
         # Augment patches (if flag is set). 
@@ -179,46 +183,67 @@ class _Dataset_(Dataset):
 # DATA LOADING CLASS. 
 # =============================================================================
 class _DataLoader_(DataLoader): 
+    """ Pytorch data loader to load dataset with the following input arguments: 
+    - batch_size: number of samples in a batch
+    - shuffle: should the dataset be shuffled before loading ?
+    - num_workers:  how many subprocesses to use for data loading. 
+                    0 means that the data will be loaded in the main process.
+    - collate_fn: merges a list of samples to form a mini-batch. """
 
-    def __init__(self, dataset, batch_size, num_workers): 
+    def __init__(self, dataset, 
+                 batch_size, 
+                 shuffle=False, 
+                 num_workers=0, 
+                 collate_fn=default_collate): 
         super(_DataLoader_, self).__init__(
             dataset, 
             batch_size=batch_size, 
-            shuffle=True, 
+            shuffle=shuffle, 
             num_workers=num_workers, 
+            collate_fn=collate_fn,
         )
 
 # =============================================================================
 # DATA HANDLING CLASS. 
 # =============================================================================
 class _Data_(object):
-    ''' Data loading class which allocates all given training and testing
+    """ Data loading class which allocates all given training and testing
     dataset stated in the input arguments to a loader (and concatenates 
     them for training). The resulting loader_test and loader_train can be 
-    used to load batches from the datasets. '''
+    used to load batches from the datasets. """
 
     def __init__(self, args: argparse.Namespace):
-        # Load testing dataset. In order to get seperated testing results, 
+        # Load validation dataset. In order to get seperated testing results, 
         # from each dataset (due to comparability reasons) the testing 
         # datasets are each loaded individually. 
+        self.loader_valid = []
+        if type(args.data_valid) == str: 
+            args.data_valid = [args.data_valid]
+        for dataset in args.data_valid: 
+            validset = self.load_dataset(args, dataset, train=False)
+            self.loader_valid.append(_DataLoader_(validset, 1))            
+        if self.args.valid_only: 
+            return
+        # Load testing dataset(s). 
         self.loader_test = []
         if type(args.data_test) == str: 
             args.data_test = [args.data_test]
         for dataset in args.data_test:
             testset = self.load_dataset(args, dataset, train=False)
-            self.loader_test.append(_DataLoader_(testset, 1, 0))
-        if args.test_only:
-            return
+            self.loader_test.append(_DataLoader_(testset, 1))
         # Load training dataset, if not testing only. For training several
         # datasets are trained in one process and therefore, each given 
         # training dataset is concatinated to one large dataset. 
         trainset = self.load_dataset(args, dataset, train=True)
-        self.loader_train = _DataLoader_(trainset, args.batch_size, args.n_threads)
+        self.loader_train = _DataLoader_(
+            trainset, args.batch_size, 
+            shuffle=True, num_workers=args.n_threads
+        )
 
     @staticmethod 
     def load_dataset(args: argparse.Namespace, name: str, train: bool) -> _Dataset_: 
-        ''' Load dataset from module (in datasets directory). Every module loaded
-        should inherit from the _Dataset_ class defined below. '''
-        m = importlib.import_module("super_resolution.datasets." + name.lower())
+        """ Load dataset from module (in datasets directory). Every module loaded
+        should inherit from the _Dataset_ class defined below. """
+        m = importlib.import_module("tar.datasets." + name.lower())
         return getattr(m, name)(args, train=train)
 

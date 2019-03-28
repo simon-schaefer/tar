@@ -11,11 +11,11 @@ import unittest
 import torch
 from torch import nn
 
-import super_resolution.inputs as argus
-import super_resolution.dataloader as dataloader
-import super_resolution.optimization as optimization
-import super_resolution.miscellaneous as miscellaneous
-import super_resolution.modules as modules
+import tar.inputs as argus
+import tar.dataloader as dataloader
+import tar.optimization as optimization
+import tar.miscellaneous as miscellaneous
+import tar.modules as modules
 
 class DataLoaderTest(unittest.TestCase): 
     
@@ -27,13 +27,13 @@ class DataLoaderTest(unittest.TestCase):
         loader_test = loader.loader_test
         assert loader_test
         # Training data loader. 
-        if not args.test_only: 
+        if not args.valid_only: 
             loader_train = loader.loader_train
             assert loader_train
     
     def test_batching(self): 
         args = argus.args
-        args.test_only = False
+        args.valid_only = False
         loader = dataloader._Data_(args)
         loader_train = loader.loader_train
         for batch, (lr, hr, files) in enumerate(loader_train): 
@@ -46,7 +46,7 @@ class DataLoaderTest(unittest.TestCase):
 
     def test_div2k(self):
         args = argus.args
-        args.test_only = False
+        args.valid_only = False
         args.data_train = "DIV2K"
         args.data_test = "DIV2K"
         loader = dataloader._Data_(args)
@@ -61,7 +61,7 @@ class DataLoaderTest(unittest.TestCase):
 
     def test_mnist(self):
         args = argus.args
-        args.test_only = False
+        args.valid_only = False
         args.data_train = "MNIST"
         args.data_test = "MNIST"
         args.patch_size = 10
@@ -105,7 +105,7 @@ class OptimizationTest(unittest.TestCase):
     def test_loss_forward(self): 
         # Intialize loss module input arguments. 
         args = argus.args
-        args.test_only = False
+        args.valid_only = False
         args.loss = "HR*1*L1"
         args.load = ""
         ckp = miscellaneous._Checkpoint_(args)
@@ -163,10 +163,10 @@ class ModulesTest(unittest.TestCase):
 
     def test_inv_pixel_shuffle(self): 
         model = self.PixelShuffle_Forward_Backward(factor=2)
-        x = torch.arange(4).view(1,1,2,2)
+        x = torch.arange(16).view(1,1,4,4)
         y = model(x)
         assert torch.all(torch.eq(x, y))
-        x = torch.arange(16).view(1,1,4,4)
+        x = torch.arange(48).view(1,3,4,4)
         y = model(x)
         assert torch.all(torch.eq(x, y))
 

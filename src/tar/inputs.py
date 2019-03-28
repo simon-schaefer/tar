@@ -7,7 +7,7 @@
 import argparse
 import os
 
-parser = argparse.ArgumentParser(description="super_resolution")
+parser = argparse.ArgumentParser(description="tar")
 parser.add_argument("--template", default=".",
                     help="set various templates in option.py")
 parser.add_argument("--verbose", action="store_true",
@@ -37,7 +37,10 @@ parser.add_argument("--data_train", type=str, default="DIV2K",
                     help="training dataset name (= 1 dataset!)")
 parser.add_argument("--data_test", type=str, default="DIV2K", 
                     choices=("DIV2K", "MNIST"), 
-                    help="testing datasets name i.e. either str or list")
+                    help="testing datasets name (>= 1 dataset!)")
+parser.add_argument("--data_valid", default=["URBAN100","SET5","SET14","BSDS100"], 
+                    choices=("URBAN100","SET5","SET14","BSDS100"), 
+                    help="validation datasets names (>= 1 dataset!)")
 parser.add_argument("--data_range", type=str, default="1-700/701-800",
                     help="train/test data range")
 parser.add_argument("--ext", type=str, default="img",
@@ -52,7 +55,11 @@ parser.add_argument("--rgb_range", type=int, default=255,
 parser.add_argument("--n_colors", type=int, default=3,
                     help="number of color channels to use")
 parser.add_argument("--no_normalize", action="store_true",
-                    help="not normalize inputs to [-0.5, 0.5] (default=False)")
+                    help="not normalize inputs to [norm_min, norm_max] (default=False)")
+parser.add_argument("--norm_min", type=float, default=0.0, 
+                    help="normalization lower border")
+parser.add_argument("--norm_max", type=float, default=1.0, 
+                    help="normalization upper border")
 parser.add_argument("--no_augment", action="store_true",
                     help="not use data augmentation (default=False)")
 
@@ -70,12 +77,14 @@ parser.add_argument("--model_type", type=str, default="",
 # =============================================================================
 parser.add_argument("--reset", action="store_true",
                     help="reset the training (default=False)")
-parser.add_argument("--epochs", type=int, default=3000,
+parser.add_argument("--epochs", type=int, default=500,
                     help="number of epochs to train")
-parser.add_argument("--batch_size", type=int, default=6,
+parser.add_argument("--fine_tuning", type=int, default=400,
+                    help="start fine tuning model at epoch")
+parser.add_argument("--batch_size", type=int, default=16,
                     help="input batch size for training")
-parser.add_argument("--test_only", action="store_true",
-                    help="set this option to test the model (default=False)")
+parser.add_argument("--valid_only", action="store_true",
+                    help="validate only, no training (default=False)")
 parser.add_argument("--precision", type=str, default="single",
                     choices=("single", "half"),
                     help="floating point precision(single | half)")
@@ -87,7 +96,7 @@ parser.add_argument("--lr", type=float, default=1e-3,
                     help="learning rate")
 parser.add_argument("--decay", type=str, default="100",
                     help="learning rate decay type")
-parser.add_argument("--gamma", type=float, default=0.6,
+parser.add_argument("--gamma", type=float, default=0.9,
                     help="learning rate decay factor for step decay")
 parser.add_argument("--optimizer", default="ADAM",
                     choices=("ADAM"),
@@ -106,7 +115,7 @@ parser.add_argument("--gclip", type=float, default=0,
 # =============================================================================
 # Loss specifications.
 # =============================================================================
-parser.add_argument("--loss", type=str, default="HR*1*L1",
+parser.add_argument("--loss", type=str, default="HR*1*L1+LR*1*L1",
                     help="loss function configuration")
 
 # =============================================================================
@@ -124,8 +133,8 @@ parser.add_argument("--print_every", type=int, default=100,
                     help="how many batches to wait before logging training status")
 parser.add_argument("--save_results", action="store_false",
                     help="save output results (default=True)")
-parser.add_argument("--save_gt", action="store_false",
-                    help="save low-resolution and high-resolution images together (default=True)")
+parser.add_argument("--save_gt", action="store_true",
+                    help="save low-resolution and high-resolution images together (default=False)")
 parser.add_argument("--save_every", type=int, default=10, 
                     help="save output/models every x steps if save_result flag is set")
 
@@ -138,47 +147,39 @@ def set_template(args):
         args.model_type = "TAD"
         args.scale      = 2
         args.optimizer  = "ADAM"
-        args.batch_size = 6
         args.data_train = "MNIST"
         args.data_test  = "MNIST"
         args.n_colors   = 1
         args.patch_size = 28
-        args.loss       = "HR*10*L1+LR*1*L1"
 
     if args.template.find("IM_AE_TAD_DIV2K") >= 0:
         args.model      = "AETAD_3D"
         args.model_type = "TAD"
         args.scale      = 2
         args.optimizer  = "ADAM"
-        args.batch_size = 6
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
         args.n_colors   = 3
         args.patch_size = 96
-        args.loss       = "HR*1*L1+LR*1*L1"
-
-    if args.template.find("IM_AE_TAD_DIV2K_SMALL") >= 0:
-        args.model      = "AETAD_3D_SMALL"
-        args.model_type = "TAD"
-        args.scale      = 2
-        args.optimizer  = "ADAM"
-        args.batch_size = 6
-        args.data_train = "DIV2K"
-        args.data_test  = "DIV2K"
-        args.n_colors   = 3
-        args.patch_size = 24
-        args.loss       = "HR*1*L1+LR*1*L1"
 
     if args.template.find("IM_AE_TEST") >= 0:
         args.model      = "AETRIAL_NOSR"
         args.scale      = 1
         args.optimizer  = "ADAM"
-        args.batch_size = 6
         args.data_train = "MNIST"
         args.data_test  = "MNIST"
         args.n_colors   = 1
         args.patch_size = 28
-        args.loss       = "HR*1*MSE"
+
+    if args.template.find("IM_AE_SIMPLE") >= 0:
+        args.model      = "AETAD_3D"
+        args.model_type = "TAD"
+        args.scale      = 2
+        args.optimizer  = "ADAM"
+        args.data_train = "SIMPLE"
+        args.data_test  = "SIMPLE"
+        args.n_colors   = 3
+        args.patch_size = 96
 
 # =============================================================================
 # MAIN. 

@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 from setuptools import find_packages, setup
 
-setup(name='super_resolution',
+setup(name='tar',
       description='Image and Video Super Resolution',
       version=0.1,
-      url='https://github.com/simon-schaefer/super_resolution',
+      url='https://github.com/simon-schaefer/tar',
       author='Simon Schaefer',
       author_email='sischaef@ethz.ch',
       package_dir={'': 'src'},

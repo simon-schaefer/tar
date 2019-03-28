@@ -1,11 +1,10 @@
 #!/bin/bash
 
-GPU_INDEX=${1:-0}
+export SGE_GPU_ALL="$(ls -rt /tmp/lock-gpu*/info.txt | xargs grep -h $(whoami) | awk '{print $2}' | paste -sd "," -)" 
+export SGE_GPU=$(echo $SGE_GPU_ALL |rev|cut -d, -f1|rev) 
+# NOTE: Use $SGE_GPU_ALL for multi GPU jobs
+# USE LAST GPU by request time.
+echo "SGE gpu=$SGE_GPU_ALL available"
+echo "SGE gpu=$SGE_GPU allocated in this use"
 
-#Cuda:0 is always the first visible GPU. So if you set CUDA_VISIBLE_DEVICES 
-# to another index (e.g. 1), this GPU is referred to as cuda:0. 
-# Alternatively you could specify the device as torch.device('cpu') for 
-# running your model/tensor on CPU.
-# The global GPU index (which is necessary to set CUDA_VISIBLE_DEVICES in the 
-# right way) can be seen by the nvidia-smi command in the shell/bash.
-export CUDA_VISIBLE_DEVICES=$GPU_INDEX
+export CUDA_VISIBLE_DEVICES="$SGE_GPU"

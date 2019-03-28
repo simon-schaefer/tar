@@ -10,6 +10,7 @@ import math
 from multiprocessing import Process, Queue
 import numpy as np
 import os
+import random
 import sys
 import time
 from typing import List
@@ -21,8 +22,8 @@ import matplotlib.pyplot as plt
 import torch
 
 class _Checkpoint_(object):
-    ''' Logging class for model training, including saving the model, 
-    optimizer state and loss curve (in a parallel threat). '''
+    """ Logging class for model training, including saving the model, 
+    optimizer state and loss curve (in a parallel threat). """
 
     def __init__(self, args: argparse.Namespace):
         super(_Checkpoint_, self).__init__()
@@ -65,7 +66,8 @@ class _Checkpoint_(object):
     def save(self, trainer, epoch: int, is_best: bool=False):
         trainer.model.save(self.get_path('model'), epoch, is_best=is_best)
         trainer.loss.save(self.dir)
-        trainer.loss.plot_loss(self.dir, epoch)
+        trainer.loss.plot_loss(self.dir, epoch, scale="linear")
+        trainer.loss.plot_loss(self.dir, epoch, scale="logarithmic")
         trainer.optimizer.save(self.dir)
         torch.save(self.log, self.get_path('psnr_log.pt'))
         # Plot peak signal-to-noise ratio (PSNR) plot. 
@@ -87,28 +89,28 @@ class _Checkpoint_(object):
         
     def save_results(self, save_list: List[torch.Tensor], 
                      filename: str, dataset, scale: int):
-        if self.args.save_results:
-            filename = self.get_path(
-                'results-{}'.format(dataset.dataset.name),
-                '{}_x{}_'.format(filename, scale)
-            )
-            if len(save_list) == 2: 
-                postfix = ('SHR', 'LR')
-            elif len(save_list) == 3: 
-                postfix = ('SHR', 'LR', 'HR')
-            elif len(save_list) == 4: 
-                postfix = ('SHR', 'SLR', 'LR', 'HR')
+        filename = self.get_path(
+            'results-{}'.format(dataset.dataset.name),
+            '{}_x{}_'.format(filename, scale)
+        )
+        if len(save_list) == 2: 
+            postfix = ('SHR', 'LR')
+        elif len(save_list) == 3: 
+            postfix = ('SHR', 'LR', 'HR')
+        elif len(save_list) == 4: 
+            postfix = ('SHR', 'SLR', 'LR', 'HR')
+        else: 
+            raise ValueError("Invalid number of savable images !")
+        for v, p in zip(save_list, postfix):
+            normalized = v[0]
+            if not self.args.no_normalize: 
+                r = 255/(self.args.norm_max - self.args.norm_min)
+                normalized = normalized.add(-self.args.norm_min).mul(r)
             else: 
-                raise ValueError("Invalid number of savable images !")
-            for v, p in zip(save_list, postfix):
-                normalized = v[0]
-                if not self.args.no_normalize: 
-                    normalized = normalized.add(0.5).mul(255)
-                else: 
-                    normalized = normalized.mul(255/self.args.rgb_range)
-                normalized = normalized.clamp(0, 255)
-                tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
-                self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
+                normalized = normalized.mul(255/self.args.rgb_range)
+            normalized = normalized.clamp(0, 255).round()
+            tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
+            self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
 
     # =========================================================================
     # Logging.  
@@ -158,7 +160,7 @@ class _Checkpoint_(object):
 # Timer class. 
 # =============================================================================
 class _Timer_(object):
-    ''' Time logging class based on time library. '''
+    """ Time logging class based on time library. """
 
     def __init__(self):
         super(_Timer_, self).__init__()
@@ -192,9 +194,9 @@ def print_header() -> None:
     os.system("bash " + header_file)
 
 def progress_bar(iteration: int, num_steps: int, bar_length: int=50) -> int: 
-    ''' Draws progress bar showing the number of executed 
+    """ Draws progress bar showing the number of executed 
     iterations over the overall number of iterations. 
-    Increments the iteration and returns it. '''
+    Increments the iteration and returns it. """
     status = ""
     progress = float(iteration) / float(num_steps)
     if progress >= 1.0:
@@ -207,19 +209,33 @@ def progress_bar(iteration: int, num_steps: int, bar_length: int=50) -> int:
     sys.stdout.flush()
     return iteration + 1
 
-def calc_psnr(x: torch.Tensor, y: torch.Tensor, rgb_range: float) -> float:
-    ''' Determine peak signal to noise ratio between to tensors 
+def calc_psnr(x: torch.Tensor, y: torch.Tensor, 
+              patch_size: int=None, rgb_range: float=255.0) -> float:
+    """ Determine peak signal to noise ratio between to tensors 
     (mostly images, given as torch tensors), according to the formula in 
-    https://www.mathworks.com/help/vision/ref/psnr.html. '''
+    https://www.mathworks.com/help/vision/ref/psnr.html. If patch size 
+    is None the PSNR will be determined over the full tensors, otherwise
+    a random patch of give patch size is determined and the PSNR is calculated
+    with respect to this patch. The tensors have an expected shape of (b,c,h,w). """
     if x.nelement() == 1: return 0
-    mse = torch.dist(x, y, 2).pow(2).mean()
+    px, py = None, None
+    if patch_size is None: px, py = x, y
+    else: 
+        h, w = x.shape[2:4]
+        lp = int(patch_size)
+        lx = random.randrange(0, w - lp + 1)
+        ly = random.randrange(0, h - lp + 1)    
+        px = x[:, :, ly:ly + lp, lx:lx + lp]
+        py = y[:, :, ly:ly + lp, lx:lx + lp]
+    mse = torch.dist(px, py, 2).pow(2).mean()
     return 10 * math.log10(rgb_range**2/mse)
 
-def discretize(img: torch.Tensor, rgb_range: float, normalized: bool) -> torch.Tensor:
-    ''' Discretize image (given as torch tensor) in defined range of
-    pixel values (e.g. 255 or 1.0), i.e. smart rounding. '''
-    pixel_range = 255 / rgb_range
-    img_dis = img if not normalized else img.add(0.5)
+def discretize(img: torch.Tensor, rgb_range: float, 
+               normalized: bool, norm_range: List[float]) -> torch.Tensor:
+    """ Discretize image (given as torch tensor) in defined range of
+    pixel values (e.g. 255 or 1.0), i.e. smart rounding. """
+    pixel_range = 255 * (norm_range[1] - norm_range[0])
+    img_dis = img if not normalized else img.add(-norm_range[0])
     img_dis = img_dis.mul(pixel_range).clamp(0, 255).round().div(pixel_range)
-    img_dis = img_dis if not normalized else img_dis.add(-0.5)
+    img_dis = img_dis if not normalized else img_dis.add(norm_range[0])
     return img_dis

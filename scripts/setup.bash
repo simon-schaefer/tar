@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export SR_PROJECT_NAME="super_resolution"
+export SR_PROJECT_NAME="tar"
 
 export SR_PROJECT_HOME="/scratch_net/biwidl215/sischaef"
 export SR_PROJECT_PROJECT_HOME="$SR_PROJECT_HOME/$SR_PROJECT_NAME"
@@ -45,8 +45,8 @@ source $SR_PROJECT_VIRTUAL_ENV_PATH/bin/activate
 # Install self-python-package. 
 echo $'\nInstalling package ...'
 cd $SR_PROJECT_PROJECT_HOME
-pip install -r requirements.txt
-pip install .
+pip install -r requirements.txt --user
+pip install -e . --user
 
 # Set environment set flag. 
 export SR_PROJECT_IS_SET="True"
@@ -82,7 +82,6 @@ if [ ! -d "DIV2K_valid_HR" ]; then
     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_HR.zip
     unzip DIV2K_valid_HR.zip
     rm DIV2K_valid_HR.zip
-    cp DIV2K_valid_HR/* DIV2K_train_HR/
 fi
 if [ ! -d "DIV2K_valid_LR_bicubic" ]; then
     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_bicubic_X2.zip
@@ -90,30 +89,57 @@ if [ ! -d "DIV2K_valid_LR_bicubic" ]; then
     rm DIV2K_valid_LR_bicubic_X2.zip
     mv DIV2K_valid_LR_bicubic/X2/* DIV2K_valid_LR_bicubic/
     rm -r DIV2K_valid_LR_bicubic/X2/
-    cp DIV2K_valid_LR_bicubic/* DIV2K_train_LR_bicubic/
 fi
 cd $SR_PROJECT_DATA_PATH
+
 # MNIST dataset. 
-echo "MNIST dataset ..."
-if [ ! -d "MNIST" ]; then
-    mkdir MNIST
+# echo "MNIST dataset ..."
+# if [ ! -d "MNIST" ]; then
+#     mkdir MNIST
+# fi
+# cd MNIST
+# if [ ! -d "MNIST_train_HR" ]; then
+#     wget https://pjreddie.com/media/files/mnist_train.tar.gz
+#     tar -xvf mnist_train.tar.gz
+#     rm mnist_train.tar.gz
+#     mv "train" "MNIST_train_HR"
+# fi
+# if [ ! -d "MNIST_valid_HR" ]; then
+#     wget https://pjreddie.com/media/files/mnist_test.tar.gz
+#     tar -xvf mnist_test.tar.gz
+#     rm mnist_test.tar.gz
+#     mv "test" "MNIST_valid_HR"
+#     cp MNIST_valid_HR/* MNIST_train_HR/
+# fi
+# if [ ! -d "MNIST_train_LR_bicubic" ]; then
+#     python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/MNIST/MNIST_train_HR 2 False
+# fi
+# cd $SR_PROJECT_DATA_PATH
+
+# SIMPLE dataset. 
+echo "SIMPLE dataset ..."
+if [ ! -d "SIMPLE" ]; then
+    python3 $SR_PROJECT_PROJECT_HOME/src/tests/create_simple_dataset.py
+    python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/SIMPLE/HR 2 True
 fi
-cd MNIST
-if [ ! -d "MNIST_train_HR" ]; then
-    wget https://pjreddie.com/media/files/mnist_train.tar.gz
-    tar -xvf mnist_train.tar.gz
-    rm mnist_train.tar.gz
-    mv "train" "MNIST_train_HR"
-fi
-if [ ! -d "MNIST_valid_HR" ]; then
-    wget https://pjreddie.com/media/files/mnist_test.tar.gz
-    tar -xvf mnist_test.tar.gz
-    rm mnist_test.tar.gz
-    mv "test" "MNIST_valid_HR"
-    cp MNIST_valid_HR/* MNIST_train_HR/
-fi
-if [ ! -d "MNIST_train_LR_bicubic" ]; then
-    python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/MNIST/MNIST_train_HR 2 False
+cd $SR_PROJECT_DATA_PATH
+
+# Validation datasets. 
+echo "Validation datasets ..."
+if [ ! -d "Urban100" ] || [ ! -d "Set5" ] || [ ! -d "Set14" ] || [ ! -d "BSDS100" ]; then
+    wget http://vllab.ucmerced.edu/wlai24/LapSRN/results/SR_testing_datasets.zip
+    unzip SR_testing_datasets.zip
+    rm SR_testing_datasets.zip
+    rm -r historical
+    rm -r Manga109
+    for dir in "Urban100" "Set5" "Set14" "BSDS100"; do
+        dir=${dir%*/} 
+        cd $SR_PROJECT_DATA_PATH/$dir
+        mkdir HR
+        mv *.png HR/
+        python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/$dir/HR 2 True
+        cd $SR_PROJECT_DATA_PATH
+    done
 fi
 cd $SR_PROJECT_DATA_PATH
 
