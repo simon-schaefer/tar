@@ -152,7 +152,7 @@ class _Trainer_(object):
         if save: self.ckp.end_background()
         if not self.args.valid_only:
             self.ckp.write_log("Saving states ...")
-            self.ckp.save(self, epoch, is_best=(best[1][0] + 1 == epoch))
+            self.ckp.save(self, epoch, self.scale, is_best=(best[1][0] + 1 == epoch))
         self.ckp.write_log(
             "Testing Total: {:.2f}s\n".format(timer_test.toc()), refresh=True
         )
@@ -175,10 +175,14 @@ class _Trainer_(object):
             # Determining PSNR and save example images. 
             num_valid_samples = len(d.dataset)
             pnsrs = np.array((num_valid_samples, self.ckp.log.shape[-1]))
+            runtimes = np.array((num_valid_samples, 1))
             for i, (lr, hr, filename) in enumerate(d):
                 lr, hr = self.prepare(lr, hr)
-                save_list, pnsr_array, _ = self.saving_core(lr, hr, di, True)
-                pnsrs[i,:] = pnsr_array
+                save_list, pnsr_array, runtime = self.saving_core(
+                    lr, hr, di, True
+                )
+                pnsrs[i,:]  = pnsr_array
+                runtimes[i] = runtime
                 save_list.extend([lr, hr])
                 self.ckp.save_results(save_list,filename[0],d,self.scale)
                 misc.progress_bar(i+1, num_valid_samples)
@@ -186,19 +190,16 @@ class _Trainer_(object):
             pnsrs[-1,:] /= len(d)
             psnr_descs = self.psnr_description()
             assert len(psnr_descs) == pnsrs.shape[-1]
-            self.ckp.write_log("\n")
+            self.ckp.write_log("\n{}x{}".format(d.dataset.name,self.scale))
             for ip, desc in enumerate(psnr_descs): 
                 pnsrs_i = pnsrs[:,ip]
                 pnsrs_i.sort()
                 self.ckp.write_log(
-                    "{}\t[{} x{}]\tPSNR: {:.3f} (1st) {:.3f} (2nd))".format(
-                        desc, 
-                        d.dataset.name,
-                        self.scale,
-                        pnsrs_i[-1], 
-                        pnsrs_i[-2]
+                    "PSNR {}: {:.3f} (1st) {:.3f} (2nd)".format(
+                        desc, pnsrs_i[-1], pnsrs_i[-2], 
                     )
                 )  
+            self.ckp.write_log("Runtime: {:.3f}".format(np.median(runtimes)))
         # Finalizing. 
         self.ckp.end_background()
         torch.set_grad_enabled(True)        

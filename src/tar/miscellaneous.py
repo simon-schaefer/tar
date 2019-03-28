@@ -64,7 +64,7 @@ class _Checkpoint_(object):
     # =========================================================================
     # Saving 
     # =========================================================================
-    def save(self, trainer, epoch: int, is_best: bool=False):
+    def save(self, trainer, epoch: int, scale: int, is_best: bool=False):
         trainer.model.save(self.get_path('model'), epoch, is_best=is_best)
         trainer.loss.save(self.dir)
         trainer.loss.plot_loss(self.dir, epoch, scale="linear")
@@ -80,7 +80,7 @@ class _Checkpoint_(object):
             plt.title(label)
             for i in range(self.log.shape[2]):             
                 plt.plot(axis,self.log[:, id, i].numpy(),
-                        label="{}: scale {}".format(labels[i], self.args.scale))
+                        label="{}: scale {}".format(labels[i], scale))
             plt.legend()
             plt.xlabel('Epochs')
             plt.ylabel('PSNR')

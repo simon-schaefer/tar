@@ -23,7 +23,6 @@ class _Model_(nn.Module):
         super(_Model_, self).__init__()
         ckp.write_log("Building model module ...")
         # Set parameters from input arguments. 
-        self.scale = args.scale
         self.cpu = args.cpu
         self.device = torch.device('cpu' if args.cpu else args.cuda_device)
         self.n_gpus = args.n_gpus
