@@ -19,7 +19,7 @@ class VDIV2K(_Dataset_):
         return names_hr, names_lr
 
     def _set_filesystem(self, dir_data):
-        super(DIV2K, self)._set_filesystem(dir_data)
+        super(VDIV2K, self)._set_filesystem(dir_data)
         self.directory = os.path.join(self.args.dir_data, "DIV2K")
         self.dir_hr = os.path.join(self.directory, 'DIV2K_valid_HR')
         self.dir_lr = os.path.join(self.directory, 'DIV2K_valid_LR_bicubic')

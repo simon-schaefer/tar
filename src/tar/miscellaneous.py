@@ -57,7 +57,8 @@ class _Checkpoint_(object):
         self.n_processes = 8
         self.ready = True
         self.write_log("Building model module ...")
-        self.write_log('Continue from epoch {}...'.format(len(self.log)))
+        if args.load: 
+            self.write_log('... continue from epoch {}...'.format(len(self.log)))
         self.write_log("... successfully built checkpoint module !")
 
     # =========================================================================

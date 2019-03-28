@@ -28,7 +28,7 @@ class _Model_(nn.Module):
         self.device = torch.device('cpu' if args.cpu else args.cuda_device)
         self.n_gpus = args.n_gpus
         self.save_models = args.save_models
-        module = importlib.import_module('models.' + args.model.lower())
+        module = importlib.import_module('tar.models.' + args.model.lower())
         self.model = module.build_net().to(self.device)
         if args.precision == "half": 
             self.model.half()

@@ -213,19 +213,20 @@ class _Data_(object):
     used to load batches from the datasets. """
 
     def __init__(self, args: argparse.Namespace):
+        self.loader_valid = []
+        self.loader_test = []
+        self.loader_train = None
         # Load validation dataset. In order to get seperated testing results, 
         # from each dataset (due to comparability reasons) the testing 
         # datasets are each loaded individually. 
-        self.loader_valid = []
         if type(args.data_valid) == str: 
             args.data_valid = [args.data_valid]
         for dataset in args.data_valid: 
             validset = self.load_dataset(args, dataset, train=False)
             self.loader_valid.append(_DataLoader_(validset, 1))            
-        if self.args.valid_only: 
+        if args.valid_only: 
             return
         # Load testing dataset(s). 
-        self.loader_test = []
         if type(args.data_test) == str: 
             args.data_test = [args.data_test]
         for dataset in args.data_test:
