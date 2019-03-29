@@ -169,13 +169,19 @@ class _Trainer_(object):
         torch.set_grad_enabled(False)
         self.model.eval()
         # Iterate over every validation dataset. 
-        self.ckp.write_log( "\nValidating model ...")
+        self.ckp.write_log("x"*50)
+        self.ckp.write_log("Validating model ...")
+        validations = []
         self.ckp.begin_background()
         for di, d in enumerate(self.loader_valid):
+            name = d.dataset.name
+            self.ckp.write_log("\n{}x{}".format(name,self.scale))
+            name = name + " "*(10-len(name))
+            v = {"dataset": "{}x{}".format(name,self.scale)}
             # Determining PSNR and save example images. 
-            num_valid_samples = len(d.dataset)
-            pnsrs = np.array((num_valid_samples, self.ckp.log.shape[-1]))
-            runtimes = np.array((num_valid_samples, 1))
+            num_valid_samples = len(d)
+            pnsrs = np.zeros((num_valid_samples, self.ckp.log.shape[-1]))
+            runtimes = np.zeros((num_valid_samples, 1))
             for i, (lr, hr, filename) in enumerate(d):
                 lr, hr = self.prepare(lr, hr)
                 save_list, pnsr_array, runtime = self.saving_core(
@@ -190,18 +196,16 @@ class _Trainer_(object):
             pnsrs[-1,:] /= len(d)
             psnr_descs = self.psnr_description()
             assert len(psnr_descs) == pnsrs.shape[-1]
-            self.ckp.write_log("\n{}x{}".format(d.dataset.name,self.scale))
             for ip, desc in enumerate(psnr_descs): 
                 pnsrs_i = pnsrs[:,ip]
                 pnsrs_i.sort()
-                self.ckp.write_log(
-                    "PSNR {}: {:.3f} (1st) {:.3f} (2nd)".format(
-                        desc, pnsrs_i[-1], pnsrs_i[-2], 
-                    )
-                )  
-            self.ckp.write_log("Runtime: {:.3f}".format(np.median(runtimes)))
+                v["PSNR {} (1st)".format(desc)] = "{:.3f}".format(pnsrs_i[-1])
+                v["PSNR {} (2st)".format(desc)] = "{:.3f}".format(pnsrs_i[-2])
+            v["runtime"] = "{:.3f}".format(np.median(runtimes))
+            validations.append(v)
         # Finalizing. 
         self.ckp.end_background()
+        self.ckp.save_validations(validations)
         torch.set_grad_enabled(True)        
 
     def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor, 
@@ -223,7 +227,7 @@ class _Trainer_(object):
         hr_psnr = misc.calc_psnr(
             hr_out, hr, self.args.patch_size, self.args.rgb_range
         )
-        return [hr_out], np.asarray([hr_psnr]), apply_time
+        return [hr_out], torch.Tensor([hr_psnr]), apply_time
 
     def psnr_description(self): 
         return ["HR"]
@@ -311,7 +315,7 @@ class _Trainer_TAD_(_Trainer_):
             hr_out, self.args.rgb_range, not self.args.no_normalize, 
             [self.args.norm_min, self.args.norm_max]
         )
-        return [hr_out, lr_out2], np.asarray([hr_psnr, lr_psnr]), apply_time
+        return [hr_out, lr_out2], torch.Tensor([hr_psnr, lr_psnr]), apply_time
 
     def psnr_description(self): 
         return ["HR", "LR"]

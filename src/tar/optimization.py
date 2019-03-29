@@ -190,7 +190,7 @@ class _Loss_(nn.modules.loss._Loss):
         return self.log[-1, -1]
 
     def plot_loss(self, directory: str, epoch: int, 
-                  threshold: float=1e3, scale: str="linear"):
+                  threshold: float=1e3, scaling: str="linear"):
         """ Plot loss curves of every internal loss function and store
         the resulting figure in given directory. To avoid badly scaled 
         loss plots the values are thresholded, i.e. every loss above the 
@@ -203,18 +203,18 @@ class _Loss_(nn.modules.loss._Loss):
             plt.title(label)
             losses = self.log[:, i].numpy()
             losses[losses > threshold] = threshold
-            if scale == "linear": 
+            if scaling == "linear": 
                 pass
-            elif scale == "logarthmic": 
+            elif scaling == "logarithmic": 
                 losses = [np.log10(x) for x in losses]
             else: 
-                raise ValueError("Invalid loss plot scale {}".format(scale))
+                raise ValueError("Invalid loss plot scaling {}".format(scaling))
             plt.plot(axis, losses, label=label)
             plt.legend()
             plt.xlabel("Epochs")
-            plt.ylabel("Loss - {}".format(scale.capitalize()))
+            plt.ylabel("Loss - {}".format(scaling.capitalize()))
             plt.grid(True)
-            plt.savefig(directory + "/loss_{}_{}.pdf".format(l['desc'],scale))
+            plt.savefig(directory + "/loss_{}_{}.pdf".format(l['desc'],scaling))
             plt.close(fig)
 
     def get_loss_module(self) -> nn.ModuleList:

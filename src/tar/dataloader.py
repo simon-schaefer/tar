@@ -91,16 +91,32 @@ class _Dataset_(Dataset):
             lr = imageio.imread(f_lr)
         else: 
             raise ValueError("Invalid file extension %s !" % str(self.args.ext))
-        assert hr.shape[0] == self.scale*lr.shape[0]
-        assert hr.shape[1] == self.scale*lr.shape[1]
 
         def _expand_dimension(img: np.ndarray) -> np.ndarray: 
-            if img.ndim == 2:
-                img = np.expand_dims(img, axis=2)
+            if img.ndim == 2 and self.args.n_colors == 3: 
+                img = np.stack((img,img,img), axis=2)
             return img
 
         lr, hr = _expand_dimension(lr), _expand_dimension(hr)
         assert hr.shape[2] == lr.shape[2]
+
+        def _cut_uneven(img: np.ndarray) -> np.ndarray:
+            if not img.shape[0] % 2 == 0: 
+                img = img[:-1,:,:]
+            if not img.shape[1] % 2  == 0: 
+                img = img[:,:-1,:]
+            return img
+
+        hr =  _cut_uneven(hr)
+
+        if not hr.shape[0] == self.scale*lr.shape[0]: 
+            print(f_hr)
+            print(hr.shape)
+            print(lr.shape)
+
+        assert hr.shape[0] == self.scale*lr.shape[0]
+        assert hr.shape[1] == self.scale*lr.shape[1]
+
         return lr, hr, filename
 
     # =========================================================================

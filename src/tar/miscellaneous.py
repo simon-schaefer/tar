@@ -13,7 +13,7 @@ import os
 import random
 import sys
 import time
-from typing import List
+from typing import Dict, List
 
 import matplotlib
 matplotlib.use('Agg')
@@ -41,11 +41,20 @@ class _Checkpoint_(object):
             if not os.path.exists(self.dir):
                 raise ValueError("Loading path %s does not exists !" % self.dir)
             self.log = torch.load(self.get_path('psnr_log.pt'))
-        # Creating output directories for model, results, logging, config, etc. 
+        # Creating output directories for model.
         os.makedirs(self.dir, exist_ok=True)
         os.makedirs(self.get_path('model'), exist_ok=True)
+        # Create output directory for test datasets. 
+        if type(args.data_test) == str: 
+            args.data_test = [args.data_test]
         for d in args.data_test:
             os.makedirs(self.get_path('results-{}'.format(d)), exist_ok=True)
+        # Create output directory for validation datasets. 
+        if type(args.data_valid) == str: 
+            args.data_valid = [args.data_valid]
+        for d in args.data_valid: 
+            os.makedirs(self.get_path('results-{}'.format(d)), exist_ok=True)
+        # Create output directory for logging data and write config. 
         open_type = 'a' if os.path.exists(self.get_path('log.txt')) else 'w'
         self.log_file = open(self.get_path('log.txt'), open_type)
         with open(self.get_path('config.txt'), open_type) as f:
@@ -64,11 +73,11 @@ class _Checkpoint_(object):
     # =========================================================================
     # Saving 
     # =========================================================================
-    def save(self, trainer, epoch: int, scale: int, is_best: bool=False):
+    def save(self, trainer, epoch: int, scaling: int, is_best: bool=False):
         trainer.model.save(self.get_path('model'), epoch, is_best=is_best)
         trainer.loss.save(self.dir)
-        trainer.loss.plot_loss(self.dir, epoch, scale="linear")
-        trainer.loss.plot_loss(self.dir, epoch, scale="logarithmic")
+        trainer.loss.plot_loss(self.dir, epoch, scaling="linear")
+        trainer.loss.plot_loss(self.dir, epoch, scaling="logarithmic")
         trainer.optimizer.save(self.dir)
         torch.save(self.log, self.get_path('psnr_log.pt'))
         # Plot peak signal-to-noise ratio (PSNR) plot. 
@@ -80,7 +89,7 @@ class _Checkpoint_(object):
             plt.title(label)
             for i in range(self.log.shape[2]):             
                 plt.plot(axis,self.log[:, id, i].numpy(),
-                        label="{}: scale {}".format(labels[i], scale))
+                        label="{}: scaling {}".format(labels[i], scaling))
             plt.legend()
             plt.xlabel('Epochs')
             plt.ylabel('PSNR')
@@ -112,6 +121,17 @@ class _Checkpoint_(object):
             normalized = normalized.clamp(0, 255).round()
             tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
             self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
+
+    def save_validations(self, valids: List[Dict[str,str]]): 
+        file_path = self.get_path('validations.txt')
+        with open(file_path, 'w') as f:
+            f.write("*Validation Results*\n\n")
+            for v in valids: 
+                out = v["dataset"] + "\t"
+                for key, value in v.items(): 
+                    if key == "dataset": continue
+                    out += str(value) + "\t"
+                f.write(out + "\n") 
 
     # =========================================================================
     # Logging.  

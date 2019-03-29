@@ -14,8 +14,6 @@ class SET5(_Dataset_):
 
     def _scan(self):
         names_hr, names_lr = super(SET5, self)._scan()
-        names_hr = names_hr[self.begin:self.end]
-        names_lr = names_lr[self.begin:self.end]
         return names_hr, names_lr
 
     def _set_filesystem(self, dir_data):

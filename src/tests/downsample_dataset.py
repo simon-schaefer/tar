@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : Downsample images in given dataset. 
+# Description : Downsample images in given dataset for RGB images. For 
+#               grayscale input the channels are stacked, i.e. R=G=B. 
 # Arguments   : Path to HR images directory.  
 #               Scaling factor (int). 
-#               Flag - Is last dimension color (True) or to be reduced (False)? 
 # =============================================================================
 import imageio
 import glob
@@ -31,11 +31,10 @@ def progress_bar(iteration: int, num_steps: int, bar_length: int=50) -> int:
     return iteration + 1
 
 # Get directory of images from input arguments. 
-if not len(sys.argv) >= 4: 
-    raise ValueError("Please state [directory, scale, is_multichannel] !")
+if not len(sys.argv) >= 3: 
+    raise ValueError("Please state [directory, scale] !")
 directory = sys.argv[1]
 scale = int(sys.argv[2])
-is_multichannel = str(sys.argv[3]).lower() == "true"
 if not directory[-1] == "/": 
     directory = directory + "/"
 assert os.path.isdir(directory)
@@ -50,10 +49,16 @@ image_files = glob.glob(directory + "*.png")
 num_files   = len(image_files)
 for i, filepath in enumerate(image_files):
     hr = imageio.imread(filepath)
+    if len(hr.shape) == 2: 
+        hr = np.stack((hr,hr,hr), axis=2)
+    if not hr.shape[0] % 2 == 0: 
+        hr = hr[:-1,:,:]
+    if not hr.shape[1] % 2 == 0: 
+        hr = hr[:,:-1,:]
     ldim = None
     lr = skimage.transform.rescale(hr, 1.0/scale,  
             anti_aliasing=True, 
-            multichannel=is_multichannel, 
+            multichannel=True, 
             mode='reflect', 
             preserve_range=True, 
             order=4

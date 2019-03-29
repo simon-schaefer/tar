@@ -143,7 +143,7 @@ parser.add_argument("--save_every", type=int, default=10,
 # =============================================================================
 def set_template(args):
     if args.template.find("IM_AE_TAD_MNIST") >= 0:
-        args.model      = "AETAD_1D"
+        args.model      = "AETAD_3D"
         args.model_type = "TAD"
         args.scale      = 2
         args.optimizer  = "ADAM"

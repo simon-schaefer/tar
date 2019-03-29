@@ -90,7 +90,6 @@ if [ ! -d "DIV2K_valid_LR_bicubic" ]; then
     mv DIV2K_valid_LR_bicubic/X2/* DIV2K_valid_LR_bicubic/
     rm -r DIV2K_valid_LR_bicubic/X2/
 fi
-cd $SR_PROJECT_DATA_PATH
 
 # MNIST dataset. 
 # echo "MNIST dataset ..."
@@ -112,21 +111,21 @@ cd $SR_PROJECT_DATA_PATH
 #     cp MNIST_valid_HR/* MNIST_train_HR/
 # fi
 # if [ ! -d "MNIST_train_LR_bicubic" ]; then
-#     python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/MNIST/MNIST_train_HR 2 False
+#     python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/MNIST/MNIST_train_HR 2
 # fi
-# cd $SR_PROJECT_DATA_PATH
 
 # SIMPLE dataset. 
 echo "SIMPLE dataset ..."
+cd $SR_PROJECT_DATA_PATH
 if [ ! -d "SIMPLE" ]; then
     python3 $SR_PROJECT_PROJECT_HOME/src/tests/create_simple_dataset.py
-    python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/SIMPLE/HR 2 True
+    python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/SIMPLE/HR 2
 fi
-cd $SR_PROJECT_DATA_PATH
 
 # Validation datasets. 
 echo "Validation datasets ..."
-if [ ! -d "Urban100" ] || [ ! -d "Set5" ] || [ ! -d "Set14" ] || [ ! -d "BSDS100" ]; then
+cd $SR_PROJECT_DATA_PATH
+if [ ! -d "URBAN100" ] || [ ! -d "SET5" ] || [ ! -d "SET14" ] || [ ! -d "BSDS100" ]; then
     wget http://vllab.ucmerced.edu/wlai24/LapSRN/results/SR_testing_datasets.zip
     unzip SR_testing_datasets.zip
     rm SR_testing_datasets.zip
@@ -137,11 +136,13 @@ if [ ! -d "Urban100" ] || [ ! -d "Set5" ] || [ ! -d "Set14" ] || [ ! -d "BSDS100
         cd $SR_PROJECT_DATA_PATH/$dir
         mkdir HR
         mv *.png HR/
-        python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/$dir/HR 2 True
+        python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/$dir/HR 2
         cd $SR_PROJECT_DATA_PATH
     done
+    mv "Urban100" "URBAN100"
+    mv "Set5" "SET5"
+    mv "Set14" "SET14"
 fi
-cd $SR_PROJECT_DATA_PATH
 
 # Build outs directory.
 echo $'\nBuilding output directory ...'
