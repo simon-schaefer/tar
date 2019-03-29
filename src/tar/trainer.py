@@ -296,7 +296,7 @@ class _Trainer_TAD_(_Trainer_):
         hr_out = self.model.model.decode(lr_out2)
         apply_time = timer_apply.toc()
         # Determine psnr values for logging procedure. 
-        lr_pnsr = misc.calc_psnr(
+        lr_psnr = misc.calc_psnr(
             lr_out2, lr, self.args.patch_size/self.scale, self.args.rgb_range
         )
         hr_psnr = misc.calc_psnr(
