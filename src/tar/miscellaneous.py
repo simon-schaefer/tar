@@ -135,7 +135,7 @@ class _Checkpoint_(object):
         with open(file_path, 'w') as f:
             f.write("*Validation Results*\n\n")
             out = "dataset" + "\t"
-            for key in valids[0].items(): 
+            for key in valids[0].keys(): 
                 if key == "dataset": continue
                 out += str(key) + "\t"                
             f.write(out + "\n") 
