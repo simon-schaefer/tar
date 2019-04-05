@@ -281,12 +281,8 @@ class _Trainer_TAD_(_Trainer_):
         lr_out2 = misc.discretize(lr_out2, *disc_args)
         hr_out = misc.discretize(hr_out, *disc_args)
         # Determine psnr values for logging procedure. 
-        lr_psnr = misc.calc_psnr(
-            lr_out2, lr, self.args.patch_size/self.scale, nmax-nmin
-        )
-        hr_psnr = misc.calc_psnr(
-            hr_out, hr, self.args.patch_size, nmax-nmin
-        )
+        lr_psnr = misc.calc_psnr(lr_out2, lr, None, nmax-nmin)
+        hr_psnr = misc.calc_psnr(hr_out, hr, None, nmax-nmin)
         psnrs = torch.Tensor([hr_psnr, lr_psnr])
         return [hr_out, lr_out2], ["SHRT", "SLR"], psnrs, apply_time
 
@@ -304,23 +300,17 @@ class _Trainer_TAD_(_Trainer_):
             lr_out = misc.discretize(lr_out, *disc_args) 
             lr_out = torch.add(lr_out,lr)
             lr_out = misc.discretize(lr_out, *disc_args)
-            pnsrs[i,0] = misc.calc_psnr(
-                lr_out, lr, self.args.patch_size/self.scale, nmax-nmin
-            )
+            pnsrs[i,0] = misc.calc_psnr(lr_out, lr, None, nmax-nmin)
             # PSNR - High resolution image (base: lr_out). 
             hr_out = self.model.model.decode(lr_out)
             hr_out = misc.discretize(hr_out, *disc_args)
-            pnsrs[i,1] = misc.calc_psnr(
-                hr_out, hr, self.args.patch_size, nmax-nmin
-            )  
+            pnsrs[i,1] = misc.calc_psnr(hr_out, hr, None, nmax-nmin)  
             # PSNR - High resolution image (base: lr). 
             timer_apply = misc._Timer_()
             hr_out2 = self.model.model.decode(lr)
             runtimes[i] = timer_apply.toc()
             hr_out2 = misc.discretize(hr_out2, *disc_args)
-            pnsrs[i,2] = misc.calc_psnr(
-                hr_out2, hr, self.args.patch_size, nmax-nmin
-            )     
+            pnsrs[i,2] = misc.calc_psnr(hr_out2, hr, None, nmax-nmin)     
             save_list = [hr_out, hr_out2, lr_out, lr, hr] 
             desc_list = ["SHRT", "SHRB", "SLR", "LR", "HR"]
             self.ckp.save_results(
