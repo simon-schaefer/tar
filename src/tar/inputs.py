@@ -66,7 +66,7 @@ parser.add_argument("--no_augment", action="store_true",
 # =============================================================================
 # Model specifications.
 # =============================================================================
-parser.add_argument("--model", default="AETAD_1D",
+parser.add_argument("--model", default="AETAD_3D",
                     help="model name")
 parser.add_argument("--model_type", type=str, default="", 
                     choices=("", "TAD"),

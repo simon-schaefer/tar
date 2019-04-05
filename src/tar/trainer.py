@@ -251,12 +251,12 @@ class _Trainer_TAD_(_Trainer_):
     def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor, 
                           finetuning: bool) -> optimization._Loss_: 
         lr_out = self.model.model.encode(hr)
+        lr_out = torch.add(lr_out, lr)
         if finetuning: 
             lr_out = misc.discretize(
                 lr_out, self.args.rgb_range, not self.args.no_normalize, 
                 [self.args.norm_min, self.args.norm_max]
             )
-        lr_out = torch.add(lr_out, lr)
         hr_out = self.model.model.decode(lr_out)
         loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out, 'LR_GT': lr, 'LR_OUT': lr_out}
         loss = self.loss(loss_kwargs)
@@ -272,9 +272,9 @@ class _Trainer_TAD_(_Trainer_):
         disc_args   = (rgb_range, not self.args.no_normalize, [nmin, nmax])
         timer_apply = misc._Timer_()
         lr_out = self.model.model.encode(hr)
-        if finetuning: 
-            lr_out = misc.discretize(lr_out, *disc_args) 
         lr_out2 = torch.add(lr_out,lr)
+        if finetuning: 
+            lr_out2 = misc.discretize(lr_out2, *disc_args) 
         hr_out = self.model.model.decode(lr_out2)
         apply_time = timer_apply.toc()
         # Save discretized output images for logging. 
@@ -297,7 +297,6 @@ class _Trainer_TAD_(_Trainer_):
             lr, hr = self.prepare(lr, hr)
             # PSNR - Low resolution image. 
             lr_out = self.model.model.encode(hr)
-            lr_out = misc.discretize(lr_out, *disc_args) 
             lr_out = torch.add(lr_out,lr)
             lr_out = misc.discretize(lr_out, *disc_args)
             pnsrs[i,0] = misc.calc_psnr(lr_out, lr, None, nmax-nmin)
@@ -323,7 +322,7 @@ class _Trainer_TAD_(_Trainer_):
             pnsrs_i.sort()
             v["PSNR {} (1st)".format(desc)] = "{:.3f}".format(pnsrs_i[-1])
             v["PSNR {} (2nd)".format(desc)] = "{:.3f}".format(pnsrs_i[-2])
-        v["RUNTIME [s]"] = "{:.3f}".format(np.median(runtimes))
+        v["RUNTIME [s]"] = "{:.5f}".format(np.median(runtimes))
         return v 
 
     def psnr_description(self): 
