@@ -108,6 +108,8 @@ data/
 dataset/
 runs/
 outs/
+results/
+results-*/
 
 # Editor
 .vscode/
