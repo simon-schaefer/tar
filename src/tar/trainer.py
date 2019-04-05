@@ -282,10 +282,10 @@ class _Trainer_TAD_(_Trainer_):
         hr_out = misc.discretize(hr_out, *disc_args)
         # Determine psnr values for logging procedure. 
         lr_psnr = misc.calc_psnr(
-            lr_out2, lr, self.args.patch_size/self.scale, rgb_range
+            lr_out2, lr, self.args.patch_size/self.scale, nmax-nmin
         )
         hr_psnr = misc.calc_psnr(
-            hr_out, hr, self.args.patch_size, rgb_range
+            hr_out, hr, self.args.patch_size, nmax-nmin
         )
         psnrs = torch.Tensor([hr_psnr, lr_psnr])
         return [hr_out, lr_out2], ["SHRT", "SLR"], psnrs, apply_time
@@ -305,13 +305,13 @@ class _Trainer_TAD_(_Trainer_):
             lr_out = torch.add(lr_out,lr)
             lr_out = misc.discretize(lr_out, *disc_args)
             pnsrs[i,0] = misc.calc_psnr(
-                lr_out, lr, self.args.patch_size/self.scale, rgb_range
+                lr_out, lr, self.args.patch_size/self.scale, nmax-nmin
             )
             # PSNR - High resolution image (base: lr_out). 
             hr_out = self.model.model.decode(lr_out)
             hr_out = misc.discretize(hr_out, *disc_args)
             pnsrs[i,1] = misc.calc_psnr(
-                hr_out, hr, self.args.patch_size, rgb_range
+                hr_out, hr, self.args.patch_size, nmax-nmin
             )  
             # PSNR - High resolution image (base: lr). 
             timer_apply = misc._Timer_()
@@ -319,7 +319,7 @@ class _Trainer_TAD_(_Trainer_):
             runtimes[i] = timer_apply.toc()
             hr_out2 = misc.discretize(hr_out2, *disc_args)
             pnsrs[i,2] = misc.calc_psnr(
-                hr_out2, hr, self.args.patch_size, rgb_range
+                hr_out2, hr, self.args.patch_size, nmax-nmin
             )     
             save_list = [hr_out, hr_out2, lr_out, lr, hr] 
             desc_list = ["SHRT", "SHRB", "SLR", "LR", "HR"]
@@ -333,7 +333,7 @@ class _Trainer_TAD_(_Trainer_):
             pnsrs_i.sort()
             v["PSNR {} (1st)".format(desc)] = "{:.3f}".format(pnsrs_i[-1])
             v["PSNR {} (2nd)".format(desc)] = "{:.3f}".format(pnsrs_i[-2])
-        v["runtime [s]"] = "{:.3f}".format(np.median(runtimes))
+        v["RUNTIME [s]"] = "{:.3f}".format(np.median(runtimes))
         return v 
 
     def psnr_description(self): 

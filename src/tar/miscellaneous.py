@@ -127,9 +127,9 @@ class _Checkpoint_(object):
     def save_validations(self, valids: List[Dict[str,str]]): 
         file_path = self.get_path('validations.csv')
         csv_data  = [] 
-        csv_data.append(sorted(valids[0].keys()))
+        csv_data.append(sorted(valids[0].keys(),reverse=True))
         for v in valids: 
-            csv_data.append(x for (_, x) in sorted(v.items()))
+            csv_data.append(x for (_, x) in sorted(v.items(),reverse=True))
         with open(file_path, 'w') as f:
             writer = csv.writer(f)
             writer.writerows(csv_data)
