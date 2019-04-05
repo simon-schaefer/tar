@@ -134,13 +134,13 @@ class _Checkpoint_(object):
         file_path = self.get_path('validations.txt')
         with open(file_path, 'w') as f:
             f.write("*Validation Results*\n\n")
-            out = "dataset" + "\t"
+            out = "dataset" + "\t\t"
             for key in valids[0].keys(): 
                 if key == "dataset": continue
                 out += str(key) + "\t"                
             f.write(out + "\n") 
             for v in valids: 
-                out = v["dataset"] + "\t\t"
+                out = v["dataset"] + "\t"
                 for key, value in v.items(): 
                     if key == "dataset": continue
                     out += str(value) + "\t\t"

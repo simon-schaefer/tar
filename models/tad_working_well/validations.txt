@@ -1,7 +1,7 @@
 *Validation Results*
 
-dataset	('dataset', 'URBAN100  x2')	('PSNR HR (1st)', '45.681')	('PSNR LR (2nd)', 'inf')	('PSNR LR (1st)', 'inf')	('runtime [s]', '0.035')	('PSNR HR (2nd)', '45.197')	
-URBAN100  x2		45.681		inf		inf		0.035		45.197		
-SET5      x2		37.976		61.331		70.081		0.031		36.510		
-SET14     x2		42.869		71.103		inf		0.017		36.142		
-BSDS100   x2		45.228		85.470		93.251		0.035		45.187		
+dataset	PSNR LR (2nd)	PSNR HR (2nd)	runtime [s]	PSNR HR (1st)	PSNR LR (1st)	
+URBAN100  x2		inf		44.322		0.031		45.704		inf		
+SET5      x2		67.471		35.812		0.025		38.467		73.123		
+SET14     x2		70.081		35.862		0.031		40.418		76.817		
+BSDS100   x2		93.251		44.406		0.035		45.007		96.262		
