@@ -18,6 +18,8 @@ from torch import from_numpy, Tensor
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.dataloader import default_collate
 
+import tar.miscellaneous as misc
+
 # =============================================================================
 # DATASET EXTENSION. 
 # =============================================================================
@@ -147,13 +149,8 @@ class _Dataset_(Dataset):
         pair = _get_patch(lr, hr, self.scale, patch_size, self.train)
         # Normalize patches from rgb_range to [norm_min, norm_max].  
         if not self.args.no_normalize:
-            assert self.args.norm_max > self.args.norm_min 
-            norm_range = self.args.norm_max - self.args.norm_min
-
-            def _normalize(image):
-                return image/self.args.rgb_range*norm_range+self.args.norm_min
-
-            pair = [_normalize(x) for x in pair]
+            pair = [misc.normalize(x, self.args.rgb_range, 
+                    self.args.norm_min, self.args.norm_max) for x in pair]
         # Augment patches (if flag is set). 
         if not self.args.no_augment: 
             hflip = random.random() < 0.5

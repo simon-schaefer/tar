@@ -286,34 +286,33 @@ class _Trainer_TAD_(_Trainer_):
         return loss  
 
     def saving_core(self, lr: torch.Tensor, hr: torch.Tensor, 
-                    di: int, finetuning: bool) -> Tuple[List[torch.Tensor], float]: 
+                    di: int, finetuning: bool) -> Tuple[List[torch.Tensor], float]:  
         # Apply model once (depending on training phase with/without 
         # discretization of the low-resoluted image). 
+        rgb_range   = self.args.rgb_range
+        nmin, nmax  = self.args.norm_min, self.args.norm_max
         timer_apply = misc._Timer_()
         lr_out = self.model.model.encode(hr)
         if finetuning: 
             lr_out = misc.discretize(
-                lr_out, self.args.rgb_range, not self.args.no_normalize, 
-                [self.args.norm_min, self.args.norm_max]
+                lr_out, rgb_range, not self.args.no_normalize, [nmin, nmax]
             ) 
         lr_out2 = torch.add(lr_out,lr)
         hr_out = self.model.model.decode(lr_out2)
         apply_time = timer_apply.toc()
-        # Determine psnr values for logging procedure. 
-        lr_psnr = misc.calc_psnr(
-            lr_out2, lr, self.args.patch_size/self.scale, self.args.rgb_range
-        )
-        hr_psnr = misc.calc_psnr(
-            hr_out, hr, self.args.patch_size, self.args.rgb_range
-        )
         # Save discretized output images for logging. 
         lr_out2 = misc.discretize(
-            lr_out2, self.args.rgb_range, not self.args.no_normalize, 
-            [self.args.norm_min, self.args.norm_max]
+            lr_out2, rgb_range, not self.args.no_normalize, [nmin, nmax]
         )
         hr_out = misc.discretize(
-            hr_out, self.args.rgb_range, not self.args.no_normalize, 
-            [self.args.norm_min, self.args.norm_max]
+            hr_out, rgb_range, not self.args.no_normalize, [nmin, nmax]
+        )
+        # Determine psnr values for logging procedure. 
+        lr_psnr = misc.calc_psnr(
+            lr_out2, lr, self.args.patch_size/self.scale, rgb_range
+        )
+        hr_psnr = misc.calc_psnr(
+            hr_out, hr, self.args.patch_size, rgb_range
         )
         return [hr_out, lr_out2], torch.Tensor([hr_psnr, lr_psnr]), apply_time
 

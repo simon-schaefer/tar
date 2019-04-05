@@ -273,3 +273,17 @@ def discretize(img: torch.Tensor, rgb_range: float,
     img_dis = img_dis.mul(pixel_range).clamp(0, 255).round().div(pixel_range)
     img_dis = img_dis if not normalized else img_dis.add(norm_range[0])
     return img_dis
+
+def normalize(img, rgb_range, norm_min, norm_max): 
+    """ Normalize numpy array or torch tensor from RGB range
+    to given norm range [norm_min, norm_max]. """
+    assert norm_max > norm_min 
+    norm_range = norm_max - norm_min
+    return img/rgb_range*norm_range + norm_min
+
+def unnormalize(img, rgb_range, norm_min, norm_max): 
+    """ Unnormalize numpy array or torch tensor from given norm
+    range [norm_min, norm_max] to RGB range. """
+    assert norm_max > norm_min 
+    norm_range = norm_max - norm_min
+    return (img - norm_min)/norm_range*rgb_range
