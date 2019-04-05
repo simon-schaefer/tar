@@ -64,11 +64,12 @@ class _Checkpoint_(object):
         # Create output directory for logging data and write config. 
         open_type = 'a' if os.path.exists(self.get_path('log.txt')) else 'w'
         self.log_file = open(self.get_path('log.txt'), open_type)
-        with open(self.get_path('config.txt'), open_type) as f:
-            f.write(now + '\n\n')
-            for arg in vars(args):
-                f.write('{}: {}\n'.format(arg, getattr(args, arg)))
-            f.write('\n')
+        if not args.valid_only: 
+            with open(self.get_path('config.txt'), open_type) as f:
+                f.write(now + '\n\n')
+                for arg in vars(args):
+                    f.write('{}: {}\n'.format(arg, getattr(args, arg)))
+                f.write('\n')
         # Set number of logging threats. 
         self.n_processes = 8
         self.ready = True
@@ -133,11 +134,16 @@ class _Checkpoint_(object):
         file_path = self.get_path('validations.txt')
         with open(file_path, 'w') as f:
             f.write("*Validation Results*\n\n")
+            out = "dataset" + "\t"
+            for key in v[0].items(): 
+                if key == "dataset": continue
+                out += str(key) + "\t"                
+            f.write(out + "\n") 
             for v in valids: 
-                out = v["dataset"] + "\t"
+                out = v["dataset"] + "\t\t"
                 for key, value in v.items(): 
                     if key == "dataset": continue
-                    out += str(value) + "\t"
+                    out += str(value) + "\t\t"
                 f.write(out + "\n") 
 
     # =========================================================================

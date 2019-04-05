@@ -200,8 +200,8 @@ class _Trainer_(object):
                 pnsrs_i = pnsrs[:,ip]
                 pnsrs_i.sort()
                 v["PSNR {} (1st)".format(desc)] = "{:.3f}".format(pnsrs_i[-1])
-                v["PSNR {} (2st)".format(desc)] = "{:.3f}".format(pnsrs_i[-2])
-            v["runtime"] = "{:.3f}".format(np.median(runtimes))
+                v["PSNR {} (2nd)".format(desc)] = "{:.3f}".format(pnsrs_i[-2])
+            v["runtime [s]"] = "{:.3f}".format(np.median(runtimes))
             validations.append(v)
         # Finalizing. 
         self.ckp.end_background()
