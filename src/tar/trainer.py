@@ -180,7 +180,7 @@ class _Trainer_(object):
             name = d.dataset.name
             self.ckp.write_log("\n{}x{}".format(name,self.scale))
             name = name + " "*(10-len(name))
-            v = {"dataset": "{}x{}".format(name,self.scale)}
+            v = {"dataset":"{}".format(name),"scale": "x{}".format(self.scale)}
             v = self.validation_core(v, di, d)
             validations.append(v)
         # Finalizing. 
@@ -318,7 +318,7 @@ class _Trainer_TAD_(_Trainer_):
             hr_out2 = self.model.model.decode(lr)
             runtimes[i] = timer_apply.toc()
             hr_out2 = misc.discretize(hr_out2, *disc_args)
-            pnsrs[i,1] = misc.calc_psnr(
+            pnsrs[i,2] = misc.calc_psnr(
                 hr_out2, hr, self.args.patch_size, rgb_range
             )     
             save_list = [hr_out, hr_out2, lr_out, lr, hr] 
