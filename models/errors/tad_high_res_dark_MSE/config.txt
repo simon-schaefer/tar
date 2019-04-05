@@ -1,0 +1,48 @@
+16_28_03_18_Mar
+
+resume: 0
+epsilon: 1e-08
+batch_size: 6
+reset: False
+template: IM_AE_TAD_DIV2K
+gclip: 0
+betas: (0.9, 0.999)
+n_colors: 3
+momentum: 0.9
+data_range: 1-100/1-10
+patch_size: 96
+dir_data: /scratch_net/biwidl215/sischaef/data
+n_gpus: 1
+precision: single
+save: test
+cuda_device: cuda:0
+save_results: True
+scale: 2
+save_every: 10
+weight_decay: 0
+gamma: 0.6
+seed: 1
+save_gt: True
+n_threads: 6
+test_only: False
+model_type: TAD
+rgb_range: 255
+data_train: ['DIV2K']
+decay: 100
+norm_min: 0.0
+no_normalize: False
+loss: HR*10*MSE+LR*1*L1
+epochs: 3000
+data_test: ['DIV2K']
+optimizer: ADAM
+cpu: False
+verbose: True
+norm_max: 1.0
+print_every: 100
+model: AETAD_3D
+ext: img
+save_models: False
+load: 
+lr: 0.001
+no_augment: True
+
