@@ -1,7 +1,7 @@
 *Validation Results*
 
-dataset	PSNR LR (2nd)	PSNR HR (2nd)	runtime [s]	PSNR HR (1st)	PSNR LR (1st)	
-URBAN100  x2		inf		44.322		0.031		45.704		inf		
-SET5      x2		67.471		35.812		0.025		38.467		73.123		
-SET14     x2		70.081		35.862		0.031		40.418		76.817		
-BSDS100   x2		93.251		44.406		0.035		45.007		96.262		
+dataset		PSNR LR (2nd)	PSNR LR (1st)	PSNR HR (1st)	runtime [s]	PSNR HR (2nd)	
+URBAN100  x2	90.241		96.262		46.508		0.033		45.845		
+SET5      x2	65.306		76.091		40.565		0.003		36.780		
+SET14     x2	69.877		96.262		43.659		0.015		38.753		
+BSDS100   x2	82.282		inf		45.151		0.035		44.571		
