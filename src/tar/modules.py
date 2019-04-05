@@ -32,7 +32,10 @@ class _Model_(nn.Module):
         if args.precision == "half": 
             self.model.half()
         if not args.load == "": 
-            self.load(ckp.get_path('model'), resume=args.resume, cpu=args.cpu)
+            load_path = self.load(
+                ckp.get_path('model'), resume=args.resume, cpu=args.cpu
+            )
+            ckp.write_log("... loaded model from {}".format(load_path))
         print(self.model, file=ckp.log_file)
         ckp.write_log("... successfully built model module !")
 
@@ -67,11 +70,16 @@ class _Model_(nn.Module):
         or from a specific epoch (resume = epoch) to device. """
         load_from = None
         kwargs = {'map_location': lambda storage, loc: storage} if cpu else {}
+        path = ""
         if resume == -1:
-            load_from = torch.load(directory + "/model_latest.pt", **kwargs)
+            path = directory + "/model_latest.pt"
+        elif resume == -2: 
+            path = directory + "/model_best.pt"
         else:
-            load_from = torch.load(directory + "/model_{}.pt".format(resume), **kwargs)
+            path = directory + "/model_{}.pt".format(resume)
+        load_from = torch.load(path, **kwargs)
         self.model.load_state_dict(load_from, strict=False)
+        return path
 
 # =============================================================================
 # Customly implemented building blocks (nn.Modules). 

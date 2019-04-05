@@ -33,11 +33,18 @@ class _Checkpoint_(object):
         self.log = torch.Tensor()
         # Building model directory based on name and time. 
         now = time.strftime("%H_%M_%S_%d_%b", time.gmtime())
-        tag = args.model + "_" + now
         if not args.load:
+            tag = args.model + "_" + now
             self.dir = os.path.join(os.environ['SR_PROJECT_OUTS_PATH'], tag)
         else:
-            self.dir = os.path.join(os.environ['SR_PROJECT_OUTS_PATH'], args.load)
+            assert len(args.load.split("x")) == 2
+            path, tag = args.load.split("x")
+            assert path in ["outs", "models"]
+            if path == "outs": 
+                path = os.environ['SR_PROJECT_OUTS_PATH']
+            else: 
+                path = os.environ['SR_PROJECT_MODELS_PATH']
+            self.dir = os.path.join(path, tag)
             if not os.path.exists(self.dir):
                 raise ValueError("Loading path %s does not exists !" % self.dir)
             self.log = torch.load(self.get_path('psnr_log.pt'))

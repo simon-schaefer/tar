@@ -33,10 +33,10 @@ parser.add_argument("--seed", type=int, default=1,
 parser.add_argument("--dir_data", type=str, default=os.environ["SR_PROJECT_DATA_PATH"],
                     help="dataset directory")
 parser.add_argument("--data_train", type=str, default="DIV2K",
-                    choices=("DIV2K", "MNIST"), 
+                    choices=("DIV2K"), 
                     help="training dataset name (= 1 dataset!)")
 parser.add_argument("--data_test", type=str, default="DIV2K", 
-                    choices=("DIV2K", "MNIST"), 
+                    choices=("DIV2K"), 
                     help="testing datasets name (>= 1 dataset!)")
 parser.add_argument("--data_valid", default=["URBAN100","SET5","SET14","BSDS100"], 
                     choices=("URBAN100","SET5","SET14","BSDS100"), 
@@ -122,11 +122,11 @@ parser.add_argument("--loss", type=str, default="HR*1*L1+LR*1*L1",
 # Log specifications.
 # =============================================================================
 parser.add_argument("--save", type=str, default="test",
-                    help="file name to save")
+                    help="directory name to save")
 parser.add_argument("--load", type=str, default="",
-                    help="file name to load")
-parser.add_argument("--resume", type=int, default=0,
-                    help="resume from specific checkpoint")
+                    help="directory to load, format [outs,models]xdir_name")
+parser.add_argument("--resume", type=int, default=-2,
+                    help="resume from specific checkpoint (-1=latest, -2=best)")
 parser.add_argument("--save_models", action="store_true",
                     help="save all intermediate models (default=False)")
 parser.add_argument("--print_every", type=int, default=100,

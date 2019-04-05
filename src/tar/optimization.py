@@ -51,6 +51,7 @@ def make_optimizer(model: torch.nn.Module, args: argparse.Namespace):
             self.scheduler.step()
 
         def load(self, directory, epoch=1):
+            print(self.state_dict())
             self.load_state_dict(torch.load(directory + "/optimizer.pth"))
             if epoch > 1:
                 for _ in range(epoch): self.scheduler.step()
