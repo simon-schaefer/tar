@@ -117,16 +117,19 @@ class _Trainer_(object):
             num_test_samples = len(d.dataset)
             for i, (lr, hr, filename) in enumerate(d):
                 lr, hr = self.prepare(lr, hr)
-                save_list, psnr_array, apply_time = self.saving_core(
-                    lr, hr, di, finetuning
+                save_list, desc_list, psnr_array, apply_time = self.saving_core(
+                    lr, hr, finetuning
                 )
                 self.ckp.log[-1, di, :] += psnr_array
                 net_applying_times.append(apply_time)
                 if save: 
                     if self.args.save_gt:
                         save_list.extend([lr, hr])
+                        desc_list.extend(["LR","HR"])
                     if self.args.save_results:
-                        self.ckp.save_results(save_list,filename[0],d,self.scale)
+                        self.ckp.save_results(
+                            save_list, desc_list,filename[0],d,self.scale
+                        )
                 misc.progress_bar(i+1, num_test_samples)
             # Logging PSNR values. 
             self.ckp.log[-1, di, :] /= len(d)
@@ -178,60 +181,34 @@ class _Trainer_(object):
             self.ckp.write_log("\n{}x{}".format(name,self.scale))
             name = name + " "*(10-len(name))
             v = {"dataset": "{}x{}".format(name,self.scale)}
-            # Determining PSNR and save example images. 
-            num_valid_samples = len(d)
-            pnsrs = np.zeros((num_valid_samples, self.ckp.log.shape[-1]))
-            runtimes = np.zeros((num_valid_samples, 1))
-            for i, (lr, hr, filename) in enumerate(d):
-                lr, hr = self.prepare(lr, hr)
-                save_list, pnsr_array, runtime = self.saving_core(
-                    lr, hr, di, True
-                )
-                pnsrs[i,:]  = pnsr_array
-                runtimes[i] = runtime
-                save_list.extend([lr, hr])
-                self.ckp.save_results(save_list,filename[0],d,self.scale)
-                misc.progress_bar(i+1, num_valid_samples)
-            # Logging PSNR values. 
-            pnsrs[-1,:] /= len(d)
-            psnr_descs = self.psnr_description()
-            assert len(psnr_descs) == pnsrs.shape[-1]
-            for ip, desc in enumerate(psnr_descs): 
-                pnsrs_i = pnsrs[:,ip]
-                pnsrs_i.sort()
-                v["PSNR {} (1st)".format(desc)] = "{:.3f}".format(pnsrs_i[-1])
-                v["PSNR {} (2nd)".format(desc)] = "{:.3f}".format(pnsrs_i[-2])
-            v["runtime [s]"] = "{:.3f}".format(np.median(runtimes))
+            v = self.validation_core(v, di, d)
             validations.append(v)
         # Finalizing. 
         self.ckp.end_background()
         self.ckp.save_validations(validations)
         torch.set_grad_enabled(True)        
 
+    # =========================================================================
+    # Trainer-Specific Functions
+    # =========================================================================
     def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor, 
                           finetuning: bool) -> optimization._Loss_: 
-        hr_out = self.model(hr)
-        loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out}
-        loss = self.loss(loss_kwargs)
-        return loss
+        raise NotImplementedError
 
     def saving_core(self, lr: torch.Tensor, hr: torch.Tensor, 
-                    di: int, finetuning: bool) -> Tuple[List[torch.Tensor], float]: 
-        timer_apply = misc._Timer_()
-        hr_out = self.model(hr)
-        apply_time = timer_apply.toc()
-        hr_out = misc.discretize(
-            hr_out, self.args.rgb_range, not self.args.no_normalize, 
-            [self.args.norm_min, self.args.norm_max]
-        )
-        hr_psnr = misc.calc_psnr(
-            hr_out, hr, self.args.patch_size, self.args.rgb_range
-        )
-        return [hr_out], torch.Tensor([hr_psnr]), apply_time
+                    finetuning: bool) -> Tuple[List[torch.Tensor], List[str], 
+                                               torch.Tensor, float]: 
+        raise NotImplementedError
+
+    def validation_core(self, v: dict, di: int, dataset) -> dict: 
+        raise NotImplementedError       
 
     def psnr_description(self): 
-        return ["HR"]
+        raise NotImplementedError
 
+    # =========================================================================
+    # Auxialiary Functions
+    # =========================================================================
     def prepare(self, *kwargs):
         device = torch.device('cpu' if self.args.cpu else self.args.cuda_device)
 
@@ -286,27 +263,23 @@ class _Trainer_TAD_(_Trainer_):
         return loss  
 
     def saving_core(self, lr: torch.Tensor, hr: torch.Tensor, 
-                    di: int, finetuning: bool) -> Tuple[List[torch.Tensor], float]:  
+                    finetuning: bool) -> Tuple[List[torch.Tensor], List[str], 
+                                               torch.Tensor, float]: 
         # Apply model once (depending on training phase with/without 
         # discretization of the low-resoluted image). 
         rgb_range   = self.args.rgb_range
         nmin, nmax  = self.args.norm_min, self.args.norm_max
+        disc_args   = (rgb_range, not self.args.no_normalize, [nmin, nmax])
         timer_apply = misc._Timer_()
         lr_out = self.model.model.encode(hr)
         if finetuning: 
-            lr_out = misc.discretize(
-                lr_out, rgb_range, not self.args.no_normalize, [nmin, nmax]
-            ) 
+            lr_out = misc.discretize(lr_out, *disc_args) 
         lr_out2 = torch.add(lr_out,lr)
         hr_out = self.model.model.decode(lr_out2)
         apply_time = timer_apply.toc()
         # Save discretized output images for logging. 
-        lr_out2 = misc.discretize(
-            lr_out2, rgb_range, not self.args.no_normalize, [nmin, nmax]
-        )
-        hr_out = misc.discretize(
-            hr_out, rgb_range, not self.args.no_normalize, [nmin, nmax]
-        )
+        lr_out2 = misc.discretize(lr_out2, *disc_args)
+        hr_out = misc.discretize(hr_out, *disc_args)
         # Determine psnr values for logging procedure. 
         lr_psnr = misc.calc_psnr(
             lr_out2, lr, self.args.patch_size/self.scale, rgb_range
@@ -314,7 +287,54 @@ class _Trainer_TAD_(_Trainer_):
         hr_psnr = misc.calc_psnr(
             hr_out, hr, self.args.patch_size, rgb_range
         )
-        return [hr_out, lr_out2], torch.Tensor([hr_psnr, lr_psnr]), apply_time
+        psnrs = torch.Tensor([hr_psnr, lr_psnr])
+        return [hr_out, lr_out2], ["SHRT", "SLR"], psnrs, apply_time
+
+    def validation_core(self, v: dict, di: int, dataset) -> dict: 
+        num_valid_samples = len(dataset)
+        rgb_range   = self.args.rgb_range
+        nmin, nmax  = self.args.norm_min, self.args.norm_max
+        disc_args   = (rgb_range, not self.args.no_normalize, [nmin, nmax])
+        pnsrs = np.zeros((num_valid_samples, 3))
+        runtimes = np.zeros((num_valid_samples, 1))
+        for i, (lr, hr, filename) in enumerate(dataset):
+            lr, hr = self.prepare(lr, hr)
+            # PSNR - Low resolution image. 
+            lr_out = self.model.model.encode(hr)
+            lr_out = misc.discretize(lr_out, *disc_args) 
+            lr_out = torch.add(lr_out,lr)
+            lr_out = misc.discretize(lr_out, *disc_args)
+            pnsrs[i,0] = misc.calc_psnr(
+                lr_out, lr, self.args.patch_size/self.scale, rgb_range
+            )
+            # PSNR - High resolution image (base: lr_out). 
+            hr_out = self.model.model.decode(lr_out)
+            hr_out = misc.discretize(hr_out, *disc_args)
+            pnsrs[i,1] = misc.calc_psnr(
+                hr_out, hr, self.args.patch_size, rgb_range
+            )  
+            # PSNR - High resolution image (base: lr). 
+            timer_apply = misc._Timer_()
+            hr_out2 = self.model.model.decode(lr)
+            runtimes[i] = timer_apply.toc()
+            hr_out2 = misc.discretize(hr_out2, *disc_args)
+            pnsrs[i,1] = misc.calc_psnr(
+                hr_out2, hr, self.args.patch_size, rgb_range
+            )     
+            save_list = [hr_out, hr_out2, lr_out, lr, hr] 
+            desc_list = ["SHRT", "SHRB", "SLR", "LR", "HR"]
+            self.ckp.save_results(
+                save_list,desc_list,filename[0],dataset,self.scale
+            )
+            misc.progress_bar(i+1, num_valid_samples)
+        # Logging PSNR values. 
+        for ip, desc in enumerate(["SLR","SHRT","SHRB"]): 
+            pnsrs_i = pnsrs[:,ip]
+            pnsrs_i.sort()
+            v["PSNR {} (1st)".format(desc)] = "{:.3f}".format(pnsrs_i[-1])
+            v["PSNR {} (2nd)".format(desc)] = "{:.3f}".format(pnsrs_i[-2])
+        v["runtime [s]"] = "{:.3f}".format(np.median(runtimes))
+        return v 
 
     def psnr_description(self): 
         return ["HR", "LR"]

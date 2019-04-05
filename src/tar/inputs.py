@@ -162,15 +162,6 @@ def set_template(args):
         args.n_colors   = 3
         args.patch_size = 96
 
-    if args.template.find("IM_AE_TEST") >= 0:
-        args.model      = "AETRIAL_NOSR"
-        args.scale      = 1
-        args.optimizer  = "ADAM"
-        args.data_train = "MNIST"
-        args.data_test  = "MNIST"
-        args.n_colors   = 1
-        args.patch_size = 28
-
     if args.template.find("IM_AE_SIMPLE") >= 0:
         args.model      = "AETAD_3D"
         args.model_type = "TAD"

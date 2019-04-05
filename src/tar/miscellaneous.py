@@ -5,6 +5,7 @@
 # Description : Collection of miscellaneous helper functions. 
 # =============================================================================
 import argparse
+import csv
 import imageio
 import math
 from multiprocessing import Process, Queue
@@ -105,21 +106,14 @@ class _Checkpoint_(object):
             plt.savefig(self.get_path("test_{}.pdf".format(d)))
             plt.close(fig)
         
-    def save_results(self, save_list: List[torch.Tensor], 
+    def save_results(self, save_list: List[torch.Tensor], desc_list: List[str], 
                      filename: str, dataset, scale: int):
         filename = self.get_path(
             'results-{}'.format(dataset.dataset.name),
             '{}_x{}_'.format(filename, scale)
         )
-        if len(save_list) == 2: 
-            postfix = ('SHR', 'LR')
-        elif len(save_list) == 3: 
-            postfix = ('SHR', 'LR', 'HR')
-        elif len(save_list) == 4: 
-            postfix = ('SHR', 'SLR', 'LR', 'HR')
-        else: 
-            raise ValueError("Invalid number of savable images !")
-        for v, p in zip(save_list, postfix):
+        assert len(save_list) == len(desc_list)
+        for v, p in zip(save_list, desc_list):
             normalized = v[0]
             if not self.args.no_normalize: 
                 r = 255/(self.args.norm_max - self.args.norm_min)
@@ -131,20 +125,15 @@ class _Checkpoint_(object):
             self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
 
     def save_validations(self, valids: List[Dict[str,str]]): 
-        file_path = self.get_path('validations.txt')
+        file_path = self.get_path('validations.csv')
+        csv_data  = [] 
+        csv_data.append(valids[0].keys())
+        for v in valids: 
+            csv_data.append(v.values())
         with open(file_path, 'w') as f:
-            f.write("*Validation Results*\n\n")
-            out = "dataset" + "\t\t"
-            for key in valids[0].keys(): 
-                if key == "dataset": continue
-                out += str(key) + "\t"                
-            f.write(out + "\n") 
-            for v in valids: 
-                out = v["dataset"] + "\t"
-                for key, value in v.items(): 
-                    if key == "dataset": continue
-                    out += str(value) + "\t\t"
-                f.write(out + "\n") 
+            writer = csv.writer(f)
+            writer.writerows(csv_data)
+        f.close()
 
     # =========================================================================
     # Logging.  
