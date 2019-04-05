@@ -7,3 +7,7 @@
 --> intermediate scales 
 - previous CVL project: Dario Fuerli
 - extension to video domain by RNN 
+
+
+# Questions
+
