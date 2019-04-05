@@ -3376,3 +3376,108 @@ Mean network applying time: 24.17ms
 Saving states ...
 Testing Total: 24.30s
 
+Building model module ...
+... continue from epoch 236...
+... successfully built checkpoint module !
+Building model module ...
+... loaded model from /scratch_net/biwidl215/sischaef/tar/models/tad_working_well/model/model_best.pt
+AETRIAL_1D_NOSR(
+  (_encode_seq): Sequential(
+    (0): Conv2d(1, 16, kernel_size=(3, 3), stride=(3, 3), padding=(1, 1))
+    (1): ReLU(inplace)
+    (2): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+    (3): Conv2d(16, 8, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+    (4): ReLU(inplace)
+    (5): MaxPool2d(kernel_size=2, stride=1, padding=0, dilation=1, ceil_mode=False)
+  )
+  (_decode_seq): Sequential(
+    (0): ConvTranspose2d(8, 16, kernel_size=(3, 3), stride=(2, 2))
+    (1): ReLU(inplace)
+    (2): ConvTranspose2d(16, 8, kernel_size=(5, 5), stride=(3, 3), padding=(1, 1))
+    (3): ReLU(inplace)
+    (4): ConvTranspose2d(8, 1, kernel_size=(2, 2), stride=(2, 2), padding=(1, 1))
+    (5): Tanh()
+  )
+)
+... successfully built model module !
+Building model module ...
+... continue from epoch 236...
+... successfully built checkpoint module !
+Building model module ...
+... loaded model from /scratch_net/biwidl215/sischaef/tar/models/tad_working_well/model/model_best.pt
+AETAD_3D(
+  (_downscaling): Sequential(
+    (0): Conv2d(3, 8, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): Conv2d(8, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (2): _ReversePixelShuffle_(downscale_factor=2)
+  )
+  (_res_en1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_en1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_en2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_de1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_res_de1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_de2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_upscaling): Sequential(
+    (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+    (2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  )
+)
+... successfully built model module !
+Machine: GeForce GTX TITAN X
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Validating model ...
+
+URBAN100x2
+
+SET5x2
+
+SET14x2
+
+BSDS100x2

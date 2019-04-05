@@ -47,3 +47,103 @@ norm_max: 1.0
 momentum: 0.9
 model: AETAD_3D
 
+06_33_43_05_Apr
+
+momentum: 0.9
+ext: img
+data_range: 1-700/701-800
+norm_min: 0.0
+patch_size: 28
+batch_size: 16
+model_type: 
+save: test
+data_train: ['MNIST']
+no_normalize: False
+save_gt: False
+save_results: True
+optimizer: ADAM
+dir_data: /scratch_net/biwidl215/sischaef/data
+no_augment: False
+decay: 100
+reset: False
+print_every: 100
+resume: -2
+verbose: True
+save_every: 10
+valid_only: True
+n_threads: 6
+betas: (0.9, 0.999)
+epsilon: 1e-08
+load: modelsxtad_working_well
+norm_max: 1.0
+data_valid: ['URBAN100', 'SET5', 'SET14', 'BSDS100']
+epochs: 500
+gclip: 0
+cpu: False
+n_gpus: 1
+save_models: False
+template: IM_AE_TEST
+scale: 1
+loss: HR*1*L1+LR*1*L1
+model: AETRIAL_NOSR
+fine_tuning: 400
+n_colors: 1
+cuda_device: cuda:0
+gamma: 0.9
+rgb_range: 255
+seed: 1
+weight_decay: 0
+precision: single
+data_test: ['MNIST']
+lr: 0.001
+
+06_34_21_05_Apr
+
+save: test
+scale: 2
+rgb_range: 255
+lr: 0.001
+decay: 100
+fine_tuning: 400
+save_results: True
+norm_min: 0.0
+precision: single
+cuda_device: cuda:0
+data_range: 1-700/701-800
+data_train: ['DIV2K']
+n_colors: 3
+cpu: False
+model_type: TAD
+patch_size: 96
+no_normalize: False
+betas: (0.9, 0.999)
+norm_max: 1.0
+batch_size: 16
+model: AETAD_3D
+momentum: 0.9
+data_test: ['DIV2K']
+ext: img
+n_gpus: 1
+data_valid: ['URBAN100', 'SET5', 'SET14', 'BSDS100']
+seed: 1
+gclip: 0
+weight_decay: 0
+valid_only: True
+optimizer: ADAM
+save_every: 10
+dir_data: /scratch_net/biwidl215/sischaef/data
+epochs: 500
+template: IM_AE_TAD_DIV2K
+no_augment: False
+resume: -2
+save_gt: False
+epsilon: 1e-08
+reset: False
+load: modelsxtad_working_well
+n_threads: 6
+gamma: 0.9
+print_every: 100
+loss: HR*1*L1+LR*1*L1
+verbose: True
+save_models: False
+
