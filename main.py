@@ -17,7 +17,7 @@ trainer = None
 if args.model_type == "TAD": 
    trainer = _sr_.trainer._Trainer_TAD_(args, loader, model, loss, ckp)
 else: 
-   trainer = _sr_.trainer._Trainer_(args, loader, model, loss, ckp)
+   raise ValueError("Invalid trainer selection {}".format(args.model_type))
    
 device = torch.device('cpu' if args.cpu else args.cuda_device)
 ckp.write_log("Machine: {}".format(torch.cuda.get_device_name(None)))

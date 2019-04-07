@@ -9,8 +9,8 @@ import os
 from tar.dataloader import _Dataset_
 
 class BSDS100(_Dataset_):
-    def __init__(self, args, name='BSDS100', train=True):
-        super(BSDS100, self).__init__(args, name=name, train=train)
+    def __init__(self, args, train, scale, name="BSDS100"):
+        super(BSDS100, self).__init__(args, name=name, train=train, scale=scale)
 
     def _scan(self):
         names_hr, names_lr = super(BSDS100, self)._scan()

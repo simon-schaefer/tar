@@ -5,6 +5,7 @@
 # Description : Collection of miscellaneous helper functions. 
 # =============================================================================
 import argparse
+import csv
 import imageio
 import math
 from multiprocessing import Process, Queue
@@ -81,7 +82,7 @@ class _Checkpoint_(object):
     # =========================================================================
     # Saving 
     # =========================================================================
-    def save(self, trainer, epoch: int, scaling: int, is_best: bool=False):
+    def save(self, trainer, epoch: int, is_best: bool=False):
         trainer.model.save(self.get_path('model'), epoch, is_best=is_best)
         trainer.loss.save(self.dir)
         trainer.loss.plot_loss(self.dir, epoch, scaling="linear")
@@ -97,7 +98,7 @@ class _Checkpoint_(object):
             plt.title(label)
             for i in range(self.log.shape[2]):             
                 plt.plot(axis,self.log[:, id, i].numpy(),
-                        label="{}: scaling {}".format(labels[i], scaling))
+                         label="{}".format(labels[i]))
             plt.legend()
             plt.xlabel('Epochs')
             plt.ylabel('PSNR')
@@ -105,21 +106,14 @@ class _Checkpoint_(object):
             plt.savefig(self.get_path("test_{}.pdf".format(d)))
             plt.close(fig)
         
-    def save_results(self, save_list: List[torch.Tensor], 
+    def save_results(self, save_list: List[torch.Tensor], desc_list: List[str], 
                      filename: str, dataset, scale: int):
         filename = self.get_path(
             'results-{}'.format(dataset.dataset.name),
             '{}_x{}_'.format(filename, scale)
         )
-        if len(save_list) == 2: 
-            postfix = ('SHR', 'LR')
-        elif len(save_list) == 3: 
-            postfix = ('SHR', 'LR', 'HR')
-        elif len(save_list) == 4: 
-            postfix = ('SHR', 'SLR', 'LR', 'HR')
-        else: 
-            raise ValueError("Invalid number of savable images !")
-        for v, p in zip(save_list, postfix):
+        assert len(save_list) == len(desc_list)
+        for v, p in zip(save_list, desc_list):
             normalized = v[0]
             if not self.args.no_normalize: 
                 r = 255/(self.args.norm_max - self.args.norm_min)
@@ -131,20 +125,15 @@ class _Checkpoint_(object):
             self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
 
     def save_validations(self, valids: List[Dict[str,str]]): 
-        file_path = self.get_path('validations.txt')
+        file_path = self.get_path('validations.csv')
+        csv_data  = [] 
+        csv_data.append(sorted(valids[0].keys(),reverse=True))
+        for v in valids: 
+            csv_data.append(x for (_, x) in sorted(v.items(),reverse=True))
         with open(file_path, 'w') as f:
-            f.write("*Validation Results*\n\n")
-            out = "dataset" + "\t\t"
-            for key in valids[0].keys(): 
-                if key == "dataset": continue
-                out += str(key) + "\t"                
-            f.write(out + "\n") 
-            for v in valids: 
-                out = v["dataset"] + "\t"
-                for key, value in v.items(): 
-                    if key == "dataset": continue
-                    out += str(value) + "\t\t"
-                f.write(out + "\n") 
+            writer = csv.writer(f)
+            writer.writerows(csv_data)
+        f.close()
 
     # =========================================================================
     # Logging.  
@@ -251,18 +240,17 @@ def calc_psnr(x: torch.Tensor, y: torch.Tensor,
     is None the PSNR will be determined over the full tensors, otherwise
     a random patch of give patch size is determined and the PSNR is calculated
     with respect to this patch. The tensors have an expected shape of (b,c,h,w). """
-    if x.nelement() == 1: return 0
-    px, py = None, None
-    if patch_size is None: px, py = x, y
-    else: 
+    px, py = x.cpu().numpy(), y.cpu().numpy()
+    mse = mse = np.mean((px - py) ** 2)
+    if patch_size is not None: 
         h, w = x.shape[2:4]
         lp = int(patch_size)
         lx = random.randrange(0, w - lp + 1)
         ly = random.randrange(0, h - lp + 1)    
         px = x[:, :, ly:ly + lp, lx:lx + lp]
         py = y[:, :, ly:ly + lp, lx:lx + lp]
-    mse = torch.dist(px, py, 2).pow(2).mean()
-    return 10 * math.log10(rgb_range**2/mse)
+    if mse == 0: return 100.0
+    return 20 * math.log10(rgb_range / np.sqrt(mse))
 
 def discretize(img: torch.Tensor, rgb_range: float, 
                normalized: bool, norm_range: List[float]) -> torch.Tensor:
@@ -273,3 +261,17 @@ def discretize(img: torch.Tensor, rgb_range: float,
     img_dis = img_dis.mul(pixel_range).clamp(0, 255).round().div(pixel_range)
     img_dis = img_dis if not normalized else img_dis.add(norm_range[0])
     return img_dis
+
+def normalize(img, rgb_range, norm_min, norm_max): 
+    """ Normalize numpy array or torch tensor from RGB range
+    to given norm range [norm_min, norm_max]. """
+    assert norm_max > norm_min 
+    norm_range = norm_max - norm_min
+    return img/rgb_range*norm_range + norm_min
+
+def unnormalize(img, rgb_range, norm_min, norm_max): 
+    """ Unnormalize numpy array or torch tensor from given norm
+    range [norm_min, norm_max] to RGB range. """
+    assert norm_max > norm_min 
+    norm_range = norm_max - norm_min
+    return (img - norm_min)/norm_range*rgb_range

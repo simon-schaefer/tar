@@ -9,8 +9,8 @@ import os
 from tar.dataloader import _Dataset_
 
 class VDIV2K(_Dataset_):
-    def __init__(self, args, name='VDIV2K', train=True):
-        super(VDIV2K, self).__init__(args, name=name, train=train)
+    def __init__(self, args, train, scale, name="VDIV2K"):
+        super(VDIV2K, self).__init__(args, name=name, train=train, scale=scale)
 
     def _scan(self):
         names_hr, names_lr = super(VDIV2K, self)._scan()

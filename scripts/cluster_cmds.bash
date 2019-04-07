@@ -22,7 +22,8 @@ screen -ls          # list running sessions.
 screen -r "id"      # reattach session. 
 
 ### Example Jobs ####
+# --template=IM_AE_TAD_DIV2K --no_augment --verbose --data_range=1-700/1-10 --batch_size=6 --loss=HR*10*L1+LR*1*L1 --lr=1e-4 --gamma=0.99
 # --template=IM_AE_TAD_DIV2K --no_augment --verbose --data_range=1-700/1-10 --batch_size=1 --loss=HR*100*L1+LR*1*L1 --lr=1e-4
 # --template=IM_AE_TAD_DIV2K --no_augment --verbose --data_range=3-4/3-4 --batch_size=1 --loss=HR*100*L1+LR*1*L1 --epochs 4 --data_valid="SET14"
 # --template=IM_AE_TEST --no_augment
-# --template=IM_AE_TEST --valid_only --load="modelsxtad_working_well" --verbose
+# --template=IM_AE_TAD_DIV2K --valid_only --load="modelsxtad_working_well" --verbose
