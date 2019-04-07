@@ -76,9 +76,9 @@ if [ ! -d "DIV2K_train_LR_bicubic" ]; then
     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_LR_bicubic_X2.zip
     unzip DIV2K_train_LR_bicubic_X2.zip
     rm DIV2K_train_LR_bicubic_X2.zip
-    mv DIV2K_train_LR_bicubic/X2/* DIV2K_train_LR_bicubic/
-    rm -r DIV2K_train_LR_bicubic/X2/
-
+    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_LR_bicubic_X4.zip
+    unzip DIV2K_train_LR_bicubic_X4.zip
+    rm DIV2K_train_LR_bicubic_X4.zip
 fi
 if [ ! -d "DIV2K_valid_HR" ]; then
     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_HR.zip
@@ -89,8 +89,9 @@ if [ ! -d "DIV2K_valid_LR_bicubic" ]; then
     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_bicubic_X2.zip
     unzip DIV2K_valid_LR_bicubic_X2.zip
     rm DIV2K_valid_LR_bicubic_X2.zip
-    mv DIV2K_valid_LR_bicubic/X2/* DIV2K_valid_LR_bicubic/
-    rm -r DIV2K_valid_LR_bicubic/X2/
+    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_bicubic_X4.zip
+    unzip DIV2K_valid_LR_bicubic_X4.zip
+    rm DIV2K_valid_LR_bicubic_X4.zip
 fi
 
 # MNIST dataset. 
@@ -139,6 +140,7 @@ if [ ! -d "URBAN100" ] || [ ! -d "SET5" ] || [ ! -d "SET14" ] || [ ! -d "BSDS100
         mkdir HR
         mv *.png HR/
         python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/$dir/HR 2
+        python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/$dir/HR 4
         cd $SR_PROJECT_DATA_PATH
     done
     mv "Urban100" "URBAN100"

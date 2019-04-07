@@ -27,7 +27,7 @@ class _Dataset_(Dataset):
     """ Extension class for torch dataset module, in order to find, search, 
     load, preprocess and batch data from datasets. """
 
-    def __init__(self, args: argparse.Namespace, name: str="", train: bool=True):
+    def __init__(self, args, train: bool, scale: int, name: str=""):
         # Initialize super dataset class. 
         super(_Dataset_, self).__init__()
         # Set input parameters. 
@@ -36,7 +36,7 @@ class _Dataset_(Dataset):
         self.train = train
         self.split = 'train' if train else 'test'
         self.do_eval = True
-        self.scale = args.scale
+        self.scale = scale
         # Determining training/testing data range. 
         data_range = [r.split('-') for r in args.data_range.split('/')]
         if not train and len(data_range) > 1 and not args.valid_only: 
@@ -234,30 +234,37 @@ class _Data_(object):
         # datasets are each loaded individually. 
         if type(args.data_valid) == str: 
             args.data_valid = [args.data_valid]
-        for dataset in args.data_valid: 
-            validset = self.load_dataset(args, dataset, train=False)
-            self.loader_valid.append(_DataLoader_(validset, 1))            
+        for dataset in args.data_valid:
+            for scale in args.scales_valid:  
+                validset = self.load_dataset(
+                    args, dataset, train=False, scale=scale
+                )
+                self.loader_valid.append(_DataLoader_(validset, 1))            
         if args.valid_only: 
             return
         # Load testing dataset(s). 
         if type(args.data_test) == str: 
             args.data_test = [args.data_test]
         for dataset in args.data_test:
-            testset = self.load_dataset(args, dataset, train=False)
+            testset = self.load_dataset(
+                args, dataset, train=False, scale=args.scale
+            )
             self.loader_test.append(_DataLoader_(testset, 1))
         # Load training dataset, if not testing only. For training several
         # datasets are trained in one process and therefore, each given 
         # training dataset is concatinated to one large dataset. 
-        trainset = self.load_dataset(args, dataset, train=True)
+        trainset = self.load_dataset(
+            args, dataset, train=True, scale=args.scale
+        )
         self.loader_train = _DataLoader_(
             trainset, args.batch_size, 
             shuffle=True, num_workers=args.n_threads
         )
 
     @staticmethod 
-    def load_dataset(args: argparse.Namespace, name: str, train: bool) -> _Dataset_: 
+    def load_dataset(args, name: str, train: bool, scale: int) -> _Dataset_: 
         """ Load dataset from module (in datasets directory). Every module loaded
         should inherit from the _Dataset_ class defined below. """
         m = importlib.import_module("tar.datasets." + name.lower())
-        return getattr(m, name)(args, train=train)
+        return getattr(m, name)(args, train=train, scale=scale)
 

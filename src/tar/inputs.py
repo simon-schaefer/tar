@@ -38,7 +38,7 @@ parser.add_argument("--data_train", type=str, default="DIV2K",
 parser.add_argument("--data_test", type=str, default="DIV2K", 
                     choices=("DIV2K"), 
                     help="testing datasets name (>= 1 dataset!)")
-parser.add_argument("--data_valid", default=["URBAN100","SET5","SET14","BSDS100"], 
+parser.add_argument("--data_valid", default=["SET5","SET14","BSDS100"], 
                     choices=("URBAN100","SET5","SET14","BSDS100"), 
                     help="validation datasets names (>= 1 dataset!)")
 parser.add_argument("--data_range", type=str, default="1-700/701-800",
@@ -47,7 +47,9 @@ parser.add_argument("--ext", type=str, default="img",
                     choices=("img"),
                     help="dataset file extension")
 parser.add_argument("--scale", type=int, default=2,
-                    help="super resolution scale")
+                    help="super resolution scale for training/testing")
+parser.add_argument("--scales_valid", type=list, default=[2,4], 
+                    help="list of validation scales")
 parser.add_argument("--patch_size", type=int, default=96,
                     help="input patch size")
 parser.add_argument("--rgb_range", type=int, default=255,

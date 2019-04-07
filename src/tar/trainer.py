@@ -29,7 +29,6 @@ class _Trainer_(object):
     
         super(_Trainer_, self).__init__()
         self.args = args
-        self.scale = args.scale
         self.ckp = ckp
         self.loader_train = loader.loader_train
         self.loader_test  = loader.loader_test
@@ -115,21 +114,19 @@ class _Trainer_(object):
         for di, d in enumerate(self.loader_test):
             # Determining PSNR and save example images. 
             num_test_samples = len(d.dataset)
-            for i, (lr, hr, filename) in enumerate(d):
+            for i, (lr, hr, fname) in enumerate(d):
                 lr, hr = self.prepare(lr, hr)
-                save_list, desc_list, psnr_array, apply_time = self.saving_core(
+                lsave, ldesc, psnr_array, apply_time = self.saving_core(
                     lr, hr, finetuning
                 )
                 self.ckp.log[-1, di, :] += psnr_array
                 net_applying_times.append(apply_time)
                 if save: 
                     if self.args.save_gt:
-                        save_list.extend([lr, hr])
-                        desc_list.extend(["LR","HR"])
+                        lsave.extend([lr, hr])
+                        ldesc.extend(["LR","HR"])
                     if self.args.save_results:
-                        self.ckp.save_results(
-                            save_list, desc_list,filename[0],d,self.scale
-                        )
+                        self.ckp.save_results(lsave,ldesc,fname[0],d,d.scale)
                 misc.progress_bar(i+1, num_test_samples)
             # Logging PSNR values. 
             self.ckp.log[-1, di, :] /= len(d)
@@ -142,7 +139,7 @@ class _Trainer_(object):
                     "{}\t[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})".format(
                         desc, 
                         d.dataset.name,
-                        self.scale,
+                        d.scale,
                         self.ckp.log[-1, di, ip],
                         best[0][di],
                         best[1][di] + 1
@@ -153,9 +150,8 @@ class _Trainer_(object):
             np.mean(net_applying_times)*1000
         ))
         if save: self.ckp.end_background()
-        if not self.args.valid_only:
-            self.ckp.write_log("Saving states ...")
-            self.ckp.save(self, epoch, self.scale, is_best=(best[1][0] + 1 == epoch))
+        self.ckp.write_log("Saving states ...")
+        self.ckp.save(self, epoch, is_best=(best[1][0] + 1 == epoch))
         self.ckp.write_log(
             "Testing Total: {:.2f}s\n".format(timer_test.toc()), refresh=True
         )
@@ -178,9 +174,9 @@ class _Trainer_(object):
         self.ckp.begin_background()
         for di, d in enumerate(self.loader_valid):
             name = d.dataset.name
-            self.ckp.write_log("\n{}x{}".format(name,self.scale))
+            self.ckp.write_log("\n{}x{}".format(name,d.scale))
             name = name + " "*(10-len(name))
-            v = {"dataset":"{}".format(name),"scale": "x{}".format(self.scale)}
+            v = {"dataset":"{}".format(name),"scale": "x{}".format(d.scale)}
             v = self.validation_core(v, di, d)
             validations.append(v)
         # Finalizing. 
@@ -293,7 +289,7 @@ class _Trainer_TAD_(_Trainer_):
         disc_args   = (rgb_range, not self.args.no_normalize, [nmin, nmax])
         pnsrs = np.zeros((num_valid_samples, 3))
         runtimes = np.zeros((num_valid_samples, 1))
-        for i, (lr, hr, filename) in enumerate(dataset):
+        for i, (lr, hr, fname) in enumerate(dataset):
             lr, hr = self.prepare(lr, hr)
             # PSNR - Low resolution image. 
             lr_out = self.model.model.encode(hr)
@@ -310,11 +306,9 @@ class _Trainer_TAD_(_Trainer_):
             runtimes[i] = timer_apply.toc()
             hr_out2 = misc.discretize(hr_out2, *disc_args)
             pnsrs[i,2] = misc.calc_psnr(hr_out2, hr, None, nmax-nmin)     
-            save_list = [hr_out, hr_out2, lr_out, lr, hr] 
-            desc_list = ["SHRT", "SHRB", "SLR", "LR", "HR"]
-            self.ckp.save_results(
-                save_list,desc_list,filename[0],dataset,self.scale
-            )
+            slist = [hr_out, hr_out2, lr_out, lr, hr] 
+            dlist = ["SHRT", "SHRB", "SLR", "LR", "HR"]
+            self.ckp.save_results(slist,dlist,fname[0],dataset,dataset.scale)
             misc.progress_bar(i+1, num_valid_samples)
         # Logging PSNR values. 
         for ip, desc in enumerate(["SLR","SHRT","SHRB"]): 

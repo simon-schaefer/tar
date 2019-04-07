@@ -4,6 +4,7 @@
 # Created By  : Simon Schaefer
 # Description : Test cases for image domain. 
 # =============================================================================
+import imageio
 import numpy as np
 import os
 import unittest
@@ -57,24 +58,7 @@ class DataLoaderTest(unittest.TestCase):
             s, ls = args.patch_size, int(args.patch_size/args.scale)
             assert lr.shape[2] == ls and hr.shape[2] == s
             assert lr.shape[3] == ls and hr.shape[3] == s
-            break   
-
-    def test_mnist(self):
-        args = argus.args
-        args.valid_only = False
-        args.data_train = "MNIST"
-        args.data_test = "MNIST"
-        args.patch_size = 10
-        loader = dataloader._Data_(args)
-        loader_train = loader.loader_train
-        for batch, (lr, hr, files) in enumerate(loader_train): 
-            assert lr.shape[0] == args.batch_size and hr.shape[0] == args.batch_size
-            assert lr.shape[1] == args.n_colors and hr.shape[1] == args.n_colors
-            s, ls = args.patch_size, int(args.patch_size/args.scale)
-            assert lr.shape[2] == ls and hr.shape[2] == s
-            assert lr.shape[3] == ls and hr.shape[3] == s
-            if batch == 3: 
-                break        
+            break       
 
 class MiscellaneousTest(unittest.TestCase): 
 
@@ -108,6 +92,8 @@ class OptimizationTest(unittest.TestCase):
         args.valid_only = False
         args.loss = "HR*1*L1"
         args.load = ""
+        args.data_train = "DIV2K"
+        args.data_test = "DIV2K"
         ckp = miscellaneous._Checkpoint_(args)
         loader = dataloader._Data_(args)
         loader_train = loader.loader_train   
@@ -169,6 +155,17 @@ class ModulesTest(unittest.TestCase):
         x = torch.arange(48).view(1,3,4,4)
         y = model(x)
         assert torch.all(torch.eq(x, y))
+
+class PSNRTest(unittest.TestCase): 
+
+    def test_psnr(self): 
+        presults = os.environ["SR_PROJECT_PROJECT_HOME"] + "/src/tests/"
+        shr = imageio.imread(presults+"/ressources/SHR.png")
+        shr = torch.from_numpy(shr).double()/255.0
+        hr  = imageio.imread(presults+"/ressources/HR.png")
+        hr  = torch.from_numpy(hr).double()/255.0
+        psnr = miscellaneous.calc_psnr(shr, hr, patch_size=None, rgb_range=1.0)
+        assert np.abs(psnr - 38.7728) < 1e-4
 
 
 if __name__ == '__main__':

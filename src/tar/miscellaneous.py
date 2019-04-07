@@ -82,7 +82,7 @@ class _Checkpoint_(object):
     # =========================================================================
     # Saving 
     # =========================================================================
-    def save(self, trainer, epoch: int, scaling: int, is_best: bool=False):
+    def save(self, trainer, epoch: int, is_best: bool=False):
         trainer.model.save(self.get_path('model'), epoch, is_best=is_best)
         trainer.loss.save(self.dir)
         trainer.loss.plot_loss(self.dir, epoch, scaling="linear")
@@ -240,18 +240,17 @@ def calc_psnr(x: torch.Tensor, y: torch.Tensor,
     is None the PSNR will be determined over the full tensors, otherwise
     a random patch of give patch size is determined and the PSNR is calculated
     with respect to this patch. The tensors have an expected shape of (b,c,h,w). """
-    if x.nelement() == 1: return 0
-    px, py = None, None
-    if patch_size is None: px, py = x, y
-    else: 
+    px, py = x.numpy(), y.numpy()
+    mse = mse = np.mean((px - py) ** 2)
+    if patch_size is not None: 
         h, w = x.shape[2:4]
         lp = int(patch_size)
         lx = random.randrange(0, w - lp + 1)
         ly = random.randrange(0, h - lp + 1)    
         px = x[:, :, ly:ly + lp, lx:lx + lp]
         py = y[:, :, ly:ly + lp, lx:lx + lp]
-    mse = torch.dist(px, py, 2).pow(2).mean()
-    return 10 * math.log10(rgb_range**2/mse)
+    if mse == 0: return 100.0
+    return 20 * math.log10(rgb_range / np.sqrt(mse))
 
 def discretize(img: torch.Tensor, rgb_range: float, 
                normalized: bool, norm_range: List[float]) -> torch.Tensor:

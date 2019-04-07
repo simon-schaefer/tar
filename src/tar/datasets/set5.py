@@ -9,8 +9,8 @@ import os
 from tar.dataloader import _Dataset_
 
 class SET5(_Dataset_):
-    def __init__(self, args, name='SET5', train=True):
-        super(SET5, self).__init__(args, name=name, train=train)
+    def __init__(self, args, train, scale, name="SET5"):
+        super(SET5, self).__init__(args, name=name, train=train, scale=scale)
 
     def _scan(self):
         names_hr, names_lr = super(SET5, self)._scan()

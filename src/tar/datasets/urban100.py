@@ -9,8 +9,8 @@ import os
 from tar.dataloader import _Dataset_
 
 class URBAN100(_Dataset_):
-    def __init__(self, args, name='URBAN100', train=True):
-        super(URBAN100, self).__init__(args, name=name, train=train)
+    def __init__(self, args, train, scale, name="URBAN100"):
+        super(URBAN100, self).__init__(args, name=name, train=train, scale=scale)
 
     def _scan(self):
         names_hr, names_lr = super(URBAN100, self)._scan()
