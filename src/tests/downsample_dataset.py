@@ -6,6 +6,7 @@
 #               grayscale input the channels are stacked, i.e. R=G=B. 
 # Arguments   : Path to HR images directory.  
 #               Scaling factor (int). 
+#               Path to LR images directory (optional). 
 # =============================================================================
 import imageio
 import glob
@@ -37,11 +38,11 @@ directory = sys.argv[1]
 scale = int(sys.argv[2])
 if not directory[-1] == "/": 
     directory = directory + "/"
+directory_out = sys.argv[3] if len(sys.argv) > 3 else "LR_bicubic"
 assert os.path.isdir(directory)
 assert scale > 0 and scale % 2 == 0
 
 # Iterate over all files in directory, load, downsample and save them. 
-directory_out = directory.split("/")[-2].replace("HR", "LR_bicubic")
 directory_out = os.path.dirname(directory[:-1]) + "/" + directory_out
 os.makedirs(directory_out, exist_ok=True)
 print("Starting downscaling to {} ...".format(directory_out))

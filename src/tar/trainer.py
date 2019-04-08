@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : Model training and testing class. 
+# Description : Model training and testing class.
 # =============================================================================
 import argparse
 import os
@@ -18,15 +18,15 @@ import tar.modules as modules
 import tar.optimization as optimization
 
 class _Trainer_(object):
-    """ Training front end including training and testing functions according 
+    """ Training front end including training and testing functions according
     to the input arguments. Also includes automated logging. """
 
-    def __init__(self, args: argparse.Namespace, 
-                 loader: dataloader._Data_, 
-                 model: modules._Model_, 
-                 loss: optimization._Loss_, 
+    def __init__(self, args: argparse.Namespace,
+                 loader: dataloader._Data_,
+                 model: modules._Model_,
+                 loss: optimization._Loss_,
                  ckp: misc._Checkpoint_):
-    
+
         super(_Trainer_, self).__init__()
         self.args = args
         self.ckp = ckp
@@ -59,14 +59,14 @@ class _Trainer_(object):
         ))
         self.loss.start_log()
         self.model.train()
-        # Iterate over all batches in epoch. 
+        # Iterate over all batches in epoch.
         timer_data, timer_model = misc._Timer_(), misc._Timer_()
         for batch, (lr, hr, _) in enumerate(self.loader_train[scale]):
-            # Load images. 
+            # Load images.
             lr, hr = self.prepare(lr, hr)
             timer_data.hold()
             timer_model.tic()
-            # Optimization core. 
+            # Optimization core.
             self.optimizer.zero_grad()
             loss = self.optimization_core(lr, hr, finetuning, scale)
             loss.backward()
@@ -85,7 +85,7 @@ class _Trainer_(object):
                     timer_model.release(),
                     timer_data.release()))
             timer_data.tic()
-        # Finalizing - Save error and logging. 
+        # Finalizing - Save error and logging.
         self.loss.end_log(len(self.loader_train[scale]))
         self.error_last = self.loss.log[-1, -1]
         print("... epoch {} with train loss {}".format(epoch, self.error_last))
@@ -94,8 +94,8 @@ class _Trainer_(object):
     # Testing
     # =========================================================================
     def test(self):
-        """ Testing function. In parallel (background) evaluate every 
-        testing dataset stated in the input arguments (args). Log 
+        """ Testing function. In parallel (background) evaluate every
+        testing dataset stated in the input arguments (args). Log
         results and save model at the end. """
         torch.set_grad_enabled(False)
         epoch = self.optimizer.get_last_epoch() + 1
@@ -104,7 +104,7 @@ class _Trainer_(object):
             torch.zeros(1, len(self.loader_test), 2)
         )
         self.model.eval()
-        # Iterate over every testing dataset. 
+        # Iterate over every testing dataset.
         timer_test = misc._Timer_()
         net_applying_times = []
         save = self.args.save_results and self.test_iter%self.args.save_every==0
@@ -113,7 +113,7 @@ class _Trainer_(object):
         )
         if save: self.ckp.begin_background()
         for di, d in enumerate(self.loader_test):
-            # Determining PSNR and save example images. 
+            # Determining PSNR and save example images.
             num_test_samples = len(d.dataset)
             for i, (lr, hr, fname) in enumerate(d):
                 lr, hr = self.prepare(lr, hr)
@@ -122,7 +122,7 @@ class _Trainer_(object):
                 )
                 self.ckp.log[-1, di, :] += psnr_array
                 net_applying_times.append(apply_time)
-                if save: 
+                if save:
                     if self.args.save_gt:
                         lsave.extend([lr, hr])
                         ldesc.extend(["LR","HR"])
@@ -130,16 +130,16 @@ class _Trainer_(object):
                             lsave,ldesc,fname[0],d,d.dataset.scale
                         )
                 misc.progress_bar(i+1, num_test_samples)
-            # Logging PSNR values. 
+            # Logging PSNR values.
             self.ckp.log[-1, di, :] /= len(d)
             psnr_descs = self.psnr_description()
             assert len(psnr_descs) == self.ckp.log.shape[-1]
             self.ckp.write_log("\n")
-            for ip, desc in enumerate(psnr_descs): 
+            for ip, desc in enumerate(psnr_descs):
                 best = self.ckp.log[:,:,ip].max(0)
                 self.ckp.write_log(
                     "{}\t[{} x{}]\tPSNR: {:.3f} (Best: {:.3f} @epoch {})".format(
-                        desc, 
+                        desc,
                         d.dataset.name,
                         d.dataset.scale,
                         self.ckp.log[-1, di, ip],
@@ -147,7 +147,7 @@ class _Trainer_(object):
                         best[1][di] + 1
                     )
                 )
-        # Finalizing - Saving and logging. 
+        # Finalizing - Saving and logging.
         self.ckp.write_log("Mean network applying time: {:.2f}ms".format(
             np.mean(net_applying_times)*1000
         ))
@@ -163,13 +163,13 @@ class _Trainer_(object):
     # =========================================================================
     # Validation
     # =========================================================================
-    def validation(self): 
+    def validation(self):
         """ Validation function for validate model after training on several
         (independent) datasets. Determine several metrics as PSNR and runtime
         for different scale factors and visualize them. """
         torch.set_grad_enabled(False)
         self.model.eval()
-        # Iterate over every validation dataset. 
+        # Iterate over every validation dataset.
         self.ckp.write_log("x"*50)
         self.ckp.write_log("Validating model ...")
         validations = []
@@ -181,38 +181,38 @@ class _Trainer_(object):
             v = {"dataset":"{}".format(name),"scale": "x{}".format(d.scale)}
             v = self.validation_core(v, di, d)
             validations.append(v)
-        # Finalizing. 
+        # Finalizing.
         self.ckp.end_background()
         self.ckp.save_validations(validations)
-        torch.set_grad_enabled(True)        
+        torch.set_grad_enabled(True)
 
     # =========================================================================
     # Trainer-Specific Functions
     # =========================================================================
-    def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor, 
-                          finetuning: bool, scale: int) -> optimization._Loss_: 
+    def optimization_core(self, lr: torch.Tensor, hr: torch.Tensor,
+                          finetuning: bool, scale: int) -> optimization._Loss_:
         raise NotImplementedError
 
-    def saving_core(self, lr: torch.Tensor, hr: torch.Tensor, 
+    def saving_core(self, lr: torch.Tensor, hr: torch.Tensor,
                     finetuning: bool, scale: int) \
-                    -> Tuple[List[torch.Tensor], List[str], torch.Tensor, float]: 
+                    -> Tuple[List[torch.Tensor], List[str], torch.Tensor, float]:
         raise NotImplementedError
 
-    def validation_core(self, v: dict, di: int, dataset) -> dict: 
-        raise NotImplementedError       
-
-    def psnr_description(self) -> List[str]: 
+    def validation_core(self, v: dict, di: int, dataset) -> dict:
         raise NotImplementedError
 
-    def scale_current(self, epoch: int) -> int: 
+    def psnr_description(self) -> List[str]:
         raise NotImplementedError
 
-    def num_epochs(self) -> int: 
+    def scale_current(self, epoch: int) -> int:
+        raise NotImplementedError
+
+    def num_epochs(self) -> int:
         raise NotImplementedError
 
     # =========================================================================
     # Auxialiary Functions
-    # =========================================================================    
+    # =========================================================================
     def prepare(self, *kwargs):
         device = torch.device('cpu' if self.args.cpu else self.args.cuda_device)
 
@@ -228,82 +228,82 @@ class _Trainer_(object):
         else:
             epoch = self.optimizer.get_last_epoch() + 1
             training_over = epoch >= self.num_epochs()
-            if training_over: 
+            if training_over:
                 self.validation()
                 return True
-            else: 
+            else:
                 return False
 
 # =============================================================================
-# TASK-AWARE DOWNSCALING TRAINER. 
+# TASK-AWARE DOWNSCALING TRAINER.
 # =============================================================================
-class _Trainer_TAD_(_Trainer_): 
+class _Trainer_TAD_(_Trainer_):
     """ Trainer class for training the image super resolution using the task
     aware downscaling method, i.e. downscale to scaled image in autoencoder
     and include difference between encoded features and bicubic image to loss.
     Therefore the trainer assumes the model to have an encoder() and decoder()
     function. """
 
-    def __init__(self, args: argparse.Namespace, 
-                 loader: dataloader._Data_, 
-                 model: modules._Model_, 
-                 loss: optimization._Loss_, 
+    def __init__(self, args: argparse.Namespace,
+                 loader: dataloader._Data_,
+                 model: modules._Model_,
+                 loss: optimization._Loss_,
                  ckp: misc._Checkpoint_):
 
         super(_Trainer_TAD_, self).__init__(args, loader, model, loss, ckp)
 
-    def apply(self, lr, hr, scale, disc=True, enc_input=None): 
+    def apply(self, lr, hr, scale, disc=True, enc_input=None):
         assert misc.is_power2(scale)
         scl, hr_in, hr_out, lr_out = 1, hr.clone(), None, None
-        # Downsample image until output (decoded image) has the 
-        # the right scale, add to LR image and discretize. 
-        if enc_input is None: 
-            while scl < scale: 
+        # Downsample image until output (decoded image) has the
+        # the right scale, add to LR image and discretize.
+        if enc_input is None:
+            while scl < scale:
                 lr_out = self.model.model.encode(hr_in)
                 hr_in  = lr_out
-                scl    = scl*2   
-            if scale in args.scales_guidance: 
+                scl    = scl*2
+            if scale in self.args.scales_guidance: 
                 lr_out = torch.add(lr_out, lr)
-            if disc: 
+            if disc:
                 lr_out = misc.discretize(
-                    lr_out, self.args.rgb_range, 
-                    not self.args.no_normalize, 
+                    lr_out, self.args.rgb_range,
+                    not self.args.no_normalize,
                     [self.args.norm_min, self.args.norm_max]
-                ) 
-        else: lr_out = enc_input 
+                )
+        else: lr_out = enc_input
         # Upscale resulting LR_OUT image until decoding output
-        # has the right scale. 
-        hr_out = lr_out.clone()   
-        while scl > 1: 
+        # has the right scale.
+        hr_out = lr_out.clone()
+        while scl > 1:
             hr_out = self.model.model.decode(hr_out)
             scl    = scl//2
         return lr_out, hr_out
 
-    def optimization_core(self, lr, hr, finetuning, scale): 
+    def optimization_core(self, lr, hr, finetuning, scale):
         lr_out, hr_out = self.apply(lr, hr, scale, disc=finetuning)
         loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out, 'LR_GT': lr, 'LR_OUT': lr_out}
         loss = self.loss(loss_kwargs)
-        return loss  
+        return loss
 
-    def saving_core(self, lr, hr, finetuning, scale): 
-        # Apply model once (depending on training phase with/without 
-        # discretization of the low-resoluted image). 
+    def saving_core(self, lr, hr, finetuning, scale):
+        # Apply model once (depending on training phase with/without
+        # discretization of the low-resoluted image).
         rgb_range   = self.args.rgb_range
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         disc_args   = (rgb_range, not self.args.no_normalize, [nmin, nmax])
         timer_apply = misc._Timer_()
         lr_out, hr_out = self.apply(lr, hr, scale, disc=finetuning)
         apply_time = timer_apply.toc()
-        # Save discretized output images for logging. 
+        # Save discretized output images for logging.
         lr_out = misc.discretize(lr_out, *disc_args)
         hr_out = misc.discretize(hr_out, *disc_args)
-        # Determine psnr values for logging procedure. 
+        # Determine psnr values for logging procedure.
         lr_psnr = misc.calc_psnr(lr_out, lr, None, nmax-nmin)
         hr_psnr = misc.calc_psnr(hr_out, hr, None, nmax-nmin)
         psnrs = torch.Tensor([hr_psnr, lr_psnr])
         return [hr_out, lr_out], ["SHRT", "SLR"], psnrs, apply_time
 
-    def validation_core(self, v, di, dataset): 
+    def validation_core(self, v, di, dataset):
         num_valid_samples = len(dataset)
         rgb_range   = self.args.rgb_range
         nmin, nmax  = self.args.norm_min, self.args.norm_max
@@ -316,38 +316,38 @@ class _Trainer_TAD_(_Trainer_):
             timer_apply = misc._Timer_()
             _, hr_out_b = self.apply(lr, hr, dataset.scale, enc_input=lr)
             runtimes[i] = timer_apply.toc()
-            # PSNR - Low resolution image. 
+            # PSNR - Low resolution image.
             lr_out = misc.discretize(lr_out, *disc_args)
             pnsrs[i,0] = misc.calc_psnr(lr_out, lr, None, nmax-nmin)
-            # PSNR - High resolution image (base: lr_out). 
+            # PSNR - High resolution image (base: lr_out).
             hr_out_t = misc.discretize(hr_out_t, *disc_args)
-            pnsrs[i,1] = misc.calc_psnr(hr_out_t, hr, None, nmax-nmin)  
-            # PSNR - High resolution image (base: lr). 
+            pnsrs[i,1] = misc.calc_psnr(hr_out_t, hr, None, nmax-nmin)
+            # PSNR - High resolution image (base: lr).
             hr_out_b = misc.discretize(hr_out_b, *disc_args)
-            pnsrs[i,2] = misc.calc_psnr(hr_out_b, hr, None, nmax-nmin)     
-            slist = [hr_out_t, hr_out_b, lr_out, lr, hr] 
+            pnsrs[i,2] = misc.calc_psnr(hr_out_b, hr, None, nmax-nmin)
+            slist = [hr_out_t, hr_out_b, lr_out, lr, hr]
             dlist = ["SHRT", "SHRB", "SLR", "LR", "HR"]
             self.ckp.save_results(slist,dlist,fname[0],dataset,dataset.scale)
             misc.progress_bar(i+1, num_valid_samples)
-        # Logging PSNR values. 
-        for ip, desc in enumerate(["SLR","SHRT","SHRB"]): 
+        # Logging PSNR values.
+        for ip, desc in enumerate(["SLR","SHRT","SHRB"]):
             pnsrs_i = pnsrs[:,ip]
             pnsrs_i.sort()
             v["PSNR {} (1st)".format(desc)] = "{:.3f}".format(pnsrs_i[-1])
             v["PSNR {} (2nd)".format(desc)] = "{:.3f}".format(pnsrs_i[-2])
         v["RUNTIME [s]"] = "{:.5f}".format(np.median(runtimes))
-        return v 
+        return v
 
-    def psnr_description(self): 
+    def psnr_description(self):
         return ["HR", "LR"]
 
-    def scale_current(self, epoch): 
+    def scale_current(self, epoch):
         scalestrain  = self.args.scales_train
         ebase, ezoom = self.args.epochs_base, self.args.epochs_zoom
         if epoch < ebase: return scalestrain[0]
         else: return scalestrain[(epoch-ebase)//ezoom+1]
 
-    def num_epochs(self): 
+    def num_epochs(self):
         ebase, ezoom = self.args.epochs_base, self.args.epochs_zoom
         if len(self.args.scales_train) == 1: return ebase
         n_zooms = len(self.args.scales_train) - 1

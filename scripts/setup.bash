@@ -61,6 +61,7 @@ if [ ! -d "data" ]; then
     mkdir data
 fi
 cd data
+DOWNSAMPLE_FILE="$SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py"
 ## DIV2K dataset.
 echo "DIV2K dataset ..."
 if [ ! -d "DIV2K" ]; then
@@ -72,34 +73,27 @@ if [ ! -d "DIV2K_train_HR" ]; then
     unzip DIV2K_train_HR.zip
     rm DIV2K_train_HR.zip
 fi
-if [ ! -d "DIV2K_train_LR_bicubic" ]; then
+if [ ! -d "DIV2K_train_LR_bicubic/X2" ]; then
     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_LR_bicubic_X2.zip
     unzip DIV2K_train_LR_bicubic_X2.zip
     rm DIV2K_train_LR_bicubic_X2.zip
+fi
+if [ ! -d "DIV2K_train_LR_bicubic/X4" ]; then
     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_LR_bicubic_X4.zip
     unzip DIV2K_train_LR_bicubic_X4.zip
     rm DIV2K_train_LR_bicubic_X4.zip
+fi
+if [ ! -d "DIV2K_train_LR_bicubic/X8" ]; then
     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_LR_x8.zip
     unzip DIV2K_train_LR_x8.zip
     rm DIV2K_train_LR_x8.zip
     mv DIV2K_train_LR_x8 DIV2K_train_LR_bicubic/X8
 fi
-if [ ! -d "DIV2K_valid_HR" ]; then
-    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_HR.zip
-    unzip DIV2K_valid_HR.zip
-    rm DIV2K_valid_HR.zip
-fi
-if [ ! -d "DIV2K_valid_LR_bicubic" ]; then
-    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_bicubic_X2.zip
-    unzip DIV2K_valid_LR_bicubic_X2.zip
-    rm DIV2K_valid_LR_bicubic_X2.zip
-    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_bicubic_X4.zip
-    unzip DIV2K_valid_LR_bicubic_X4.zip
-    rm DIV2K_valid_LR_bicubic_X4.zip
-    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_x8.zip
-    unzip DIV2K_valid_LR_x8.zip
-    rm DIV2K_valid_LR_x8.zip
-    mv DIV2K_valid_LR_x8 DIV2K_valid_LR_bicubic/X8
+if [ ! -d "DIV2K_train_LR_bicubic/X16" ]; then
+    HRS="$SR_PROJECT_DATA_PATH/DIV2K/DIV2K_train_HR"
+    for scale in "16" "32" "64" "128"; do
+        python3 $DOWNSAMPLE_FILE $HRS $scale "DIV2K_train_LR_bicubic/X$scale"
+    done 
 fi
 
 # MNIST dataset. 
@@ -134,28 +128,47 @@ fi
 #     python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/SIMPLE/HR 4
 # fi
 
+## DIV2K validation dataset.
+if [ ! -d "DIV2K_valid_HR" ]; then
+    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_HR.zip
+    unzip DIV2K_valid_HR.zip
+    rm DIV2K_valid_HR.zip
+fi
+if [ ! -d "DIV2K_valid_LR_bicubic/X2" ]; then
+    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_bicubic_X2.zip
+    unzip DIV2K_valid_LR_bicubic_X2.zip
+    rm DIV2K_valid_LR_bicubic_X2.zip
+fi
+if [ ! -d "DIV2K_valid_LR_bicubic/X4" ]; then
+    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_bicubic_X4.zip
+    unzip DIV2K_valid_LR_bicubic_X4.zip
+    rm DIV2K_valid_LR_bicubic_X4.zip
+fi
+if [ ! -d "DIV2K_valid_LR_bicubic/X8" ]; then
+    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_x8.zip
+    unzip DIV2K_valid_LR_x8.zip
+    rm DIV2K_valid_LR_x8.zip
+    mv DIV2K_valid_LR_x8 DIV2K_valid_LR_bicubic/X8
+fi
+
 # Validation datasets. 
 echo "Validation datasets ..."
 cd $SR_PROJECT_DATA_PATH
 if [ ! -d "URBAN100" ] || [ ! -d "SET5" ] || [ ! -d "SET14" ] || [ ! -d "BSDS100" ]; then
     wget http://vllab.ucmerced.edu/wlai24/LapSRN/results/SR_testing_datasets.zip
     unzip SR_testing_datasets.zip
-    rm SR_testing_datasets.zip
-    rm -r historical
-    rm -r Manga109
+    rm SR_testing_datasets.zip; rm -r historical; rm -r Manga109
     for dir in "Urban100" "Set5" "Set14" "BSDS100"; do
         dir=${dir%*/} 
         cd $SR_PROJECT_DATA_PATH/$dir
         mkdir HR
         mv *.png HR/
-        python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/$dir/HR 2
-        python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/$dir/HR 4
-        python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/$dir/HR 8
+        for scale in "2" "4" "8" "16" "32" "64" "128"; do
+            python3 $DOWNSAMPLE_FILE $SR_PROJECT_DATA_PATH/$dir/HR $scale
+        done 
         cd $SR_PROJECT_DATA_PATH
     done
-    mv "Urban100" "URBAN100"
-    mv "Set5" "SET5"
-    mv "Set14" "SET14"
+    mv "Urban100" "URBAN100"; mv "Set5" "SET5"; mv "Set14" "SET14"
 fi
 
 # Build outs directory.
