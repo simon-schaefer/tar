@@ -53,13 +53,9 @@ class _Checkpoint_(object):
         os.makedirs(self.dir, exist_ok=True)
         os.makedirs(self.get_path('model'), exist_ok=True)
         # Create output directory for test datasets. 
-        if type(args.data_test) == str: 
-            args.data_test = [args.data_test]
         for d in args.data_test:
             os.makedirs(self.get_path('results-{}'.format(d)), exist_ok=True)
         # Create output directory for validation datasets. 
-        if type(args.data_valid) == str: 
-            args.data_valid = [args.data_valid]
         for d in args.data_valid: 
             os.makedirs(self.get_path('results-{}'.format(d)), exist_ok=True)
         # Create output directory for logging data and write config. 
@@ -276,7 +272,8 @@ def unnormalize(img, rgb_range, norm_min, norm_max):
     norm_range = norm_max - norm_min
     return (img - norm_min)/norm_range*rgb_range
 
-def all_power2(numbers): 
-    def is_power2(num):
-        return num != 0 and ((num & (num - 1)) == 0)
+def is_power2(num):
+    return num != 0 and ((num & (num - 1)) == 0)
+
+def all_power2(numbers):     
     return all([is_power2(x) for x in numbers])

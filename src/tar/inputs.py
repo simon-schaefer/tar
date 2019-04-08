@@ -182,6 +182,12 @@ set_template(args)
 # Reformat arguments. 
 args.data_train = args.data_train.split("+")
 args.data_test = args.data_test.split("+")
+if type(args.scales_train) == int: args.scales_train = [args.scales_train]
+args.scales_train = [int(x) for x in args.scales_train]
+if type(args.scales_valid) == int: args.scales_valid = [args.scales_valid]
+args.scales_valid = [int(x) for x in args.scales_valid]
+if type(args.data_valid) == str: args.data_valid = [args.data_valid]
+if type(args.data_test) == str: args.data_test = [args.data_test]
 for arg in vars(args):
     if vars(args)[arg] == "True":
         vars(args)[arg] = True
