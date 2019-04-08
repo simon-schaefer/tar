@@ -51,16 +51,17 @@ class _Trainer_(object):
         self.optimizer.schedule()
         epoch = self.optimizer.get_last_epoch() + 1
         finetuning = epoch >= self.args.fine_tuning
+        scale = self.scale_current(epoch)
         lr = self.optimizer.get_lr()
         self.ckp.write_log(
             "[Epoch {}]\tLearning rate: {}\tFinetuning: {}".format(
-                epoch, lr, finetuning
+            epoch, lr, finetuning
         ))
         self.loss.start_log()
         self.model.train()
         # Iterate over all batches in epoch. 
         timer_data, timer_model = misc._Timer_(), misc._Timer_()
-        for batch, (lr, hr, _) in enumerate(self.loader_train):
+        for batch, (lr, hr, _) in enumerate(self.loader_train[scale]):
             # Load images. 
             lr, hr = self.prepare(lr, hr)
             timer_data.hold()
@@ -79,13 +80,13 @@ class _Trainer_(object):
             if (batch + 1) % self.args.print_every == 0:
                 self.ckp.write_log("[{}/{}]\t{}\t{:.1f}+{:.1f}s".format(
                     (batch + 1) * self.args.batch_size,
-                    len(self.loader_train.dataset),
+                    len(self.loader_train[scale].dataset),
                     self.loss.display_loss(batch),
                     timer_model.release(),
                     timer_data.release()))
             timer_data.tic()
         # Finalizing - Save error and logging. 
-        self.loss.end_log(len(self.loader_train))
+        self.loss.end_log(len(self.loader_train[scale]))
         self.error_last = self.loss.log[-1, -1]
         print("... epoch {} with train loss {}".format(epoch, self.error_last))
 
@@ -125,8 +126,9 @@ class _Trainer_(object):
                     if self.args.save_gt:
                         lsave.extend([lr, hr])
                         ldesc.extend(["LR","HR"])
-                    if self.args.save_results:
-                        self.ckp.save_results(lsave,ldesc,fname[0],d,d.dataset.scale)
+                    if self.args.save_results: self.ckp.save_results(
+                            lsave,ldesc,fname[0],d,d.dataset.scale
+                        )
                 misc.progress_bar(i+1, num_test_samples)
             # Logging PSNR values. 
             self.ckp.log[-1, di, :] /= len(d)
@@ -202,9 +204,15 @@ class _Trainer_(object):
     def psnr_description(self): 
         raise NotImplementedError
 
+    def scale_current(self, epoch): 
+        raise NotImplementedError
+
+    def num_epochs(self): 
+        raise NotImplementedError
+
     # =========================================================================
     # Auxialiary Functions
-    # =========================================================================
+    # =========================================================================    
     def prepare(self, *kwargs):
         device = torch.device('cpu' if self.args.cpu else self.args.cuda_device)
 
@@ -219,7 +227,7 @@ class _Trainer_(object):
             return True
         else:
             epoch = self.optimizer.get_last_epoch() + 1
-            training_over = epoch >= self.args.epochs
+            training_over = epoch >= self.num_epochs()
             if training_over: 
                 self.validation()
                 return True
@@ -321,3 +329,16 @@ class _Trainer_TAD_(_Trainer_):
 
     def psnr_description(self): 
         return ["HR", "LR"]
+
+    def scale_current(self, epoch): 
+        scalestrain  = self.args.scales_train
+        ebase, ezoom = self.args.epochs_base, self.args.epochs_zoom
+        if type(scalestrain) == int: return scalestrain
+        elif epoch < ebase: return scalestrain[0]
+        else: return scalestrain[(epoch-ebase)//ezoom+1]
+
+    def num_epochs(self): 
+        ebase, ezoom = self.args.epochs_base, self.args.epochs_zoom
+        if type(self.args.scales_train) == int: return ebase
+        n_zooms = len(self.args.scales_train) - 1
+        return ebase + n_zooms*ezoom

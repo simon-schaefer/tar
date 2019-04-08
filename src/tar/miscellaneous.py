@@ -275,3 +275,8 @@ def unnormalize(img, rgb_range, norm_min, norm_max):
     assert norm_max > norm_min 
     norm_range = norm_max - norm_min
     return (img - norm_min)/norm_range*rgb_range
+
+def all_power2(numbers): 
+    def is_power2(num):
+        return num != 0 and ((num & (num - 1)) == 0)
+    return all([is_power2(x) for x in numbers])

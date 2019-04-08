@@ -29,30 +29,30 @@ class DataLoaderTest(unittest.TestCase):
         assert loader_test
         # Training data loader. 
         if not args.valid_only: 
-            loader_train = loader.loader_train
-            assert loader_train
+            assert loader.loader_train
     
     def test_batching(self): 
         args = argus.args
         args.valid_only = False
+        args.patch_size, args.scales_train = 96, [2,4]
         loader = dataloader._Data_(args)
-        loader_train = loader.loader_train
-        for batch, (lr, hr, files) in enumerate(loader_train): 
-            assert lr.shape[0] == args.batch_size and hr.shape[0] == args.batch_size
-            assert lr.shape[1] == args.n_colors and hr.shape[1] == args.n_colors
-            s, ls = args.patch_size, int(args.patch_size/args.scale)
-            assert lr.shape[2] == ls and hr.shape[2] == s
-            assert lr.shape[3] == ls and hr.shape[3] == s
-            break
+        for scale, d in loader.loader_train.items(): 
+            for batch, (lr, hr, files) in enumerate(d): 
+                assert lr.shape[0] == args.batch_size and hr.shape[0] == args.batch_size
+                assert lr.shape[1] == args.n_colors and hr.shape[1] == args.n_colors
+                s, ls = args.patch_size, int(args.patch_size/scale)
+                assert lr.shape[2] == ls and hr.shape[2] == s
+                assert lr.shape[3] == ls and hr.shape[3] == s
+                break
 
     def test_div2k(self):
         args = argus.args
         args.valid_only = False
         args.data_train = "DIV2K"
         args.data_test = "DIV2K"
+        args.patch_size, args.scale = 96, 2
         loader = dataloader._Data_(args)
-        loader_train = loader.loader_train
-        for batch, (lr, hr, files) in enumerate(loader_train): 
+        for batch, (lr, hr, files) in enumerate(loader.loader_train[2]): 
             assert lr.shape[0] == args.batch_size and hr.shape[0] == args.batch_size
             assert lr.shape[1] == args.n_colors and hr.shape[1] == args.n_colors
             s, ls = args.patch_size, int(args.patch_size/args.scale)
@@ -94,13 +94,14 @@ class OptimizationTest(unittest.TestCase):
         args.load = ""
         args.data_train = "DIV2K"
         args.data_test = "DIV2K"
+        args.scales_train = 2
         ckp = miscellaneous._Checkpoint_(args)
         loader = dataloader._Data_(args)
         loader_train = loader.loader_train   
         # Test forward. 
         loss = optimization._Loss_(args, ckp)  
         loss.start_log()   
-        for batch, (lr, hr, files) in enumerate(loader_train): 
+        for batch, (lr, hr, files) in enumerate(loader_train[2]): 
             loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr}
             loss_sum = loss.forward(loss_kwargs)
             assert loss_sum == 0

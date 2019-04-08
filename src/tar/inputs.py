@@ -46,8 +46,8 @@ parser.add_argument("--data_range", type=str, default="1-700/701-800",
 parser.add_argument("--ext", type=str, default="img",
                     choices=("img"),
                     help="dataset file extension")
-parser.add_argument("--scale", type=int, default=2,
-                    help="super resolution scale for training/testing")
+parser.add_argument("--scales_train", type=list, default=[2,4,8],
+                    help="super resolution scales for training/testing")
 parser.add_argument("--scales_valid", type=list, default=[2,4], 
                     help="list of validation scales")
 parser.add_argument("--patch_size", type=int, default=96,
@@ -79,8 +79,10 @@ parser.add_argument("--model_type", type=str, default="",
 # =============================================================================
 parser.add_argument("--reset", action="store_true",
                     help="reset the training (default=False)")
-parser.add_argument("--epochs", type=int, default=500,
-                    help="number of epochs to train")
+parser.add_argument("--epochs_base", type=int, default=500,
+                    help="number of epochs to train on base scale")
+parser.add_argument("--epochs_zoom", type=int, default=500,
+                    help="number of epochs to train on further scale")
 parser.add_argument("--fine_tuning", type=int, default=400,
                     help="start fine tuning model at epoch")
 parser.add_argument("--batch_size", type=int, default=16,
@@ -147,7 +149,6 @@ def set_template(args):
     if args.template.find("IM_AE_TAD_MNIST") >= 0:
         args.model      = "AETAD_3D"
         args.model_type = "TAD"
-        args.scale      = 2
         args.optimizer  = "ADAM"
         args.data_train = "MNIST"
         args.data_test  = "MNIST"
@@ -157,7 +158,6 @@ def set_template(args):
     if args.template.find("IM_AE_TAD_DIV2K") >= 0:
         args.model      = "AETAD_3D"
         args.model_type = "TAD"
-        args.scale      = 2
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
@@ -167,7 +167,6 @@ def set_template(args):
     if args.template.find("IM_AE_SIMPLE") >= 0:
         args.model      = "AETAD_3D"
         args.model_type = "TAD"
-        args.scale      = 2
         args.optimizer  = "ADAM"
         args.data_train = "SIMPLE"
         args.data_test  = "SIMPLE"
@@ -183,7 +182,6 @@ set_template(args)
 # Reformat arguments. 
 args.data_train = args.data_train.split("+")
 args.data_test = args.data_test.split("+")
-args.epochs = 1e8 if (args.epochs == 0) else args.epochs   
 for arg in vars(args):
     if vars(args)[arg] == "True":
         vars(args)[arg] = True

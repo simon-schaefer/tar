@@ -228,38 +228,39 @@ class _Data_(object):
     def __init__(self, args: argparse.Namespace):
         self.loader_valid = []
         self.loader_test = []
-        self.loader_train = None
+        self.loader_train = {}
+        # Check input scales, lists have to be a power of 2. 
+        if type(args.scales_valid) == int: 
+            args.scales_valid = [args.scales_valid]
+        assert misc.all_power2(args.scales_valid)
+        if type(args.scales_train) == int: 
+            args.scales_train = [args.scales_train]
+        assert misc.all_power2(args.scales_train)
         # Load validation dataset. In order to get seperated testing results, 
         # from each dataset (due to comparability reasons) the testing 
         # datasets are each loaded individually. 
         if type(args.data_valid) == str: 
             args.data_valid = [args.data_valid]
         for dataset in args.data_valid:
-            for scale in args.scales_valid:  
-                validset = self.load_dataset(
-                    args, dataset, train=False, scale=scale
-                )
-                self.loader_valid.append(_DataLoader_(validset, 1))            
-        if args.valid_only: 
-            return
+            for s in args.scales_valid:  
+                vset = self.load_dataset(args, dataset, train=False, scale=s)
+                self.loader_valid.append(_DataLoader_(vset, 1))            
+        if args.valid_only: return
         # Load testing dataset(s). 
         if type(args.data_test) == str: 
             args.data_test = [args.data_test]
-        for dataset in args.data_test:
-            testset = self.load_dataset(
-                args, dataset, train=False, scale=args.scale
-            )
-            self.loader_test.append(_DataLoader_(testset, 1))
+        for s in args.scales_train: 
+            for dataset in args.data_test:
+                tset = self.load_dataset(args, dataset, train=False, scale=s)
+                self.loader_test.append(_DataLoader_(tset, 1))
         # Load training dataset, if not testing only. For training several
         # datasets are trained in one process and therefore, each given 
-        # training dataset is concatinated to one large dataset. 
-        trainset = self.load_dataset(
-            args, dataset, train=True, scale=args.scale
-        )
-        self.loader_train = _DataLoader_(
-            trainset, args.batch_size, 
-            shuffle=True, num_workers=args.n_threads
-        )
+        # training dataset is concatinated to one large dataset (for each scale).
+        for s in args.scales_train: 
+            tset = self.load_dataset(args, dataset, train=True, scale=s)
+            self.loader_train[s] = _DataLoader_(
+                tset, args.batch_size, shuffle=True, num_workers=args.n_threads
+            )
 
     @staticmethod 
     def load_dataset(args, name: str, train: bool, scale: int) -> _Dataset_: 

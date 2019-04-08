@@ -118,12 +118,13 @@ fi
 # fi
 
 # SIMPLE dataset. 
-echo "SIMPLE dataset ..."
-cd $SR_PROJECT_DATA_PATH
-if [ ! -d "SIMPLE" ]; then
-    python3 $SR_PROJECT_PROJECT_HOME/src/tests/create_simple_dataset.py
-    python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/SIMPLE/HR 2
-fi
+# echo "SIMPLE dataset ..."
+# cd $SR_PROJECT_DATA_PATH
+# if [ ! -d "SIMPLE" ]; then
+#     python3 $SR_PROJECT_PROJECT_HOME/src/tests/create_simple_dataset.py
+#     python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/SIMPLE/HR 2
+#     python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/SIMPLE/HR 4
+# fi
 
 # Validation datasets. 
 echo "Validation datasets ..."
