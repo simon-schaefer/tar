@@ -48,7 +48,9 @@ parser.add_argument("--ext", type=str, default="img",
                     help="dataset file extension")
 parser.add_argument("--scales_train", type=list, default=[2,4,8],
                     help="super resolution scales for training/testing")
-parser.add_argument("--scales_valid", type=list, default=[2,4], 
+parser.add_argument("--scales_guidance", type=list, default=[2],
+                    help="subset of training in which guidance image should be added")
+parser.add_argument("--scales_valid", type=list, default=[2,4,8], 
                     help="list of validation scales")
 parser.add_argument("--patch_size", type=int, default=96,
                     help="input patch size")
@@ -184,6 +186,8 @@ args.data_train = args.data_train.split("+")
 args.data_test = args.data_test.split("+")
 if type(args.scales_train) == int: args.scales_train = [args.scales_train]
 args.scales_train = [int(x) for x in args.scales_train]
+if type(args.scales_guidance) == int: args.scales_guidance = [args.scales_guidance]
+args.scales_guidance = [int(x) for x in args.scales_guidance]
 if type(args.scales_valid) == int: args.scales_valid = [args.scales_valid]
 args.scales_valid = [int(x) for x in args.scales_valid]
 if type(args.data_valid) == str: args.data_valid = [args.data_valid]

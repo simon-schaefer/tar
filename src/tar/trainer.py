@@ -252,7 +252,7 @@ class _Trainer_TAD_(_Trainer_):
 
         super(_Trainer_TAD_, self).__init__(args, loader, model, loss, ckp)
 
-    def apply(self, lr, hr, scale, disc=True, add=True, enc_input=None): 
+    def apply(self, lr, hr, scale, disc=True, enc_input=None): 
         assert misc.is_power2(scale)
         scl, hr_in, hr_out, lr_out = 1, hr.clone(), None, None
         # Downsample image until output (decoded image) has the 
@@ -262,10 +262,12 @@ class _Trainer_TAD_(_Trainer_):
                 lr_out = self.model.model.encode(hr_in)
                 hr_in  = lr_out
                 scl    = scl*2   
-            if add: lr_out = torch.add(lr_out, lr)
+            if scale in args.scales_guidance: 
+                lr_out = torch.add(lr_out, lr)
             if disc: 
                 lr_out = misc.discretize(
-                    lr_out, self.args.rgb_range, not self.args.no_normalize, 
+                    lr_out, self.args.rgb_range, 
+                    not self.args.no_normalize, 
                     [self.args.norm_min, self.args.norm_max]
                 ) 
         else: lr_out = enc_input 
@@ -278,7 +280,7 @@ class _Trainer_TAD_(_Trainer_):
         return lr_out, hr_out
 
     def optimization_core(self, lr, hr, finetuning, scale): 
-        lr_out, hr_out = self.apply(lr, hr, scale, disc=finetuning, add=True)
+        lr_out, hr_out = self.apply(lr, hr, scale, disc=finetuning)
         loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out, 'LR_GT': lr, 'LR_OUT': lr_out}
         loss = self.loss(loss_kwargs)
         return loss  
@@ -290,7 +292,7 @@ class _Trainer_TAD_(_Trainer_):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         disc_args   = (rgb_range, not self.args.no_normalize, [nmin, nmax])
         timer_apply = misc._Timer_()
-        lr_out, hr_out = self.apply(lr, hr, scale, disc=finetuning, add=True)
+        lr_out, hr_out = self.apply(lr, hr, scale, disc=finetuning)
         apply_time = timer_apply.toc()
         # Save discretized output images for logging. 
         lr_out = misc.discretize(lr_out, *disc_args)
@@ -310,7 +312,7 @@ class _Trainer_TAD_(_Trainer_):
         runtimes = np.zeros((num_valid_samples, 1))
         for i, (lr, hr, fname) in enumerate(dataset):
             lr, hr = self.prepare(lr, hr)
-            lr_out, hr_out_t = self.apply(lr, hr, dataset.scale, add=True)
+            lr_out, hr_out_t = self.apply(lr, hr, dataset.scale)
             timer_apply = misc._Timer_()
             _, hr_out_b = self.apply(lr, hr, dataset.scale, enc_input=lr)
             runtimes[i] = timer_apply.toc()
