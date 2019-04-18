@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : Collection of input arguments. 
+# Description : Collection of input arguments.
 # =============================================================================
 import argparse
 import os
@@ -14,15 +14,15 @@ parser.add_argument("--verbose", action="store_true",
                     help="print in log file and terminal (default=False)")
 
 # =============================================================================
-# Hardware specifications.  
+# Hardware specifications.
 # =============================================================================
 parser.add_argument("--n_threads", type=int, default=6,
                     help="number of threads for data loading")
 parser.add_argument("--cpu", action="store_true",
                     help="use cpu only (default=False)")
-parser.add_argument("--cuda_device", type=str, default="cuda:0", 
+parser.add_argument("--cuda_device", type=str, default="cuda:0",
                     help="index name of used GPU")
-parser.add_argument("--n_gpus", type=int, default=1, 
+parser.add_argument("--n_gpus", type=int, default=1,
                     help="number of GPUs (unblocked device_count gives error)")
 parser.add_argument("--seed", type=int, default=1,
                     help="random seed")
@@ -33,13 +33,13 @@ parser.add_argument("--seed", type=int, default=1,
 parser.add_argument("--dir_data", type=str, default=os.environ["SR_PROJECT_DATA_PATH"],
                     help="dataset directory")
 parser.add_argument("--data_train", type=str, default="DIV2K",
-                    choices=("DIV2K"), 
+                    choices=("DIV2K"),
                     help="training dataset name (= 1 dataset!)")
-parser.add_argument("--data_test", type=str, default="DIV2K", 
-                    choices=("DIV2K"), 
+parser.add_argument("--data_test", type=str, default="DIV2K",
+                    choices=("DIV2K"),
                     help="testing datasets name (>= 1 dataset!)")
-parser.add_argument("--data_valid", default=["SET5","SET14","BSDS100"], 
-                    choices=("URBAN100","SET5","SET14","BSDS100"), 
+parser.add_argument("--data_valid", default=["SET5","SET14","BSDS100"],
+                    choices=("URBAN100","SET5","SET14","BSDS100"),
                     help="validation datasets names (>= 1 dataset!)")
 parser.add_argument("--data_range", type=str, default="1-700/701-800",
                     help="train/test data range")
@@ -50,7 +50,7 @@ parser.add_argument("--scales_train", type=list, default=[2,4,8],
                     help="super resolution scales for training/testing")
 parser.add_argument("--scales_guidance", type=list, default=[2],
                     help="subset of training in which guidance image should be added")
-parser.add_argument("--scales_valid", type=list, default=[2,4,8], 
+parser.add_argument("--scales_valid", type=list, default=[2,4,8],
                     help="list of validation scales")
 parser.add_argument("--patch_size", type=int, default=96,
                     help="input patch size")
@@ -60,9 +60,9 @@ parser.add_argument("--n_colors", type=int, default=3,
                     help="number of color channels to use")
 parser.add_argument("--no_normalize", action="store_true",
                     help="not normalize inputs to [norm_min, norm_max] (default=False)")
-parser.add_argument("--norm_min", type=float, default=0.0, 
+parser.add_argument("--norm_min", type=float, default=0.0,
                     help="normalization lower border")
-parser.add_argument("--norm_max", type=float, default=1.0, 
+parser.add_argument("--norm_max", type=float, default=1.0,
                     help="normalization upper border")
 parser.add_argument("--no_augment", action="store_true",
                     help="not use data augmentation (default=False)")
@@ -72,12 +72,12 @@ parser.add_argument("--no_augment", action="store_true",
 # =============================================================================
 parser.add_argument("--model", default="AETAD_3D",
                     help="model name")
-parser.add_argument("--model_type", type=str, default="", 
+parser.add_argument("--model_type", type=str, default="",
                     choices=("", "TAD"),
                     help="kind of model specifying opt. core")
 
 # =============================================================================
-# Training specifications. 
+# Training specifications.
 # =============================================================================
 parser.add_argument("--reset", action="store_true",
                     help="reset the training (default=False)")
@@ -141,11 +141,11 @@ parser.add_argument("--save_results", action="store_false",
                     help="save output results (default=True)")
 parser.add_argument("--save_gt", action="store_true",
                     help="save low-resolution and high-resolution images together (default=False)")
-parser.add_argument("--save_every", type=int, default=10, 
+parser.add_argument("--save_every", type=int, default=10,
                     help="save output/models every x steps if save_result flag is set")
 
 # =============================================================================
-# TEMPLATES. 
+# TEMPLATES.
 # =============================================================================
 def set_template(args):
     if args.template.find("IM_AE_TAD_MNIST") >= 0:
@@ -176,20 +176,22 @@ def set_template(args):
         args.patch_size = 96
 
 # =============================================================================
-# MAIN. 
+# MAIN.
 # =============================================================================
 args = parser.parse_args()
 set_template(args)
 
-# Reformat arguments. 
+def reformat_to_list(inputs):
+    if type(inputs) == list: return inputs
+    elif type(inputs) == int: return [inputs]
+    elif type(inputs) == str: return [int(x) for x in inputs.split(",")]
+
+# Reformat arguments.
 args.data_train = args.data_train.split("+")
 args.data_test = args.data_test.split("+")
-if type(args.scales_train) == int: args.scales_train = [args.scales_train]
-args.scales_train = [int(x) for x in args.scales_train]
-if type(args.scales_guidance) == int: args.scales_guidance = [args.scales_guidance]
-args.scales_guidance = [int(x) for x in args.scales_guidance]
-if type(args.scales_valid) == int: args.scales_valid = [args.scales_valid]
-args.scales_valid = [int(x) for x in args.scales_valid]
+args.scales_train = reformat_to_list(args.scales_train)
+args.scales_guidance = reformat_to_list(args.scales_guidance)
+args.scales_valid = reformat_to_list(args.scales_valid)
 if type(args.data_valid) == str: args.data_valid = [args.data_valid]
 if type(args.data_test) == str: args.data_test = [args.data_test]
 for arg in vars(args):
@@ -197,4 +199,3 @@ for arg in vars(args):
         vars(args)[arg] = True
     elif vars(args)[arg] == "False":
         vars(args)[arg] = False
-
