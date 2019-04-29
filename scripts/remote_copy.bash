@@ -1,8 +1,17 @@
 #!/bin/bash
 
-REMOTE_OUTS=sischaef@biwidl215:/scratch_net/biwidl215/sischaef/outs
-REMOTE_MODS=sischaef@biwidl215:/scratch_net/biwidl215/sischaef/tar/models
+HOST=sischaef@biwidl215
+REMOTE_OUTS=/scratch_net/biwidl215/sischaef/outs
+REMOTE_MODS=/scratch_net/biwidl215/sischaef/tar/models
 LOCAL=/Users/sele/Projects/tar/outs
 
-scp -r $REMOTE_OUTS/* $LOCAL/
-scp -r $REMOTE_MODS/* $LOCAL/
+for path in $REMOTE_OUTS $REMOTE_MODS; do
+    dirs=$(ssh $HOST ls $path)
+    for dir in $dirs; do
+        mkdir $LOCAL/$dir
+        for ext in ".pdf" ".txt" ".pt" ".pth" ".csv"; do
+            scp $HOST:$path/$dir/*$ext $LOCAL/$dir/
+        done
+        scp -r $HOST:$path/$dir/model $LOCAL/$dir/
+    done
+done

@@ -4,7 +4,7 @@
 #$ -S /bin/bash
 #
 ## <= 1h is short queue, <= 6h is middle queue, <= 48h is long queue
-#$ -q gpu.long.q@*
+#$ -q gpu.middle.q@*
 #
 ## the maximum memory usage of this job
 #$ -l gpu=1 -l h_vmem=20G
