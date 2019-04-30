@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Build outs directory.
+echo $'\nBuilding output directory ...'
+cd $SR_PROJECT_HOME
+if [ ! -d "outs" ]; then
+    mkdir outs
+fi
+
 # Download datasets.
 echo $'\nDownloading datasets ...'
 cd $SR_PROJECT_HOME
@@ -8,7 +15,7 @@ if [ ! -d "data" ]; then
 fi
 cd data
 DOWNSAMPLE_FILE="$SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py"
-CHECKING_FILE="$SR_PROJECT_PROJECT_HOME/src/tests/check_dataset.py"
+max_scale=16
 ## DIV2K dataset.
 echo "DIV2K dataset ..."
 if [ ! -d "DIV2K" ]; then
@@ -39,13 +46,10 @@ if [ ! -d "DIV2K_train_LR_bicubic/X8" ]; then
     python3 $CHECKING_FILE $HRS "DIV2K_train_LR_bicubic"
 fi
 if [ ! -d "DIV2K_train_LR_bicubic/X16" ]; then
-    for scale in "16" "32" "64" "128"; do
-        python3 $DOWNSAMPLE_FILE $HRS $scale "DIV2K_train_LR_bicubic/X$scale"
+    for scale in $(seq 16 2 $max_scale); do
+        python3 $DOWNSAMPLE_FILE $HRS $scale $max_scale "DIV2K_train_LR_bicubic"
     done
 fi
-DIV2K_HR="$SR_PROJECT_DATA_PATH/DIV2K/DIV2K_train_HR"
-DIV2K_LR="$SR_PROJECT_DATA_PATH/DIV2K/DIV2K_train_LR_bicubic"
-python3 $CHECKING_FILE $DIV2K_HR $DIV2K_LR
 
 # SIMPLE dataset.
 # echo "SIMPLE dataset ..."
@@ -58,6 +62,7 @@ python3 $CHECKING_FILE $DIV2K_HR $DIV2K_LR
 
 ## DIV2K validation dataset.
 echo "DIV2K validation dataset ..."
+HRS="$SR_PROJECT_DATA_PATH/DIV2K/DIV2K_valid_HR"
 if [ ! -d "DIV2K_valid_HR" ]; then
     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_HR.zip
     unzip DIV2K_valid_HR.zip
@@ -79,9 +84,11 @@ if [ ! -d "DIV2K_valid_LR_bicubic/X8" ]; then
     rm DIV2K_valid_LR_x8.zip
     mv DIV2K_valid_LR_x8 DIV2K_valid_LR_bicubic/X8
 fi
-DIV2Kv_HR="$SR_PROJECT_DATA_PATH/DIV2K/DIV2K_valid_HR"
-DIV2Kv_LR="$SR_PROJECT_DATA_PATH/DIV2K/DIV2K_valid_LR_bicubic"
-python3 $CHECKING_FILE $DIV2Kv_HR $DIV2Kv_LR
+if [ ! -d "DIV2K_valid_LR_bicubic/X16" ]; then
+    for scale in $(seq 16 2 $max_scale); do
+        python3 $DOWNSAMPLE_FILE $HRS $scale $max_scale "DIV2K_valid_LR_bicubic"
+    done
+fi
 
 # Validation datasets.
 echo "Validation datasets ..."
@@ -96,20 +103,14 @@ then
         cd $SR_PROJECT_DATA_PATH/$dir
         mkdir HR
         mv *.png HR/
-        for scale in "2" "4" "8" "16" "32" "64" "128"; do
-            python3 $DOWNSAMPLE_FILE $SR_PROJECT_DATA_PATH/$dir/HR $scale
+        for scale in $(seq 2 2 $max_scale); do
+            python3 $DOWNSAMPLE_FILE $SR_PROJECT_DATA_PATH/$dir/HR $scale $max_scale
         done
 
         cd $SR_PROJECT_DATA_PATH
     done
     mv "Urban100" "URBAN100"; mv "Set5" "SET5"; mv "Set14" "SET14"
 fi
-for dir in "Urban100" "Set5" "Set14" "BSDS100"; do
-    echo $"[$dir] ..."
-    VALID_HR="$SR_PROJECT_DATA_PATH/$dir/HR"
-    VALID_LR="$SR_PROJECT_DATA_PATH/$dir/LR_bicubic"
-    python3 $CHECKING_FILE $VALID_HR $VALID_LR
-done
 
 # MNIST dataset.
 # echo "MNIST dataset ..."

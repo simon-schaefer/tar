@@ -16,9 +16,4 @@ cd $SR_PROJECT_PROJECT_HOME
 pip install -r requirements.txt --user
 pip install -e . --user
 
-# Build outs directory.
-echo $'\nBuilding output directory ...'
-cd $SR_PROJECT_HOME
-if [ ! -d "outs" ]; then
-    mkdir outs
-fi
+echo "Successfully built environment !"

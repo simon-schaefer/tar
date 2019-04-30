@@ -12,7 +12,6 @@ import glob
 import numpy as np
 import os
 import sys
-import skimage
 
 def progress_bar(iteration: int, num_steps: int, bar_length: int=50) -> int:
     """ Draws progress bar showing the number of executed
@@ -43,18 +42,39 @@ assert os.path.isdir(lr_directory)
 print("Starting checking operation ...")
 # Get all scales (assuming having directory name "Xs").
 scales = [int(s.split("/")[-2][1:]) for s in glob.glob(lr_directory+"*/")]
+max_scale = max(scales)
 print("... found scales {}".format(scales))
 
 # Iterate over all files in directory and check scale coherence.
 image_files = glob.glob(hr_directory + "*.png")
 num_files   = len(image_files)
 error_files = []
-for i, filepath in enumerate(image_files):
-    hr = imageio.imread(filepath)
-    filename, _ = os.path.splitext(os.path.basename(filepath))
+error = ""
+for i, hr_filepath in enumerate(image_files):
+    hr = imageio.imread(hr_filepath)
+    filename, _ = os.path.splitext(os.path.basename(hr_filepath))
+    if hr.shape[0] % max_scale != 0 or hr.shape[1] % max_scale != 0:
+        os.remove(hr_filepath)
+        if hr.shape[0] % max_scale != 0:
+            hr = hr[:max_scale*(hr.shape[0]//max_scale),:,:]
+        if hr.shape[1] % max_scale != 0:
+            hr = hr[:,:max_scale*(hr.shape[1]//max_scale),:]
+        imageio.imwrite(hr_filepath, hr.astype(np.uint8))
     for s in scales:
-        lr = imageio.imread(lr_directory + "X{}/{}x{}.png".format(s,filename,s))
+        lr_filepath = lr_directory + "X{}/{}x{}.png".format(s,filename,s)
+        lr = imageio.imread(lr_filepath)
         if not (hr.shape[0] == s*lr.shape[0]) and (hr.shape[1] == s*lr.shape[1]):
-            error_files.append("{}_{}".format(filename, s))
-    progress_bar(i, num_files)
-print("... finished checking, error files: {}".format(error_files))
+            if filename not in error_files:
+                error += "{},{},{},{}\n".format(filename,hr.shape,lr.shape,s)
+                error_files.append(filename)
+    progress_bar(i+1, num_files)
+print("... finished checking, with error messages: \n{}".format(error))
+
+# Delete errorerous files in all scales.
+for file in error_files:
+    hr_filepath = hr_directory + file + ".png"
+    if os.path.exists(hr_filepath): os.remove(hr_filepath)
+    for s in scales:
+        lr_filepath = lr_directory + "X{}/{}x{}.png".format(s,file,s)
+        if os.path.exists(lr_filepath): os.remove(lr_filepath)
+print("... deleted errerous files.")
