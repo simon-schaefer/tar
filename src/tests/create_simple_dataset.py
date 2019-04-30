@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : Create test dataset consisting of similar and repeated shapes. 
+# Description : Create test dataset consisting of similar and repeated shapes.
 # =============================================================================
 import imageio
 import numpy as np
 import os
 import sys
 
-def progress_bar(iteration: int, num_steps: int, bar_length: int=50) -> int: 
-    """ Draws progress bar showing the number of executed 
-    iterations over the overall number of iterations. 
+def progress_bar(iteration: int, num_steps: int, bar_length: int=50) -> int:
+    """ Draws progress bar showing the number of executed
+    iterations over the overall number of iterations.
     Increments the iteration and returns it. """
     status = ""
     progress = float(iteration) / float(num_steps)
@@ -31,7 +31,7 @@ directory_out = os.path.join(directory_out, "HR")
 os.makedirs(directory_out, exist_ok=True)
 print("Starting dataset creation to {} ...".format(directory_out))
 N = 100
-for i in range(N): 
+for i in range(N):
     img = np.ones((1024,960,3), dtype=np.uint8)*255
     x_start = np.random.randint(100, 800)
     y_start = np.random.randint(100, 700)
