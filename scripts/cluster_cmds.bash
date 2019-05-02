@@ -9,8 +9,8 @@ grep -h $(whoami) /tmp/lock-gpu*/info.txt
 nvidia-smi
 
 # Job submission.
-qsub scripts/job24.bash
-qsub scripts/job48.bash 
+qsub scripts/jobs/job24.bash
+qsub scripts/jobs/job48.bash 
 
 # Queue handling.
 qstat

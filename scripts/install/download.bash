@@ -28,26 +28,26 @@ if [ ! -d "DIV2K_train_HR" ]; then
     unzip DIV2K_train_HR.zip
     rm DIV2K_train_HR.zip
 fi
-if [ ! -d "DIV2K_train_LR_bicubic/X2" ]; then
-    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_LR_bicubic_X2.zip
-    unzip DIV2K_train_LR_bicubic_X2.zip
-    rm DIV2K_train_LR_bicubic_X2.zip
-fi
-if [ ! -d "DIV2K_train_LR_bicubic/X4" ]; then
-    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_LR_bicubic_X4.zip
-    unzip DIV2K_train_LR_bicubic_X4.zip
-    rm DIV2K_train_LR_bicubic_X4.zip
-fi
-if [ ! -d "DIV2K_train_LR_bicubic/X8" ]; then
-    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_LR_x8.zip
-    unzip DIV2K_train_LR_x8.zip
-    rm DIV2K_train_LR_x8.zip
-    mv DIV2K_train_LR_x8 DIV2K_train_LR_bicubic/X8
-    python3 $CHECKING_FILE $HRS "DIV2K_train_LR_bicubic"
-fi
+# if [ ! -d "DIV2K_train_LR_bicubic/X2" ]; then
+#     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_LR_bicubic_X2.zip
+#     unzip DIV2K_train_LR_bicubic_X2.zip
+#     rm DIV2K_train_LR_bicubic_X2.zip
+# fi
+# if [ ! -d "DIV2K_train_LR_bicubic/X4" ]; then
+#     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_LR_bicubic_X4.zip
+#     unzip DIV2K_train_LR_bicubic_X4.zip
+#     rm DIV2K_train_LR_bicubic_X4.zip
+# fi
+# if [ ! -d "DIV2K_train_LR_bicubic/X8" ]; then
+#     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_train_LR_x8.zip
+#     unzip DIV2K_train_LR_x8.zip
+#     rm DIV2K_train_LR_x8.zip
+#     mv DIV2K_train_LR_x8 DIV2K_train_LR_bicubic/X8
+#     python3 $CHECKING_FILE $HRS "DIV2K_train_LR_bicubic"
+# fi
 if [ ! -d "DIV2K_train_LR_bicubic/X16" ]; then
-    for scale in $(seq 16 2 $max_scale); do
-        python3 $DOWNSAMPLE_FILE $HRS $scale $max_scale "DIV2K_train_LR_bicubic"
+    for (( s = 2; s <= $max_scale; s=s*2 )); do
+        python3 $DOWNSAMPLE_FILE $HRS $s $max_scale "DIV2K_train_LR_bicubic"
     done
 fi
 
@@ -68,25 +68,25 @@ if [ ! -d "DIV2K_valid_HR" ]; then
     unzip DIV2K_valid_HR.zip
     rm DIV2K_valid_HR.zip
 fi
-if [ ! -d "DIV2K_valid_LR_bicubic/X2" ]; then
-    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_bicubic_X2.zip
-    unzip DIV2K_valid_LR_bicubic_X2.zip
-    rm DIV2K_valid_LR_bicubic_X2.zip
-fi
-if [ ! -d "DIV2K_valid_LR_bicubic/X4" ]; then
-    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_bicubic_X4.zip
-    unzip DIV2K_valid_LR_bicubic_X4.zip
-    rm DIV2K_valid_LR_bicubic_X4.zip
-fi
-if [ ! -d "DIV2K_valid_LR_bicubic/X8" ]; then
-    wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_x8.zip
-    unzip DIV2K_valid_LR_x8.zip
-    rm DIV2K_valid_LR_x8.zip
-    mv DIV2K_valid_LR_x8 DIV2K_valid_LR_bicubic/X8
-fi
+# if [ ! -d "DIV2K_valid_LR_bicubic/X2" ]; then
+#     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_bicubic_X2.zip
+#     unzip DIV2K_valid_LR_bicubic_X2.zip
+#     rm DIV2K_valid_LR_bicubic_X2.zip
+# fi
+# if [ ! -d "DIV2K_valid_LR_bicubic/X4" ]; then
+#     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_bicubic_X4.zip
+#     unzip DIV2K_valid_LR_bicubic_X4.zip
+#     rm DIV2K_valid_LR_bicubic_X4.zip
+# fi
+# if [ ! -d "DIV2K_valid_LR_bicubic/X8" ]; then
+#     wget https://data.vision.ee.ethz.ch/cvl/DIV2K/DIV2K_valid_LR_x8.zip
+#     unzip DIV2K_valid_LR_x8.zip
+#     rm DIV2K_valid_LR_x8.zip
+#     mv DIV2K_valid_LR_x8 DIV2K_valid_LR_bicubic/X8
+# fi
 if [ ! -d "DIV2K_valid_LR_bicubic/X16" ]; then
-    for scale in $(seq 16 2 $max_scale); do
-        python3 $DOWNSAMPLE_FILE $HRS $scale $max_scale "DIV2K_valid_LR_bicubic"
+    for (( s = 2; s <= $max_scale; s=s*2 )); do
+        python3 $DOWNSAMPLE_FILE $HRS $s $max_scale "DIV2K_valid_LR_bicubic"
     done
 fi
 
@@ -103,8 +103,8 @@ then
         cd $SR_PROJECT_DATA_PATH/$dir
         mkdir HR
         mv *.png HR/
-        for scale in $(seq 2 2 $max_scale); do
-            python3 $DOWNSAMPLE_FILE $SR_PROJECT_DATA_PATH/$dir/HR $scale $max_scale
+        for (( s = 2; s <= $max_scale; s=s*2 )); do
+            python3 $DOWNSAMPLE_FILE $SR_PROJECT_DATA_PATH/$dir/HR $s $max_scale
         done
 
         cd $SR_PROJECT_DATA_PATH

@@ -63,7 +63,7 @@ for i, hr_filepath in enumerate(image_files):
     for s in scales:
         lr_filepath = lr_directory + "X{}/{}x{}.png".format(s,filename,s)
         lr = imageio.imread(lr_filepath)
-        if not (hr.shape[0] == s*lr.shape[0]) and (hr.shape[1] == s*lr.shape[1]):
+        if not ((hr.shape[0] == s*lr.shape[0]) and (hr.shape[1] == s*lr.shape[1])):
             if filename not in error_files:
                 error += "{},{},{},{}\n".format(filename,hr.shape,lr.shape,s)
                 error_files.append(filename)

@@ -4,7 +4,7 @@
 #$ -S /bin/bash
 #
 ## <= 1h is short queue, <= 6h is middle queue, <= 48h is long queue
-#$ -q gpu.middle.q@*
+#$ -q gpu.48.q@*
 #
 ## the maximum memory usage of this job
 #$ -l gpu=1 -l h_vmem=20G
@@ -16,6 +16,6 @@
 #$ -o /scratch_net/biwidl215/sischaef/outs/
 #
 # calling exectuable.
-source /scratch_net/biwidl215/sischaef/tar/scripts/setup.bash
+source /scratch_net/biwidl215/sischaef/tar/scripts/setup.bash --build
 source /scratch_net/biwidl215/sischaef/tar/scripts/cluster_setup.bash
 python3 /scratch_net/biwidl215/sischaef/tar/main.py "$@"
