@@ -6,8 +6,8 @@ REMOTE_MODS=/scratch_net/biwidl215/sischaef/tar/models
 LOCAL=/Users/sele/Projects/tar/outs
 
 for path in $REMOTE_OUTS $REMOTE_MODS; do
-    dirs=$(ssh $HOST ls $path)
-    for dir in $dirs; do
+    files=$(ssh $HOST ls $path)
+    for dir in $files; do
         mkdir $LOCAL/$dir
         for ext in ".pdf" ".txt" ".pt" ".pth" ".csv"; do
             scp $HOST:$path/$dir/*$ext $LOCAL/$dir/
