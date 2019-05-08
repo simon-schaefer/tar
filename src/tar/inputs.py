@@ -46,11 +46,11 @@ parser.add_argument("--data_range", type=str, default="1-700/701-800",
 parser.add_argument("--ext", type=str, default="img",
                     choices=("img"),
                     help="dataset file extension")
-parser.add_argument("--scales_train", type=list, default=[2,4,8],
+parser.add_argument("--scales_train", type=list, default=[2],
                     help="super resolution scales for training/testing")
 parser.add_argument("--scales_guidance", type=list, default=[2],
                     help="subset of training in which guidance image should be added")
-parser.add_argument("--scales_valid", type=list, default=[2,4,8],
+parser.add_argument("--scales_valid", type=list, default=[2,4],
                     help="list of validation scales")
 parser.add_argument("--patch_size", type=int, default=96,
                     help="input patch size")
@@ -83,7 +83,7 @@ parser.add_argument("--reset", action="store_true",
                     help="reset the training (default=False)")
 parser.add_argument("--epochs_base", type=int, default=500,
                     help="number of epochs to train on base scale")
-parser.add_argument("--epochs_zoom", type=int, default=500,
+parser.add_argument("--epochs_zoom", type=int, default=0,
                     help="number of epochs to train on further scale")
 parser.add_argument("--fine_tuning", type=int, default=400,
                     help="start fine tuning model at epoch")
@@ -121,7 +121,7 @@ parser.add_argument("--gclip", type=float, default=0,
 # =============================================================================
 # Loss specifications.
 # =============================================================================
-parser.add_argument("--loss", type=str, default="HR*1*L1+LR*1*L1",
+parser.add_argument("--loss", type=str, default="HR*10*L1+LR*1*L1",
                     help="loss function configuration")
 
 # =============================================================================
