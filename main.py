@@ -14,14 +14,15 @@ loader  = _sr_.dataloader._Data_(args)
 loss    = _sr_.optimization._Loss_(args, ckp) if not args.valid_only else None
 model   = _sr_.modules._Model_(args, ckp)
 trainer = None
-if args.model_type == "TAD": 
+if args.model_type == "TAD":
    trainer = _sr_.trainer._Trainer_TAD_(args, loader, model, loss, ckp)
-else: 
+else:
    raise ValueError("Invalid trainer selection {}".format(args.model_type))
-   
+
 device = torch.device('cpu' if args.cpu else args.cuda_device)
 ckp.write_log("Machine: {}".format(torch.cuda.get_device_name(None)))
-while ckp.ready and not trainer.terminate(): 
+while ckp.ready and trainer.step():
     trainer.train()
     trainer.test()
+    trainer.validation()
 ckp.done()
