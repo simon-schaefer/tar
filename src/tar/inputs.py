@@ -38,8 +38,8 @@ parser.add_argument("--data_train", type=str, default="DIV2K",
 parser.add_argument("--data_test", type=str, default="DIV2K",
                     choices=("DIV2K"),
                     help="testing datasets name (>= 1 dataset!)")
-parser.add_argument("--data_valid", default=["SET5","SET14","BSDS100", "VDIV2K"],
-                    choices=("URBAN100","SET5","SET14","BSDS100"),
+parser.add_argument("--data_valid", default=["SET5","SET14","BSDS100"],
+                    choices=("URBAN100","SET5","SET14","BSDS100", "VDIV2K"),
                     help="validation datasets names (>= 1 dataset!)")
 parser.add_argument("--data_range", type=str, default="1-700/701-800",
                     help="train/test data range")
