@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : DIV2K validation dataset extension. 
+# Description : DIV2K validation dataset extension.
 # =============================================================================
 import os
 
@@ -21,3 +21,4 @@ class VDIV2K(_Dataset_):
         self.directory = os.path.join(self.args.dir_data, "DIV2K")
         self.dir_hr = os.path.join(self.directory, 'DIV2K_valid_HR')
         self.dir_lr = os.path.join(self.directory, 'DIV2K_valid_LR_bicubic')
+        self.dir_lr = os.path.join(self.dir_lr, "X{}".format(self.scale))

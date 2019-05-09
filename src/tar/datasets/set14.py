@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : SET14 validation dataset extension. 
+# Description : SET14 validation dataset extension.
 # =============================================================================
 import os
 
@@ -20,3 +20,4 @@ class SET14(_Dataset_):
         super(SET14, self)._set_filesystem(dir_data)
         self.dir_hr = os.path.join(self.directory, 'HR')
         self.dir_lr = os.path.join(self.directory, 'LR_bicubic')
+        self.dir_lr = os.path.join(self.dir_lr, "X{}".format(self.scale))

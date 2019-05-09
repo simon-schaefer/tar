@@ -299,18 +299,18 @@ class _Trainer_TAD_(_Trainer_):
         psnrs = torch.Tensor([hr_psnr, lr_psnr])
         return [hr_out, lr_out], ["SHRT", "SLR"], psnrs, apply_time
 
-    def validation_core(self, v, di, dataset, save=False):
-        num_valid_samples = len(dataset)
+    def validation_core(self, v, di, d, save=False):
+        num_valid_samples = len(d)
         rgb_range   = self.args.rgb_range
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         disc_args   = (rgb_range, not self.args.no_normalize, [nmin, nmax])
         pnsrs = np.zeros((num_valid_samples, 3))
         runtimes = np.zeros((num_valid_samples, 1))
-        for i, (lr, hr, fname) in enumerate(dataset):
+        for i, (lr, hr, fname) in enumerate(d):
             lr, hr = self.prepare(lr, hr)
-            lr_out, hr_out_t = self.apply(lr, hr, dataset.scale)
+            lr_out, hr_out_t = self.apply(lr, hr, d.dataset.scale)
             timer_apply = misc._Timer_()
-            _, hr_out_b = self.apply(lr, hr, dataset.scale, enc_input=lr)
+            _, hr_out_b = self.apply(lr, hr, d.dataset.scale, enc_input=lr)
             runtimes[i] = timer_apply.toc()
             # PSNR - Low resolution image.
             lr_out = misc.discretize(lr_out, *disc_args)
@@ -324,7 +324,7 @@ class _Trainer_TAD_(_Trainer_):
             if save:
                 slist = [hr_out_t, hr_out_b, lr_out, lr, hr]
                 dlist = ["SHRT", "SHRB", "SLR", "LR", "HR"]
-                self.ckp.save_results(slist,dlist,fname[0],dataset,dataset.scale)
+                self.ckp.save_results(slist,dlist,fname[0],d,d.dataset.scale)
             misc.progress_bar(i+1, num_valid_samples)
         # Logging PSNR values.
         for ip, desc in enumerate(["SLR","SHRT","SHRB"]):
