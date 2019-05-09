@@ -113,7 +113,7 @@ class _Trainer_(object):
             num_test_samples = len(d.dataset)
             for i, (lr, hr, fname) in enumerate(d):
                 lr, hr = self.prepare(lr, hr)
-                lsave, ldesc, psnr_array, apply_time = self.apply_core(
+                lsave, ldesc, psnr_array, apply_time = self.test_core(
                     lr, hr, finetuning, d.dataset.scale
                 )
                 self.ckp.log[-1, di, :] += psnr_array
@@ -153,16 +153,17 @@ class _Trainer_(object):
         if save: self.ckp.begin_background()
         validations = []
         for di, d in enumerate(self.loader_valid):
-            li = di + len(self.loader_test)
+            li = di + len(self.loader_test) - 1
             # Validation for every dataset, i.e. determine output list of
             # measures such as PSNR, runtime, etc..
             name = d.dataset.name
-            self.ckp.write_log("\n{}x{}".format(name,d.dataset.scale))
+            self.ckp.write_log("{}x{}".format(name,d.dataset.scale))
             name = name + " "*(10-len(name))
             v = {"dataset":"{}".format(name),"scale": "x{}".format(d.dataset.scale)}
             v = self.validation_core(v, di, d, save=save)
             validations.append(v)
-            self.ckp.log[-1, li, :] += [v["PSNR_SHRT_1"],v["PSNR_SLR_1"]]
+            log = torch.Tensor([float(v["PSNR_SHRT_1"]),float(v["PSNR_SLR_1"])])
+            self.ckp.log[-1, li, :] += log
             # Logging PSNR values.
             best = self.save_psnr_checkpoint(d, li)
         # Finalizing.
@@ -179,7 +180,7 @@ class _Trainer_(object):
                           finetuning: bool, scale: int) -> optimization._Loss_:
         raise NotImplementedError
 
-    def apply_core(self, lr: torch.Tensor, hr: torch.Tensor,
+    def test_core(self, lr: torch.Tensor, hr: torch.Tensor,
                     finetuning: bool, scale: int) \
                     -> Tuple[List[torch.Tensor], List[str], torch.Tensor, float]:
         raise NotImplementedError
@@ -228,6 +229,7 @@ class _Trainer_(object):
         else:
             self.ckp.step()
             epoch = self.optimizer.get_last_epoch() + 1
+            if epoch > 1: self._save(self, epoch)
             return epoch < self.num_epochs()
 
 # =============================================================================
@@ -248,25 +250,22 @@ class _Trainer_TAD_(_Trainer_):
 
         super(_Trainer_TAD_, self).__init__(args, loader, model, loss, ckp)
 
-    def apply(self, lr, hr, scale, disc=True, enc_input=None):
+    def apply(self, lr, hr, scale, discretize=True, dec_input=None):
         assert misc.is_power2(scale)
         scl, hr_in, hr_out, lr_out = 1, hr.clone(), None, None
         # Downsample image until output (decoded image) has the
         # the right scale, add to LR image and discretize.
-        if enc_input is None:
+        if dec_input is None:
             while scl < scale:
                 lr_out = self.model.model.encode(hr_in)
-                hr_in  = lr_out
-                scl    = scl*2
-            if scale in self.args.scales_guidance:
-                lr_out = torch.add(lr_out, lr)
-            if disc:
+                hr_in, scl = lr_out, scl*2
+            if scale in self.args.scales_guidance: lr_out=torch.add(lr_out, lr)
+            if discretize:
                 lr_out = misc.discretize(
-                    lr_out, self.args.rgb_range,
-                    not self.args.no_normalize,
+                    lr_out, self.args.rgb_range, not self.args.no_normalize,
                     [self.args.norm_min, self.args.norm_max]
                 )
-        else: lr_out = enc_input
+        else: lr_out, scl = dec_input, scale
         # Upscale resulting LR_OUT image until decoding output
         # has the right scale.
         hr_out = lr_out.clone()
@@ -276,19 +275,19 @@ class _Trainer_TAD_(_Trainer_):
         return lr_out, hr_out
 
     def optimization_core(self, lr, hr, finetuning, scale):
-        lr_out, hr_out = self.apply(lr, hr, scale, disc=finetuning)
+        lr_out, hr_out = self.apply(lr, hr, scale, discretize=finetuning)
         loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out, 'LR_GT': lr, 'LR_OUT': lr_out}
         loss = self.loss(loss_kwargs)
         return loss
 
-    def apply_core(self, lr, hr, finetuning, scale):
+    def test_core(self, lr, hr, finetuning, scale):
         # Apply model once (depending on training phase with/without
         # discretization of the low-resoluted image).
         rgb_range   = self.args.rgb_range
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         disc_args   = (rgb_range, not self.args.no_normalize, [nmin, nmax])
         timer_apply = misc._Timer_()
-        lr_out, hr_out = self.apply(lr, hr, scale, disc=finetuning)
+        lr_out, hr_out = self.apply(lr, hr, scale, discretize=finetuning)
         apply_time = timer_apply.toc()
         # Save discretized output images for logging.
         lr_out = misc.discretize(lr_out, *disc_args)
@@ -310,7 +309,7 @@ class _Trainer_TAD_(_Trainer_):
             lr, hr = self.prepare(lr, hr)
             lr_out, hr_out_t = self.apply(lr, hr, d.dataset.scale)
             timer_apply = misc._Timer_()
-            _, hr_out_b = self.apply(lr, hr, d.dataset.scale, enc_input=lr)
+            _, hr_out_b = self.apply(lr, hr, d.dataset.scale, dec_input=lr)
             runtimes[i] = timer_apply.toc()
             # PSNR - Low resolution image.
             lr_out = misc.discretize(lr_out, *disc_args)

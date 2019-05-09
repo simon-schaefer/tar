@@ -67,26 +67,28 @@ class _Checkpoint_(object):
                 for arg in vars(args):
                     f.write('{}: {}\n'.format(arg, getattr(args, arg)))
                 f.write('\n')
+        # Build list containing names of test and validation datasets
+        # for logging and plotting purposes.
+        self.log_datasets = self.args.data_test.copy()
+        for dv in self.args.data_valid:
+            for sv in self.args.scales_valid:
+                self.log_datasets.append(dv + "x" + str(sv))
         # Set number of logging threats.
         self.n_processes  = 8
         self.iter_is_best = False
-        self.epoch        = 0
         self.ready        = True
         self.write_log("Building model module ...")
         if args.load:
             self.write_log('... continue from epoch {}...'.format(len(self.log)))
         self.write_log("... successfully built checkpoint module !")
 
-    def step(self):
-        self.epoch = self.epoch + 1
-        num_logsets = len(self.args.data_test + self.args.data_valid)
-        self.add_log(torch.zeros(1, num_logsets, 2))
-        if self.epoch > 1: self._save(self, self.epoch)
+    def step(self, **kwargs):
+        self.add_log(torch.zeros(1, len(self.log_datasets), 2))
 
     # =========================================================================
     # Saving
     # =========================================================================
-    def _save(self, trainer, epoch: int):
+    def save(self, trainer, epoch: int):
         trainer.model.save(self.get_path('model'),epoch,is_best=self.iter_is_best)
         trainer.loss.save(self.dir)
         trainer.loss.plot_loss(self.dir, epoch, scaling="linear")
@@ -94,11 +96,10 @@ class _Checkpoint_(object):
         trainer.optimizer.save(self.dir)
         torch.save(self.log, self.get_path('psnr_log.pt'))
         # Plot peak signal-to-noise ratio (PSNR) plot.
-        datasets = self.args.data_test + self.args.data_valid
-        if self.log.shape[1] != len(datasets): return
+        if self.log.shape[1] != len(self.log_datasets): return
         axis = np.linspace(1, epoch, epoch)
         labels = ("SHRT", "SLR")
-        for id, d in enumerate(datasets):
+        for id, d in enumerate(self.log_datasets):
             fig = plt.figure()
             label = "PSNR on {}".format(d)
             plt.title(label)
@@ -246,7 +247,7 @@ def calc_psnr(x: torch.Tensor, y: torch.Tensor,
     a random patch of give patch size is determined and the PSNR is calculated
     with respect to this patch. The tensors have an expected shape of (b,c,h,w). """
     px, py = x.cpu().numpy(), y.cpu().numpy()
-    mse = mse = np.mean((px - py) ** 2)
+    mse = np.mean((px - py) ** 2)
     if patch_size is not None:
         h, w = x.shape[2:4]
         lp = int(patch_size)
