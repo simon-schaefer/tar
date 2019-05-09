@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Login to cluster environment.
-qrsh -l gpu=1 -l h_vmem=20G -q gpu.middle.q@*
+qrsh -l gpu=1 -l h_vmem=20G -q gpu.24h.q@*
 qrsh -l gpu=0 -q "*@biwirenderXX"
 
 # Check gpu and user.
@@ -10,7 +10,7 @@ nvidia-smi
 
 # Job submission.
 qsub scripts/jobs/job24.bash
-qsub scripts/jobs/job48.bash 
+qsub scripts/jobs/job48.bash
 
 # Queue handling.
 qstat

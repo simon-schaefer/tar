@@ -101,7 +101,7 @@ parser.add_argument("--precision", type=str, default="single",
 parser.add_argument("--lr", type=float, default=1e-3,
                     help="learning rate")
 parser.add_argument("--decay", type=str, default="100",
-                    help="learning rate decay type")
+                    help="learning rate decay interval (epochs)")
 parser.add_argument("--gamma", type=float, default=0.9,
                     help="learning rate decay factor for step decay")
 parser.add_argument("--optimizer", default="ADAM",
@@ -114,7 +114,7 @@ parser.add_argument("--betas", type=tuple, default=(0.9, 0.999),
 parser.add_argument("--epsilon", type=float, default=1e-8,
                     help="ADAM epsilon for numerical stability")
 parser.add_argument("--weight_decay", type=float, default=0,
-                    help="weight decay")
+                    help="weight decay factor for model simplification")
 parser.add_argument("--gclip", type=float, default=0,
                     help="gradient clipping threshold (0 = no clipping)")
 
@@ -148,15 +148,6 @@ parser.add_argument("--save_every", type=int, default=10,
 # TEMPLATES.
 # =============================================================================
 def set_template(args):
-    if args.template.find("IM_AE_TAD_MNIST") >= 0:
-        args.model      = "AETAD_3D"
-        args.model_type = "TAD"
-        args.optimizer  = "ADAM"
-        args.data_train = "MNIST"
-        args.data_test  = "MNIST"
-        args.n_colors   = 1
-        args.patch_size = 28
-
     if args.template.find("IM_AE_TAD_DIV2K") >= 0:
         args.model      = "AETAD_3D"
         args.model_type = "TAD"
