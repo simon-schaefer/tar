@@ -69,7 +69,7 @@ parser.add_argument("--augment", action="store_false",
 # =============================================================================
 # Model specifications.
 # =============================================================================
-parser.add_argument("--model", default="AETAD_3D",
+parser.add_argument("--model", default="",
                     help="model name")
 parser.add_argument("--model_type", type=str, default="",
                     choices=("", "TAD"),
@@ -145,8 +145,8 @@ parser.add_argument("--save_every", type=int, default=10,
 # TEMPLATES.
 # =============================================================================
 def set_template(args):
-    if args.template.find("IM_AE_TAD_DIV2K") >= 0:
-        args.model      = "AETAD_3D"
+    if args.template.find("IMG_AETAD_DIV2K") >= 0:
+        args.model      = "AETAD"
         args.model_type = "TAD"
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
@@ -155,12 +155,13 @@ def set_template(args):
         args.n_colors   = 3
         args.patch_size = 96
 
-    if args.template.find("IM_AE_SIMPLE") >= 0:
-        args.model      = "AETAD_3D"
+    if args.template.find("IMG_AETAD_SMALL_DIV2K") >= 0:
+        args.model      = "AETAD_SMALL"
         args.model_type = "TAD"
         args.optimizer  = "ADAM"
-        args.data_train = "SIMPLE"
-        args.data_test  = "SIMPLE"
+        args.data_train = "DIV2K"
+        args.data_test  = "DIV2K"
+        args.data_range  = "1-700/701-800"
         args.n_colors   = 3
         args.patch_size = 96
 
