@@ -238,7 +238,7 @@ class _Trainer_TAD_(_Trainer_):
 
         super(_Trainer_TAD_, self).__init__(args, loader, model, loss, ckp)
 
-    def apply(self, lr, hr, scale, discretize=True, dec_input=None):
+    def apply(self, lr, hr, scale, discretize=False, dec_input=None):
         assert misc.is_power2(scale)
         scl, hr_in, hr_out, lr_out = 1, hr.clone(), None, None
         # Downsample image until output (decoded image) has the
@@ -253,9 +253,9 @@ class _Trainer_TAD_(_Trainer_):
                     lr_out, self.args.rgb_range, not self.args.no_normalize,
                     [self.args.norm_min, self.args.norm_max]
                 )
+            if scale > 2: print("disc", scl, lr_out.max())
         else: lr_out, scl = dec_input, scale
-        # Upscale resulting LR_OUT image until decoding output
-        # has the right scale.
+        # Upscale resulting LR_OUT image until decoding output has right scale.
         hr_out = lr_out.clone()
         while scl > 1:
             hr_out = self.model.model.decode(hr_out)
@@ -274,10 +274,12 @@ class _Trainer_TAD_(_Trainer_):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         disc_args   = (rgb_range, not self.args.no_normalize, [nmin, nmax])
         max_samples = self.args.max_test_samples
-        pnsrs = np.zeros((num_valid_samples, 3))
+        psnrs = np.zeros((num_valid_samples, 3))
         runtimes = np.zeros((num_valid_samples, 1))
-        dsample = d if save else random.sample(d, min(max_samples,len(d)))
-        for i, (lr, hr, fname) in enumerate(dsample):
+        dsample = range(len(d))
+        if not save: dsample = random.sample(dsample, min(max_samples,len(d)))
+        for i, (lr, hr, fname) in enumerate(d):
+            if i not in dsample: continue
             lr, hr = self.prepare(lr, hr)
             scale  = d.dataset.scale
             lr_out, hr_out_t = self.apply(lr, hr, scale, discretize=finetuning)
@@ -286,13 +288,13 @@ class _Trainer_TAD_(_Trainer_):
             runtimes[i] = timer_apply.toc()
             # PSNR - Low resolution image.
             lr_out = misc.discretize(lr_out, *disc_args)
-            pnsrs[i,0] = misc.calc_psnr(lr_out, lr, None, nmax-nmin)
+            psnrs[i,0] = misc.calc_psnr(lr_out, lr, None, nmax-nmin)
             # PSNR - High resolution image (base: lr_out).
             hr_out_t = misc.discretize(hr_out_t, *disc_args)
-            pnsrs[i,1] = misc.calc_psnr(hr_out_t, hr, None, nmax-nmin)
+            psnrs[i,1] = misc.calc_psnr(hr_out_t, hr, None, nmax-nmin)
             # PSNR - High resolution image (base: lr).
             hr_out_b = misc.discretize(hr_out_b, *disc_args)
-            pnsrs[i,2] = misc.calc_psnr(hr_out_b, hr, None, nmax-nmin)
+            psnrs[i,2] = misc.calc_psnr(hr_out_b, hr, None, nmax-nmin)
             if save:
                 slist = [hr_out_t, hr_out_b, lr_out, lr, hr]
                 dlist = ["SHRT", "SHRB", "SLR", "LR", "HR"]
@@ -300,9 +302,9 @@ class _Trainer_TAD_(_Trainer_):
             #misc.progress_bar(i+1, num_valid_samples)
         # Logging PSNR values.
         for ip, desc in enumerate(["SLR","SHRT","SHRB"]):
-            pnsrs_i = pnsrs[:,ip]
-            pnsrs_i.sort()
-            v["PSNR_{}_best".format(desc)]="{:.3f}".format(pnsrs_i[-1])
+            psnrs_i = psnrs[:,ip]
+            psnrs_i.sort()
+            v["PSNR_{}_best".format(desc)]="{:.3f}".format(psnrs_i[-1])
             v["PSNR_{}_mdan".format(desc)]="{:.3f}".format(np.median(psnrs_i))
         log = torch.Tensor([float(v["PSNR_SHRT_best"]),float(v["PSNR_SLR_best"])])
         self.ckp.log[-1, di, :] += log

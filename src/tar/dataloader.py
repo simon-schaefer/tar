@@ -137,7 +137,7 @@ class _Dataset_(Dataset):
             pair = [misc.normalize(x, self.args.rgb_range,
                     self.args.norm_min, self.args.norm_max) for x in pair]
         # Augment patches (if flag is set).
-        if not self.args.no_augment:
+        if not self.args.augment:
             hflip = random.random() < 0.5
             vflip = random.random() < 0.5
             rot90 = random.random() < 0.5

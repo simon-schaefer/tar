@@ -16,7 +16,7 @@ parser.add_argument("--verbose", action="store_false",
 # =============================================================================
 # Hardware specifications.
 # =============================================================================
-parser.add_argument("--n_threads", type=int, default=6,
+parser.add_argument("--n_threads", type=int, default=10,
                     help="number of threads for data loading")
 parser.add_argument("--cpu", action="store_true",
                     help="use cpu only (default=False)")
@@ -63,7 +63,7 @@ parser.add_argument("--norm_min", type=float, default=0.0,
                     help="normalization lower border")
 parser.add_argument("--norm_max", type=float, default=1.0,
                     help="normalization upper border")
-parser.add_argument("--no_augment", action="store_false",
+parser.add_argument("--augment", action="store_false",
                     help="not use data augmentation (default=True)")
 
 # =============================================================================
