@@ -227,10 +227,9 @@ class _Trainer_(object):
             self.validation()
             return False
         else:
-            self.ckp.step()
             epoch = self.optimizer.get_last_epoch() + 1
             if epoch > 1: self.ckp.save(self, epoch)
-            return epoch < self.num_epochs()
+            return epoch < self.num_epochs() and self.ckp.step()
 
 # =============================================================================
 # TASK-AWARE DOWNSCALING TRAINER.

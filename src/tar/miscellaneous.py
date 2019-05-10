@@ -84,6 +84,7 @@ class _Checkpoint_(object):
 
     def step(self, **kwargs):
         self.add_log(torch.zeros(1, len(self.log_datasets), 2))
+        return self.ready
 
     # =========================================================================
     # Saving
