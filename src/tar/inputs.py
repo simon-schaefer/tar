@@ -43,9 +43,6 @@ parser.add_argument("--data_valid", default=["SET5","SET14","BSDS100"],
                     help="validation datasets names (>= 1 dataset!)")
 parser.add_argument("--data_range", type=str, default="1-700/701-800",
                     help="train/test data range")
-parser.add_argument("--ext", type=str, default="img",
-                    choices=("img"),
-                    help="dataset file extension")
 parser.add_argument("--scales_train", type=list, default=[2],
                     help="super resolution scales for training/testing")
 parser.add_argument("--scales_guidance", type=list, default=[2],

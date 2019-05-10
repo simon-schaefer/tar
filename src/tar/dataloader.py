@@ -47,10 +47,7 @@ class _Dataset_(Dataset):
         # Scanning for files in given directories and loading images.
         self._set_filesystem(args.dir_data)
         list_hr, list_lr = self._scan()
-        if args.ext.find('img') >= 0:
-            self.images_hr, self.images_lr = list_hr, list_lr
-        else:
-            raise ValueError("Invalid file extension %s !" % str(args.ext))
+        self.images_hr, self.images_lr = list_hr, list_lr
 
     # =========================================================================
     # Handling the filesystem
@@ -88,11 +85,8 @@ class _Dataset_(Dataset):
         f_hr = self.images_hr[idx]
         f_lr = self.images_lr[idx]
         filename, _ = os.path.splitext(os.path.basename(f_hr))
-        if self.args.ext == 'img':
-            hr = imageio.imread(f_hr)
-            lr = imageio.imread(f_lr)
-        else:
-            raise ValueError("Invalid file extension %s !" % str(self.args.ext))
+        hr = imageio.imread(f_hr)
+        lr = imageio.imread(f_lr)
 
         def _expand_dimension(img: np.ndarray) -> np.ndarray:
             if img.ndim == 2 and self.args.n_colors == 3:

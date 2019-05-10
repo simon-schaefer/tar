@@ -229,7 +229,7 @@ class _Trainer_(object):
         else:
             self.ckp.step()
             epoch = self.optimizer.get_last_epoch() + 1
-            if epoch > 1: self._save(self, epoch)
+            if epoch > 1: self.ckp.save(self, epoch)
             return epoch < self.num_epochs()
 
 # =============================================================================
