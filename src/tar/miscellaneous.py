@@ -54,10 +54,10 @@ class _Checkpoint_(object):
         os.makedirs(self.get_path('model'), exist_ok=True)
         # Create output directory for test datasets.
         for d in args.data_test:
-            os.makedirs(self.get_path('results-{}'.format(d)), exist_ok=True)
+            os.makedirs(self.get_path('results_{}'.format(d)), exist_ok=True)
         # Create output directory for validation datasets.
         for d in args.data_valid:
-            os.makedirs(self.get_path('results-{}'.format(d)), exist_ok=True)
+            os.makedirs(self.get_path('results_{}'.format(d)), exist_ok=True)
         # Create output directory for logging data and write config.
         open_type = 'a' if os.path.exists(self.get_path('log.txt')) else 'w'
         self.log_file = open(self.get_path('log.txt'), open_type)
