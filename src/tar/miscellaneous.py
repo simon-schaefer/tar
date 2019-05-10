@@ -110,7 +110,7 @@ class _Checkpoint_(object):
             plt.xlabel('Epochs')
             plt.ylabel('PSNR')
             plt.grid(True)
-            plt.savefig(self.get_path("test_{}.pdf".format(d)))
+            plt.savefig(self.get_path("psnr_{}.pdf".format(d)))
             plt.close(fig)
 
     def save_results(self, save_list: List[torch.Tensor], desc_list: List[str],

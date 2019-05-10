@@ -10,8 +10,8 @@ import os
 parser = argparse.ArgumentParser(description="tar")
 parser.add_argument("--template", default=".",
                     help="set various templates in option.py")
-parser.add_argument("--verbose", action="store_true",
-                    help="print in log file and terminal (default=False)")
+parser.add_argument("--verbose", action="store_false",
+                    help="print in log file and terminal (default=True)")
 
 # =============================================================================
 # Hardware specifications.
@@ -38,10 +38,10 @@ parser.add_argument("--data_train", type=str, default="DIV2K",
 parser.add_argument("--data_test", type=str, default="DIV2K",
                     choices=("DIV2K"),
                     help="testing datasets name (>= 1 dataset!)")
-parser.add_argument("--data_valid", default=["SET5","SET14","BSDS100"],
+parser.add_argument("--data_valid", default=["SET5","SET14"],
                     choices=("URBAN100","SET5","SET14","BSDS100", "VDIV2K"),
                     help="validation datasets names (>= 1 dataset!)")
-parser.add_argument("--data_range", type=str, default="1-700/701-800",
+parser.add_argument("--data_range", type=str, default="",
                     help="train/test data range")
 parser.add_argument("--scales_train", type=list, default=[2],
                     help="super resolution scales for training/testing")
@@ -61,8 +61,8 @@ parser.add_argument("--norm_min", type=float, default=0.0,
                     help="normalization lower border")
 parser.add_argument("--norm_max", type=float, default=1.0,
                     help="normalization upper border")
-parser.add_argument("--no_augment", action="store_true",
-                    help="not use data augmentation (default=False)")
+parser.add_argument("--no_augment", action="store_false",
+                    help="not use data augmentation (default=True)")
 
 # =============================================================================
 # Model specifications.
@@ -149,6 +149,7 @@ def set_template(args):
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
+        args.data_range  =  "1-700/1-10" #"1-700/701-800"
         args.n_colors   = 3
         args.patch_size = 96
 
