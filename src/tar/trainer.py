@@ -55,7 +55,7 @@ class _Trainer_(object):
         scale = self.scale_current(epoch)
         lr = self.optimizer.get_lr()
         self.ckp.write_log(
-            "[Epoch {}]\tLearning rate: {}\tFinetuning: {}\t Scale: x{}".format(
+            "\n[Epoch {}]\tLearning rate: {}\tFinetuning: {}\t Scale: x{}".format(
             epoch, lr, finetuning, scale
         ))
         self.loss.start_log()
@@ -120,7 +120,7 @@ class _Trainer_(object):
                 net_applying_times.append(apply_time)
                 if save and self.args.save_results:
                     self.ckp.save_results(lsave,ldesc,fname[0],d,d.dataset.scale)
-                misc.progress_bar(i+1, num_test_samples)
+                #misc.progress_bar(i+1, num_test_samples)
             # Logging PSNR values.
             best = self.save_psnr_checkpoint(d, di)
         # Finalizing - Saving and logging.
@@ -129,7 +129,7 @@ class _Trainer_(object):
         ))
         if save: self.ckp.end_background()
         self.ckp.write_log(
-            "Testing Total: {:.2f}s\n".format(timer_test.toc()), refresh=True
+            "Testing Total: {:.2f}s".format(timer_test.toc()), refresh=True
         )
         self.test_iter += 1
         torch.set_grad_enabled(True)
@@ -324,7 +324,7 @@ class _Trainer_TAD_(_Trainer_):
                 slist = [hr_out_t, hr_out_b, lr_out, lr, hr]
                 dlist = ["SHRT", "SHRB", "SLR", "LR", "HR"]
                 self.ckp.save_results(slist,dlist,fname[0],d,d.dataset.scale)
-            misc.progress_bar(i+1, num_valid_samples)
+            #misc.progress_bar(i+1, num_valid_samples)
         # Logging PSNR values.
         for ip, desc in enumerate(["SLR","SHRT","SHRB"]):
             pnsrs_i = pnsrs[:,ip]
