@@ -8,6 +8,7 @@ import argparse
 import os
 import math
 import numpy as np
+import random
 from typing import List, Tuple
 
 import torch
@@ -136,6 +137,7 @@ class _Trainer_(object):
         epoch = self.optimizer.get_last_epoch() + 1
         finetuning = epoch >= self.args.fine_tuning
         save = self.args.save_results and self.valid_iter%self.args.save_every==0
+        save = save or self.args.valid_only
         self.model.eval()
         self.ckp.write_log(
             "\nValidation {} (saving_results={}) ...".format(self.valid_iter,save)
@@ -271,9 +273,11 @@ class _Trainer_TAD_(_Trainer_):
         rgb_range   = self.args.rgb_range
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         disc_args   = (rgb_range, not self.args.no_normalize, [nmin, nmax])
+        max_samples = self.args.max_test_samples
         pnsrs = np.zeros((num_valid_samples, 3))
         runtimes = np.zeros((num_valid_samples, 1))
-        for i, (lr, hr, fname) in enumerate(d):
+        dsample = d if save else random.sample(d, min(max_samples,len(d)))
+        for i, (lr, hr, fname) in enumerate(dsample):
             lr, hr = self.prepare(lr, hr)
             scale  = d.dataset.scale
             lr_out, hr_out_t = self.apply(lr, hr, scale, discretize=finetuning)
@@ -298,9 +302,9 @@ class _Trainer_TAD_(_Trainer_):
         for ip, desc in enumerate(["SLR","SHRT","SHRB"]):
             pnsrs_i = pnsrs[:,ip]
             pnsrs_i.sort()
-            v["PSNR_{}_1".format(desc)] = "{:.3f}".format(pnsrs_i[-1])
-            v["PSNR_{}_2".format(desc)] = "{:.3f}".format(pnsrs_i[-2])
-        log = torch.Tensor([float(v["PSNR_SHRT_1"]),float(v["PSNR_SLR_1"])])
+            v["PSNR_{}_best".format(desc)]="{:.3f}".format(pnsrs_i[-1])
+            v["PSNR_{}_mdan".format(desc)]="{:.3f}".format(np.median(psnrs_i))
+        log = torch.Tensor([float(v["PSNR_SHRT_best"]),float(v["PSNR_SLR_best"])])
         self.ckp.log[-1, di, :] += log
         v["RUNTIME"] = "{:.5f}".format(np.median(runtimes))
         return v

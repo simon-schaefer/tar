@@ -38,7 +38,7 @@ parser.add_argument("--data_train", type=str, default="DIV2K",
 parser.add_argument("--data_test", type=str, default="DIV2K",
                     choices=("DIV2K"),
                     help="testing datasets name (>= 1 dataset!)")
-parser.add_argument("--data_valid", default=["SET5","SET14"],
+parser.add_argument("--data_valid", default=["SET5","SET14","VDIV2K","URBAN100"],
                     choices=("URBAN100","SET5","SET14","BSDS100", "VDIV2K"),
                     help="validation datasets names (>= 1 dataset!)")
 parser.add_argument("--data_range", type=str, default="",
@@ -51,6 +51,8 @@ parser.add_argument("--scales_valid", type=list, default=[2,4],
                     help="list of validation scales")
 parser.add_argument("--patch_size", type=int, default=96,
                     help="input patch size")
+parser.add_argument("--max_test_samples", type=int, default=30,
+                    help="maximal number of testing samples (non saving epoch)")
 parser.add_argument("--rgb_range", type=int, default=255,
                     help="maximum pixel intensity value")
 parser.add_argument("--n_colors", type=int, default=3,
@@ -149,7 +151,7 @@ def set_template(args):
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
-        args.data_range  =  "1-700/1-10" #"1-700/701-800"
+        args.data_range  = "1-700/701-800"
         args.n_colors   = 3
         args.patch_size = 96
 
