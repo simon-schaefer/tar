@@ -2,7 +2,7 @@
 
 # Download datasets.
 echo $'\nCheckings datasets ...'
-CHECKING_FILE="$SR_PROJECT_PROJECT_HOME/src/tests/check_dataset.py"
+CHECKING_FILE="$SR_PROJECT_PROJECT_HOME/src/datasets/check.py"
 
 ## DIV2K dataset.
 echo $'\nDIV2K dataset ...'

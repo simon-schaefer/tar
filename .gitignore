@@ -1,5 +1,13 @@
+# Python build.
+*.egg-info/
+*.pyc
+__pycache__/
+
 # Data
 outs/
+
+# Virtual environment.
+venv/
 
 # Editor
 .vscode/

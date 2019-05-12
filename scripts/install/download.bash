@@ -14,7 +14,7 @@ if [ ! -d "data" ]; then
     mkdir data
 fi
 cd data
-DOWNSAMPLE_FILE="$SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py"
+DOWNSAMPLE_FILE="$SR_PROJECT_PROJECT_HOME/src/datasets/downsample.py"
 max_scale=16
 ## DIV2K dataset.
 echo "DIV2K dataset ..."
@@ -50,15 +50,6 @@ if [ ! -d "DIV2K_train_LR_bicubic/X16" ]; then
         python3 $DOWNSAMPLE_FILE $HRS $s $max_scale "DIV2K_train_LR_bicubic"
     done
 fi
-
-# SIMPLE dataset.
-# echo "SIMPLE dataset ..."
-# cd $SR_PROJECT_DATA_PATH
-# if [ ! -d "SIMPLE" ]; then
-#     python3 $SR_PROJECT_PROJECT_HOME/src/tests/create_simple_dataset.py
-#     python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/SIMPLE/HR 2
-#     python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/SIMPLE/HR 4
-# fi
 
 ## DIV2K validation dataset.
 echo "DIV2K validation dataset ..."
@@ -111,26 +102,3 @@ then
     done
     mv "Urban100" "URBAN100"; mv "Set5" "SET5"; mv "Set14" "SET14"
 fi
-
-# MNIST dataset.
-# echo "MNIST dataset ..."
-# if [ ! -d "MNIST" ]; then
-#     mkdir MNIST
-# fi
-# cd MNIST
-# if [ ! -d "MNIST_train_HR" ]; then
-#     wget https://pjreddie.com/media/files/mnist_train.tar.gz
-#     tar -xvf mnist_train.tar.gz
-#     rm mnist_train.tar.gz
-#     mv "train" "MNIST_train_HR"
-# fi
-# if [ ! -d "MNIST_valid_HR" ]; then
-#     wget https://pjreddie.com/media/files/mnist_test.tar.gz
-#     tar -xvf mnist_test.tar.gz
-#     rm mnist_test.tar.gz
-#     mv "test" "MNIST_valid_HR"
-#     cp MNIST_valid_HR/* MNIST_train_HR/
-# fi
-# if [ ! -d "MNIST_train_LR_bicubic" ]; then
-#     python3 $SR_PROJECT_PROJECT_HOME/src/tests/downsample_dataset.py $SR_PROJECT_DATA_PATH/MNIST/MNIST_train_HR 2
-# fi

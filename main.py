@@ -2,20 +2,20 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : Main function for superresolution.
+# Description : *Main*
 # =============================================================================
-import tar as _sr_
+import tar
+import tar.inputs
 import torch
 
-_sr_.miscellaneous.print_header()
-args    = _sr_.inputs.args
-ckp     = _sr_.miscellaneous._Checkpoint_(args)
-loader  = _sr_.dataloader._Data_(args)
-loss    = _sr_.optimization._Loss_(args, ckp) if not args.valid_only else None
-model   = _sr_.modules._Model_(args, ckp)
-trainer = None
+tar.miscellaneous.print_header()
+args    = tar.inputs.args
+ckp     = tar.miscellaneous._Checkpoint_(args)
+loader  = tar.dataloader._Data_(args)
+loss    = tar.optimization._Loss_(args, ckp) if not args.valid_only else None
+model   = tar.modules._Model_(args, ckp)
 if args.model_type == "TAD":
-   trainer = _sr_.trainer._Trainer_TAD_(args, loader, model, loss, ckp)
+   trainer = tar.trainers._Trainer_IScale_(args, loader, model, loss, ckp)
 else:
    raise ValueError("Invalid trainer selection {}".format(args.model_type))
 
