@@ -85,18 +85,16 @@ class _Dataset_(Dataset):
         f_hr = self.images_hr[idx]
         f_lr = self.images_lr[idx]
         filename, _ = os.path.splitext(os.path.basename(f_hr))
-        hr = imageio.imread(f_hr)
-        lr = imageio.imread(f_lr)
+        hr, lr = imageio.imread(f_hr), imageio.imread(f_lr)
+
+        def _expand_dimension(img: np.ndarray) -> np.ndarray:
+            if img.ndim == 2: img = np.stack((img,img,img), axis=2)
+            return img
+
+        lr, hr = _expand_dimension(lr), _expand_dimension(hr)
         assert hr.shape[2] == lr.shape[2]
-
-        if not hr.shape[0] == self.scale*lr.shape[0]:
-            print(f_hr)
-            print(hr.shape)
-            print(lr.shape)
-
         assert hr.shape[0] == self.scale*lr.shape[0]
         assert hr.shape[1] == self.scale*lr.shape[1]
-
         return lr, hr, filename
 
     # =========================================================================
@@ -142,16 +140,17 @@ class _Dataset_(Dataset):
 
             pair = [_augment(x) for x in pair]
         # Set right number of channels.
-        def _set_channel(img, n_channels: int) -> np.ndarray:
-            if img.ndim == 2:
-                img = np.expand_dims(img, axis=2)
-            if n_channels == 1 and img.shape[2] == 3:
-                img = np.expand_dims(sc.rgb2ycbcr(img)[:, :, 0], 2)
-            elif n_channels == 3 and img.shape[2] == 1:
-                img = np.concatenate([img] * n_channels, 2)
+        def _set_channel(img) -> np.ndarray:
+            if img.ndim == 2: img = np.expand_dims(img, axis=2)
+            if img.shape[2] == 1: img = np.concatenate([img] * 3, 2)
             return img
 
-        pair = [_set_channel(x, n_channels=self.args.n_colors) for x in pair]
+        pair = [_set_channel(x) for x in pair]
+        # In colorization mode convert "LR" image to YCbCr and take Y-channel.
+        def _entcolorize(img) -> np.ndarray:
+            return np.expand_dims(sc.rgb2ycbcr(img)[:,:,0], axis=2)
+
+        if self.args.type == "COLORING": pair[0] = _entcolorize(pair[1].copy())
         # Convert to torch tensor and return.
         def _np2Tensor(img) -> Tensor:
             np_transpose = np.ascontiguousarray(img.transpose((2, 0, 1)))
@@ -204,6 +203,11 @@ class _Data_(object):
         self.loader_valid = []
         self.loader_test = []
         self.loader_train = {}
+        if args.type == "SCALING": self.init_scaling(args)
+        elif args.type == "COLORING": self.init_coloring(args)
+        else: raise ValueError("Invalid program type {}!".format(args.type))
+
+    def init_scaling(self, args: argparse.Namespace):
         # Check input scales, lists have to be a power of 2.
         assert misc.all_power2(args.scales_train)
         # Load validation dataset. In order to get seperated testing results,
@@ -214,12 +218,12 @@ class _Data_(object):
                 vset = self.load_dataset(args, dataset, train=False, scale=s)
                 self.loader_valid.append(_DataLoader_(vset, 1))
         if args.valid_only: return
-        # Load testing dataset(s).
+        # Load testing dataset(s), if not valid only
         for s in args.scales_train:
             for dataset in args.data_test:
                 tset = self.load_dataset(args, dataset, train=False, scale=s)
                 self.loader_test.append(_DataLoader_(tset, 1))
-        # Load training dataset, if not testing only. For training several
+        # Load training dataset, if not valid only. For training several
         # datasets are trained in one process and therefore, each given
         # training dataset is concatinated to one large dataset (for each scale).
         for s in args.scales_train:
@@ -227,6 +231,25 @@ class _Data_(object):
             self.loader_train[s] = _DataLoader_(
                 tset, args.batch_size, shuffle=True, num_workers=args.n_threads
             )
+
+    def init_coloring(self, args: argparse.Namespace):
+        # Load validation dataset. It is not about scaling here so merely the
+        # scale equal one is required.
+        for dataset in args.data_valid:
+            vset = self.load_dataset(args, dataset, train=False, scale=1)
+            self.loader_valid.append(_DataLoader_(vset, 1))
+        if args.valid_only: return
+        # Load testing dataset(s), if not valid only
+        for dataset in args.data_test:
+            tset = self.load_dataset(args, dataset, train=False, scale=1)
+            self.loader_test.append(_DataLoader_(tset, 1))
+        # Load training dataset, if not valid only. For training several
+        # datasets are trained in one process and therefore, each given
+        # training dataset is concatinated to one large dataset.
+        tset = self.load_dataset(args, dataset, train=True, scale=1)
+        self.loader_train[1] = _DataLoader_(
+            tset, args.batch_size, shuffle=True, num_workers=args.n_threads
+        )
 
     @staticmethod
     def load_dataset(args, name: str, train: bool, scale: int) -> _Dataset_:

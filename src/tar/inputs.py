@@ -41,7 +41,7 @@ parser.add_argument("--data_test", type=str, default="DIV2K",
 parser.add_argument("--data_valid", default=["SET5","SET14","VDIV2K","URBAN100"],
                     choices=("URBAN100","SET5","SET14","BSDS100", "VDIV2K"),
                     help="validation datasets names (>= 1 dataset!)")
-parser.add_argument("--data_range", type=str, default="",
+parser.add_argument("--data_range", type=str, default="1-700/701-800",
                     help="train/test data range")
 parser.add_argument("--scales_train", type=list, default=[2],
                     help="super resolution scales for training/testing")
@@ -132,24 +132,29 @@ parser.add_argument("--print_every", type=int, default=20,
 # TEMPLATES.
 # =============================================================================
 def set_template(args):
-    if args.template.find("IMG_AETAD_DIV2K") >= 0:
+    if args.template.find("ISCALE_AETAD_DIV2K") >= 0:
         args.model      = "AETAD"
         args.type       = "SCALING"
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
-        args.data_range  = "1-700/701-800"
-        args.n_colors   = 3
         args.patch_size = 96
 
-    if args.template.find("IMG_AETAD_SMALL_DIV2K") >= 0:
+    if args.template.find("ICOLOR_AETAD_DIV2K") >= 0:
+        args.model      = "AETAD_COLOR"
+        args.type       = "COLORING"
+        args.loss       = "COL*10*L1+GRY*1*L1"
+        args.optimizer  = "ADAM"
+        args.data_train = "DIV2K"
+        args.data_test  = "DIV2K"
+        args.patch_size = 96
+
+    if args.template.find("ISCALE_AETAD_SMALL_DIV2K") >= 0:
         args.model      = "AETAD_SMALL"
         args.type       = "SCALING"
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
-        args.data_range  = "1-700/701-800"
-        args.n_colors   = 3
         args.patch_size = 96
 
 # =============================================================================

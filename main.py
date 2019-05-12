@@ -15,7 +15,9 @@ loader  = tar.dataloader._Data_(args)
 loss    = tar.optimization._Loss_(args, ckp) if not args.valid_only else None
 model   = tar.modules._Model_(args, ckp)
 if args.type == "SCALING":
-   trainer = tar.trainers._Trainer_IScale_(args, loader, model, loss, ckp)
+   trainer = tar.trainers.iscale._Trainer_IScale_(args, loader, model, loss, ckp)
+elif args.type == "COLORING":
+    trainer = tar.trainers.icolor._Trainer_IColor_(args, loader, model, loss, ckp)
 else:
    raise ValueError("Invalid trainer selection {}".format(args.model_type))
 

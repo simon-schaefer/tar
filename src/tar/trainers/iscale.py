@@ -4,7 +4,14 @@
 # Created By  : Simon Schaefer
 # Description : Task-aware downscaling trainer for images.
 # =============================================================================
-from tar.trainer import *
+import argparse
+import numpy as np
+import random
+
+import torch
+
+from tar.trainer import _Trainer_
+import tar.miscellaneous as misc
 
 class _Trainer_IScale_(_Trainer_):
     """ Trainer class for training the image super resolution using the task
@@ -13,12 +20,7 @@ class _Trainer_IScale_(_Trainer_):
     Therefore the trainer assumes the model to have an encoder() and decoder()
     function. """
 
-    def __init__(self, args: argparse.Namespace,
-                 loader: dataloader._Data_,
-                 model: modules._Model_,
-                 loss: optimization._Loss_,
-                 ckp: misc._Checkpoint_):
-
+    def __init__(self, args, loader, model, loss, ckp):
         super(_Trainer_IScale_, self).__init__(args, loader, model, loss, ckp)
 
     def apply(self, lr, hr, scale, discretize=False, dec_input=None):
@@ -34,7 +36,6 @@ class _Trainer_IScale_(_Trainer_):
             if scale in self.args.scales_guidance: lr_out=torch.add(lr_out, lr)
             if discretize:
                 lr_out = misc.discretize(lr_out,[nmin,nmax])
-            if scale > 2: print("disc", scl, lr_out.max())
         else: lr_out, scl = dec_input, scale
         # Upscale resulting LR_OUT image until decoding output has right scale.
         hr_out = lr_out.clone()
@@ -52,7 +53,6 @@ class _Trainer_IScale_(_Trainer_):
     def testing_core(self, v, d, di, save=False, finetuning=False):
         num_valid_samples = len(d)
         nmin, nmax  = self.args.norm_min, self.args.norm_max
-        disc_args   = ([nmin, nmax])
         max_samples = self.args.max_test_samples
         psnrs = np.zeros((num_valid_samples, 3))
         runtimes = np.zeros((num_valid_samples, 1))
@@ -67,13 +67,13 @@ class _Trainer_IScale_(_Trainer_):
             _, hr_out_b = self.apply(lr, hr, scale, dec_input=lr)
             runtimes[i] = timer_apply.toc()
             # PSNR - Low resolution image.
-            lr_out = misc.discretize(lr_out, *disc_args)
+            lr_out = misc.discretize(lr_out, [nmin, nmax])
             psnrs[i,0] = misc.calc_psnr(lr_out, lr, None, nmax-nmin)
             # PSNR - High resolution image (base: lr_out).
-            hr_out_t = misc.discretize(hr_out_t, *disc_args)
+            hr_out_t = misc.discretize(hr_out_t, [nmin, nmax])
             psnrs[i,1] = misc.calc_psnr(hr_out_t, hr, None, nmax-nmin)
             # PSNR - High resolution image (base: lr).
-            hr_out_b = misc.discretize(hr_out_b, *disc_args)
+            hr_out_b = misc.discretize(hr_out_b, [nmin, nmax])
             psnrs[i,2] = misc.calc_psnr(hr_out_b, hr, None, nmax-nmin)
             if save:
                 slist = [hr_out_t, hr_out_b, lr_out, lr, hr]
@@ -86,7 +86,7 @@ class _Trainer_IScale_(_Trainer_):
             psnrs_i.sort()
             v["PSNR_{}_best".format(desc)]="{:.3f}".format(psnrs_i[-1])
             v["PSNR_{}_mdan".format(desc)]="{:.3f}".format(np.median(psnrs_i))
-        log = [float(v["PSNR_%s_best".format(x)]) for x in self.log_description()]
+        log = [float(v["PSNR_{}_best".format(x)]) for x in self.log_description()]
         self.ckp.log[-1, di, :] += torch.Tensor(log)
         v["RUNTIME"] = "{:.5f}".format(np.median(runtimes))
         return v
