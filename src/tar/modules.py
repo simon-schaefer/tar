@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : Model superclasses and custom building modules. 
+# Description : Model superclasses and custom building modules.
 # =============================================================================
 from abc import abstractmethod
 import argparse
@@ -16,22 +16,22 @@ import tar.miscellaneous as misc
 
 class _Model_(nn.Module):
     """ Model front end module including parallization (adapting to available
-    hardware) as well as saving/loading functions. 
+    hardware) as well as saving/loading functions.
     All models should inherit from this (abstract) model class. """
 
     def __init__(self, args: argparse.Namespace, ckp: misc._Checkpoint_):
         super(_Model_, self).__init__()
         ckp.write_log("Building model module ...")
-        # Set parameters from input arguments. 
+        # Set parameters from input arguments.
         self.cpu = args.cpu
         self.device = torch.device('cpu' if args.cpu else args.cuda_device)
         self.n_gpus = args.n_gpus
         self.save_models = args.save_models
         module = importlib.import_module('tar.models.' + args.model.lower())
         self.model = module.build_net().to(self.device)
-        if args.precision == "half": 
+        if args.precision == "half":
             self.model.half()
-        if not args.load == "": 
+        if not args.load == "":
             load_path = self.load(
                 ckp.get_path('model'), resume=args.resume, cpu=args.cpu
             )
@@ -40,7 +40,7 @@ class _Model_(nn.Module):
         ckp.write_log("... successfully built model module !")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        if self.training: 
+        if self.training:
             if self.n_gpus > 1:
                 return torch.nn.parallel.data_parallel(
                     self.model, x, range(self.n_GPUs)
@@ -51,7 +51,7 @@ class _Model_(nn.Module):
             return self.model.forward(x)
 
     # =========================================================================
-    # Saving and Loading 
+    # Saving and Loading
     # =========================================================================
     def save(self, directory: str, epoch: int, is_best: bool=False):
         """ Save model as latest version, as epoch version and (if is_best flag
@@ -61,7 +61,7 @@ class _Model_(nn.Module):
             save_dirs.append(directory + "/model_best.pt")
         if self.save_models:
             save_dirs.append(directory + "/model_{}.pt".format(epoch))
-        # Save model under given paths. 
+        # Save model under given paths.
         for s in save_dirs:
             torch.save(self.model.state_dict(), s)
 
@@ -73,7 +73,7 @@ class _Model_(nn.Module):
         path = ""
         if resume == -1:
             path = directory + "/model_latest.pt"
-        elif resume == -2: 
+        elif resume == -2:
             path = directory + "/model_best.pt"
         else:
             path = directory + "/model_{}.pt".format(resume)
@@ -82,12 +82,12 @@ class _Model_(nn.Module):
         return path
 
 # =============================================================================
-# Customly implemented building blocks (nn.Modules). 
+# Customly implemented building blocks (nn.Modules).
 # =============================================================================
-class _Resblock_(nn.Module): 
-    """ Residual convolutional block consisting of two convolutional 
-    layers, a RELU activation in between and a residual connection from 
-    start to end. The inputs size (=s) is therefore contained. The number 
+class _Resblock_(nn.Module):
+    """ Residual convolutional block consisting of two convolutional
+    layers, a RELU activation in between and a residual connection from
+    start to end. The inputs size (=s) is therefore contained. The number
     of channels is contained as well, but can be adapted (=c). """
 
     __constants__ = ['channels']
@@ -101,14 +101,14 @@ class _Resblock_(nn.Module):
         )
         self.channels = c
 
-    def forward(self, x): 
+    def forward(self, x):
         return x + self.filter_block(x)
 
     def extra_repr(self):
         return 'channels={}'.format(self.channels)
 
-class _ReversePixelShuffle_(nn.Module): 
-    """ Reverse pixel shuffeling module, i.e. rearranges elements in a tensor 
+class _ReversePixelShuffle_(nn.Module):
+    """ Reverse pixel shuffeling module, i.e. rearranges elements in a tensor
     of shape (*, C, H*r, W*r) to (*, C*r^2, H, W). Inverse implementation according
     to https://pytorch.org/docs/0.3.1/_modules/torch/nn/functional.html#pixel_shuffle. """
 
@@ -132,9 +132,9 @@ class _ReversePixelShuffle_(nn.Module):
         out_channels = in_channels * (downscale_factor ** 2)
         height //= downscale_factor
         width //= downscale_factor
-        # Reshape input to new shape. 
+        # Reshape input to new shape.
         input_view = input.contiguous().view(
-            batch_size, in_channels, height, downscale_factor, 
-            width, downscale_factor)    
+            batch_size, in_channels, height, downscale_factor,
+            width, downscale_factor)
         shuffle_out = input_view.permute(0,1,3,5,2,4).contiguous()
         return shuffle_out.view(batch_size, out_channels, height, width)

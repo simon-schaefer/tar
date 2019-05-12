@@ -87,13 +87,6 @@ class _Dataset_(Dataset):
         filename, _ = os.path.splitext(os.path.basename(f_hr))
         hr = imageio.imread(f_hr)
         lr = imageio.imread(f_lr)
-
-        def _expand_dimension(img: np.ndarray) -> np.ndarray:
-            if img.ndim == 2 and self.args.n_colors == 3:
-                img = np.stack((img,img,img), axis=2)
-            return img
-
-        lr, hr = _expand_dimension(lr), _expand_dimension(hr)
         assert hr.shape[2] == lr.shape[2]
 
         if not hr.shape[0] == self.scale*lr.shape[0]:
@@ -133,9 +126,8 @@ class _Dataset_(Dataset):
         assert patch_size <= hr.shape[0] and patch_size <= hr.shape[1]
         pair = _get_patch(lr, hr, self.scale, patch_size, self.train)
         # Normalize patches from rgb_range to [norm_min, norm_max].
-        if not self.args.no_normalize:
-            pair = [misc.normalize(x, self.args.rgb_range,
-                    self.args.norm_min, self.args.norm_max) for x in pair]
+        pair = [misc.normalize(x,
+                self.args.norm_min, self.args.norm_max) for x in pair]
         # Augment patches (if flag is set).
         if not self.args.augment:
             hflip = random.random() < 0.5
@@ -153,22 +145,20 @@ class _Dataset_(Dataset):
         def _set_channel(img, n_channels: int) -> np.ndarray:
             if img.ndim == 2:
                 img = np.expand_dims(img, axis=2)
-            c = img.shape[2]
-            if n_channels == 1 and c == 3:
+            if n_channels == 1 and img.shape[2] == 3:
                 img = np.expand_dims(sc.rgb2ycbcr(img)[:, :, 0], 2)
-            elif n_channels == 3 and c == 1:
+            elif n_channels == 3 and img.shape[2] == 1:
                 img = np.concatenate([img] * n_channels, 2)
             return img
 
         pair = [_set_channel(x, n_channels=self.args.n_colors) for x in pair]
         # Convert to torch tensor and return.
-        def _np2Tensor(img, rgb_range=255) -> Tensor:
+        def _np2Tensor(img) -> Tensor:
             np_transpose = np.ascontiguousarray(img.transpose((2, 0, 1)))
             tensor = from_numpy(np_transpose).float()
-            tensor.mul_(rgb_range / 255)
             return tensor
 
-        pair_t = [_np2Tensor(x, rgb_range=self.args.rgb_range) for x in pair]
+        pair_t = [_np2Tensor(x) for x in pair]
         return pair_t[0], pair_t[1], filename
 
     # =========================================================================

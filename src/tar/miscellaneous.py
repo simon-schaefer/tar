@@ -125,8 +125,6 @@ class _Checkpoint_(object):
             if not self.args.no_normalize:
                 r = 255/(self.args.norm_max - self.args.norm_min)
                 normalized = normalized.add(-self.args.norm_min).mul(r)
-            else:
-                normalized = normalized.mul(255/self.args.rgb_range)
             normalized = normalized.clamp(0, 255).round()
             tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
             self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
@@ -259,29 +257,28 @@ def calc_psnr(x: torch.Tensor, y: torch.Tensor,
     if mse == 0: return 100.0
     return 20 * math.log10(rgb_range / np.sqrt(mse))
 
-def discretize(img: torch.Tensor, rgb_range: float,
-               normalized: bool, norm_range: List[float]) -> torch.Tensor:
+def discretize(img: torch.Tensor, norm_range: List[float]) -> torch.Tensor:
     """ Discretize image (given as torch tensor) in defined range of
     pixel values (e.g. 255 or 1.0), i.e. smart rounding. """
     pixel_range = 255 * (norm_range[1] - norm_range[0])
-    img_dis = img if not normalized else img.add(-norm_range[0])
+    img_dis = img.add(-norm_range[0]) # denormalization
     img_dis = img_dis.mul(pixel_range).clamp(0, 255).round().div(pixel_range)
-    img_dis = img_dis if not normalized else img_dis.add(norm_range[0])
+    img_dis = img_dis.add(norm_range[0]) # normalization
     return img_dis
 
-def normalize(img, rgb_range, norm_min, norm_max):
+def normalize(img, norm_min, norm_max):
     """ Normalize numpy array or torch tensor from RGB range
     to given norm range [norm_min, norm_max]. """
     assert norm_max > norm_min
     norm_range = norm_max - norm_min
-    return img/rgb_range*norm_range + norm_min
+    return img/255.0*norm_range + norm_min
 
-def unnormalize(img, rgb_range, norm_min, norm_max):
+def unnormalize(img, norm_min, norm_max):
     """ Unnormalize numpy array or torch tensor from given norm
     range [norm_min, norm_max] to RGB range. """
     assert norm_max > norm_min
     norm_range = norm_max - norm_min
-    return (img - norm_min)/norm_range*rgb_range
+    return (img - norm_min)/norm_range*255.0
 
 def is_power2(num):
     return num != 0 and ((num & (num - 1)) == 0)

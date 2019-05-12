@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 # =============================================================================
-# TASK-AWARE DOWNSCALING TRAINER.
+# Created By  : Simon Schaefer
+# Description : Task-aware downscaling trainer for images.
 # =============================================================================
 from tar.trainer import *
 
@@ -21,6 +24,7 @@ class _Trainer_IScale_(_Trainer_):
     def apply(self, lr, hr, scale, discretize=False, dec_input=None):
         assert misc.is_power2(scale)
         scl, hr_in, hr_out, lr_out = 1, hr.clone(), None, None
+        nmin, nmax  = self.args.norm_min, self.args.norm_max
         # Downsample image until output (decoded image) has the
         # the right scale, add to LR image and discretize.
         if dec_input is None:
@@ -29,10 +33,7 @@ class _Trainer_IScale_(_Trainer_):
                 hr_in, scl = lr_out, scl*2
             if scale in self.args.scales_guidance: lr_out=torch.add(lr_out, lr)
             if discretize:
-                lr_out = misc.discretize(
-                    lr_out, self.args.rgb_range, not self.args.no_normalize,
-                    [self.args.norm_min, self.args.norm_max]
-                )
+                lr_out = misc.discretize(lr_out,[nmin,nmax])
             if scale > 2: print("disc", scl, lr_out.max())
         else: lr_out, scl = dec_input, scale
         # Upscale resulting LR_OUT image until decoding output has right scale.
@@ -50,9 +51,8 @@ class _Trainer_IScale_(_Trainer_):
 
     def testing_core(self, v, d, di, save=False, finetuning=False):
         num_valid_samples = len(d)
-        rgb_range   = self.args.rgb_range
         nmin, nmax  = self.args.norm_min, self.args.norm_max
-        disc_args   = (rgb_range, not self.args.no_normalize, [nmin, nmax])
+        disc_args   = ([nmin, nmax])
         max_samples = self.args.max_test_samples
         psnrs = np.zeros((num_valid_samples, 3))
         runtimes = np.zeros((num_valid_samples, 1))

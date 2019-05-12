@@ -170,8 +170,7 @@ class _Trainer_(object):
         raise NotImplementedError
 
     def test_core(self, lr: torch.Tensor, hr: torch.Tensor,
-                    finetuning: bool, scale: int) \
-                    -> Tuple[List[torch.Tensor], List[str], torch.Tensor, float]:
+                  finetuning: bool, scale: int) -> dict:
         raise NotImplementedError
 
     def validation_core(self, v: dict, dataset, di: int,
@@ -182,6 +181,9 @@ class _Trainer_(object):
         raise NotImplementedError
 
     def num_epochs(self) -> int:
+        raise NotImplementedError
+
+    def scale_current(self, epoch: int) -> int:
         raise NotImplementedError
 
     # =========================================================================

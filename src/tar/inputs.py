@@ -8,6 +8,8 @@ import argparse
 import os
 
 parser = argparse.ArgumentParser(description="tar")
+parser.add_argument("--type", type=str, default="SCALING",
+                    choices=("SCALING" "COLORING"))
 parser.add_argument("--template", default=".",
                     help="set various templates in option.py")
 parser.add_argument("--verbose", action="store_false",
@@ -24,8 +26,6 @@ parser.add_argument("--cuda_device", type=str, default="cuda:0",
                     help="index name of used GPU")
 parser.add_argument("--n_gpus", type=int, default=1,
                     help="number of GPUs (unblocked device_count gives error)")
-parser.add_argument("--seed", type=int, default=1,
-                    help="random seed")
 
 # =============================================================================
 # Data specifications.
@@ -53,12 +53,6 @@ parser.add_argument("--patch_size", type=int, default=96,
                     help="input patch size")
 parser.add_argument("--max_test_samples", type=int, default=30,
                     help="maximal number of testing samples (non saving epoch)")
-parser.add_argument("--rgb_range", type=int, default=255,
-                    help="maximum pixel intensity value")
-parser.add_argument("--n_colors", type=int, default=3,
-                    help="number of color channels to use")
-parser.add_argument("--no_normalize", action="store_true",
-                    help="not normalize inputs to [norm_min, norm_max] (default=False)")
 parser.add_argument("--norm_min", type=float, default=0.0,
                     help="normalization lower border")
 parser.add_argument("--norm_max", type=float, default=1.0,
@@ -71,15 +65,10 @@ parser.add_argument("--augment", action="store_false",
 # =============================================================================
 parser.add_argument("--model", default="",
                     help="model name")
-parser.add_argument("--model_type", type=str, default="",
-                    choices=("", "TAD"),
-                    help="kind of model specifying opt. core")
 
 # =============================================================================
 # Training specifications.
 # =============================================================================
-parser.add_argument("--reset", action="store_true",
-                    help="reset the training (default=False)")
 parser.add_argument("--epochs_base", type=int, default=500,
                     help="number of epochs to train on base scale")
 parser.add_argument("--epochs_zoom", type=int, default=0,
@@ -126,20 +115,18 @@ parser.add_argument("--loss", type=str, default="HR*10*L1+LR*1*L1",
 # =============================================================================
 # Log specifications.
 # =============================================================================
-parser.add_argument("--save", type=str, default="test",
-                    help="directory name to save")
 parser.add_argument("--load", type=str, default="",
                     help="directory to load, format [outs,models]xdir_name")
 parser.add_argument("--resume", type=int, default=-2,
                     help="resume from specific checkpoint (-1=latest, -2=best)")
 parser.add_argument("--save_models", action="store_true",
                     help="save all intermediate models (default=False)")
-parser.add_argument("--print_every", type=int, default=20,
-                    help="how many batches to wait before logging training status")
 parser.add_argument("--save_results", action="store_false",
                     help="save output results (default=True)")
 parser.add_argument("--save_every", type=int, default=10,
                     help="save output/models every x steps if save_result flag is set")
+parser.add_argument("--print_every", type=int, default=20,
+                    help="how many batches to wait before logging training status")
 
 # =============================================================================
 # TEMPLATES.
@@ -147,7 +134,7 @@ parser.add_argument("--save_every", type=int, default=10,
 def set_template(args):
     if args.template.find("IMG_AETAD_DIV2K") >= 0:
         args.model      = "AETAD"
-        args.model_type = "TAD"
+        args.type       = "SCALING"
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
@@ -157,7 +144,7 @@ def set_template(args):
 
     if args.template.find("IMG_AETAD_SMALL_DIV2K") >= 0:
         args.model      = "AETAD_SMALL"
-        args.model_type = "TAD"
+        args.type       = "SCALING"
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
