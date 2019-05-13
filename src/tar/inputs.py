@@ -45,7 +45,7 @@ parser.add_argument("--data_range", type=str, default="1-700/701-800",
                     help="train/test data range")
 parser.add_argument("--scales_train", type=list, default=[2],
                     help="super resolution scales for training/testing")
-parser.add_argument("--scales_guidance", type=list, default=[2],
+parser.add_argument("--scales_guidance", type=list, default=[2,4],
                     help="subset of training in which guidance image should be added")
 parser.add_argument("--scales_valid", type=list, default=[2,4],
                     help="list of validation scales")
