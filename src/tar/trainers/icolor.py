@@ -48,10 +48,7 @@ class _Trainer_IColor_(_Trainer_):
         max_samples = self.args.max_test_samples
         psnrs = np.zeros((num_valid_samples, 4))
         runtimes = np.zeros((num_valid_samples, 1))
-        dsample = range(len(d))
-        if not save: dsample = random.sample(dsample, min(max_samples,len(d)))
         for i, (gry, col, fname) in enumerate(d):
-            if i not in dsample: continue
             gry, col = self.prepare(gry, col)
             scale  = d.dataset.scale
             gry_out, col_out_t = self.apply(gry, col, discretize=finetuning)

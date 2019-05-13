@@ -37,7 +37,7 @@ class _Model_(nn.Module):
             )
             ckp.write_log("... loaded model from {}".format(load_path))
         print(self.model, file=ckp.log_file)
-        ckp.write_log("... successfully built model module !")
+        ckp.write_log("... successfully built model {}!".format(args.model))
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if self.training:

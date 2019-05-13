@@ -19,7 +19,7 @@ if args.type == "SCALING":
 elif args.type == "COLORING":
     trainer = tar.trainers.icolor._Trainer_IColor_(args, loader, model, loss, ckp)
 else:
-   raise ValueError("Invalid trainer selection {}".format(args.model_type))
+   raise ValueError("Invalid trainer selection {}".format(args.type))
 
 device = torch.device('cpu' if args.cpu else args.cuda_device)
 ckp.write_log("Machine: {}".format(torch.cuda.get_device_name(None)))

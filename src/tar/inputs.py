@@ -51,7 +51,7 @@ parser.add_argument("--scales_valid", type=list, default=[2,4],
                     help="list of validation scales")
 parser.add_argument("--patch_size", type=int, default=96,
                     help="input patch size")
-parser.add_argument("--max_test_samples", type=int, default=30,
+parser.add_argument("--max_test_samples", type=int, default=20,
                     help="maximal number of testing samples (non saving epoch)")
 parser.add_argument("--norm_min", type=float, default=0.0,
                     help="normalization lower border")

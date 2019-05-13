@@ -17,6 +17,7 @@ from typing import List, Tuple
 from torch import from_numpy, Tensor
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.dataloader import default_collate
+from torch.utils.data.sampler import RandomSampler
 
 import tar.miscellaneous as misc
 
@@ -180,13 +181,16 @@ class _DataLoader_(DataLoader):
     def __init__(self, dataset,
                  batch_size,
                  shuffle=False,
-                 num_workers=0,
+                 num_workers=1,
+                 sampler=None,
                  collate_fn=default_collate):
+
         super(_DataLoader_, self).__init__(
             dataset,
             batch_size=batch_size,
             shuffle=shuffle,
             num_workers=num_workers,
+            sampler=sampler,
             collate_fn=collate_fn,
         )
 
@@ -216,13 +220,23 @@ class _Data_(object):
         for dataset in args.data_valid:
             for s in args.scales_valid:
                 vset = self.load_dataset(args, dataset, train=False, scale=s)
-                self.loader_valid.append(_DataLoader_(vset, 1))
+                sampler = RandomSampler(vset, replacement=True,
+                                        num_samples=args.max_test_samples)
+                if args.max_test_samples > len(vset): sampler = None
+                self.loader_valid.append(_DataLoader_(
+                    vset, 1, num_workers=args.n_threads, sampler=sampler
+                ))
         if args.valid_only: return
         # Load testing dataset(s), if not valid only
         for s in args.scales_train:
             for dataset in args.data_test:
                 tset = self.load_dataset(args, dataset, train=False, scale=s)
-                self.loader_test.append(_DataLoader_(tset, 1))
+                sampler = RandomSampler(tset, replacement=True,
+                                        num_samples=args.max_test_samples)
+                if args.max_test_samples > len(tset): sampler = None
+                self.loader_test.append(_DataLoader_(
+                    tset, 1, num_workers=args.n_threads, sampler=sampler
+                ))
         # Load training dataset, if not valid only. For training several
         # datasets are trained in one process and therefore, each given
         # training dataset is concatinated to one large dataset (for each scale).
@@ -237,12 +251,22 @@ class _Data_(object):
         # scale equal one is required.
         for dataset in args.data_valid:
             vset = self.load_dataset(args, dataset, train=False, scale=1)
-            self.loader_valid.append(_DataLoader_(vset, 1))
+            sampler = RandomSampler(vset, replacement=True,
+                                    num_samples=args.max_test_samples)
+            if args.max_test_samples > len(vset): sampler = None
+            self.loader_valid.append(_DataLoader_(
+                vset, 1, num_workers=args.n_threads, sampler=sampler
+            ))
         if args.valid_only: return
         # Load testing dataset(s), if not valid only
         for dataset in args.data_test:
             tset = self.load_dataset(args, dataset, train=False, scale=1)
-            self.loader_test.append(_DataLoader_(tset, 1))
+            sampler = RandomSampler(tset, replacement=True,
+                                    num_samples=args.max_test_samples)
+            if args.max_test_samples > len(tset): sampler = None
+            self.loader_test.append(_DataLoader_(
+                tset, 1, num_workers=args.n_threads, sampler=sampler
+            ))
         # Load training dataset, if not valid only. For training several
         # datasets are trained in one process and therefore, each given
         # training dataset is concatinated to one large dataset.

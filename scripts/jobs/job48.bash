@@ -7,7 +7,7 @@
 #$ -q gpu.48h.q@*
 #
 ## the maximum memory usage of this job
-#$ -l gpu=1 -l h_vmem=20G
+#$ -l gpu=1 -l h_vmem=40G
 #
 ## stderr and stdout are merged together to stdout
 #$ -j y

@@ -145,6 +145,7 @@ class _Trainer_(object):
         # Validation for every dataset, i.e. determine output list of
         # measures such as PSNR, runtime, etc..
         if save: self.ckp.begin_background()
+        timer_valid = misc._Timer_()
         validations = []
         for di, d in enumerate(self.loader_valid):
             li = di + len(self.loader_test)
@@ -158,6 +159,9 @@ class _Trainer_(object):
         # Finalizing.
         self.ckp.iter_is_best = best[1][0] + 1 == epoch
         if save: self.ckp.end_background()
+        self.ckp.write_log(
+            "Validation Total: {:.2f}s".format(timer_valid.toc()), refresh=True
+        )
         self.ckp.save_validations(validations)
         self.valid_iter += 1
         torch.set_grad_enabled(True)
