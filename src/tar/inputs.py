@@ -123,7 +123,7 @@ parser.add_argument("--save_models", action="store_true",
                     help="save all intermediate models (default=False)")
 parser.add_argument("--save_results", action="store_false",
                     help="save output results (default=True)")
-parser.add_argument("--save_every", type=int, default=10,
+parser.add_argument("--save_every", type=int, default=20,
                     help="save output/models every x steps if save_result flag is set")
 parser.add_argument("--print_every", type=int, default=20,
                     help="how many batches to wait before logging training status")

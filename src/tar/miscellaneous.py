@@ -245,17 +245,16 @@ def calc_psnr(x: torch.Tensor, y: torch.Tensor,
     is None the PSNR will be determined over the full tensors, otherwise
     a random patch of give patch size is determined and the PSNR is calculated
     with respect to this patch. The tensors have an expected shape of (b,c,h,w). """
-    px, py = x.cpu().numpy(), y.cpu().numpy()
-    mse = np.mean((px - py) ** 2)
-    if patch_size is not None:
-        h, w = x.shape[2:4]
-        lp = int(patch_size)
-        lx = random.randrange(0, w - lp + 1)
-        ly = random.randrange(0, h - lp + 1)
-        px = x[:, :, ly:ly + lp, lx:lx + lp]
-        py = y[:, :, ly:ly + lp, lx:lx + lp]
+    mse = torch.pow(x - y, 2).mean().item()
+    # if patch_size is not None:
+    #     h, w = x.shape[2:4]
+    #     lp = int(patch_size)
+    #     lx = random.randrange(0, w - lp + 1)
+    #     ly = random.randrange(0, h - lp + 1)
+    #     px = x[:, :, ly:ly + lp, lx:lx + lp]
+    #     py = y[:, :, ly:ly + lp, lx:lx + lp]
     if mse == 0: return 100.0
-    return 20 * math.log10(rgb_range / np.sqrt(mse))
+    return 20 * math.log10(rgb_range/np.sqrt(mse))
 
 def discretize(img: torch.Tensor, norm_range: List[float]) -> torch.Tensor:
     """ Discretize image (given as torch tensor) in defined range of
