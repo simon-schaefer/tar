@@ -148,6 +148,9 @@ def set_template(args):
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
         args.patch_size = 96
+        args.scales_train = [1]
+        args.scales_valid = [1]
+        args.scales_guidance = [1]
 
     if args.template.find("ISCALE_AETAD_SMALL_DIV2K") >= 0:
         args.model      = "AETAD_SMALL"
