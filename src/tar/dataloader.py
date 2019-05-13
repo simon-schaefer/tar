@@ -38,13 +38,6 @@ class _Dataset_(Dataset):
         self.split = 'train' if train else 'test'
         self.do_eval = True
         self.scale = scale
-        # Determining training/testing data range.
-        data_range = [r.split('-') for r in args.data_range.split('/')]
-        if not train and len(data_range) > 1 and not args.valid_only:
-            data_range = data_range[1]
-        else:
-            data_range = data_range[0]
-        self.begin, self.end = list(map(lambda x: int(x), data_range))
         # Scanning for files in given directories and loading images.
         self._set_filesystem(args.dir_data)
         list_hr, list_lr = self._scan()

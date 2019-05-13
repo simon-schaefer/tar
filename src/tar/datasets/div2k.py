@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : DIV2K dataset extension. 
+# Description : DIV2K dataset extension.
 # =============================================================================
 import os
 
@@ -11,6 +11,11 @@ from tar.dataloader import _Dataset_
 class DIV2K(_Dataset_):
     def __init__(self, args, train, scale, name="DIV2K"):
         super(DIV2K, self).__init__(args, name=name, train=train, scale=scale)
+        # Determining training/testing data range.
+        data_range = [r.split('-') for r in args.data_range.split('/')]
+        if not train and len(data_range) > 1: data_range = data_range[1]
+        else: data_range = data_range[0]
+        self.begin, self.end = list(map(lambda x: int(x), data_range))
 
     def _scan(self):
         names_hr, names_lr = super(DIV2K, self)._scan()
