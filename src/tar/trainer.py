@@ -112,6 +112,7 @@ class _Trainer_(object):
         # Testing for every dataset, i.e. determine output list of
         # measures such as PSNR, runtime, etc..
         for di, d in enumerate(self.loader_test):
+            if save: self.ckp.clear_results(d)
             v = self.testing_core({}, d, di, save=save, finetuning=finetuning)
             net_applying_times.append(float(v["RUNTIME"]))
             best = self.save_psnr_checkpoint(d, di)
@@ -150,12 +151,13 @@ class _Trainer_(object):
         for di, d in enumerate(self.loader_valid):
             li = di + len(self.loader_test)
             name, scale = d.dataset.name, d.dataset.scale
+            if save: self.ckp.clear_results(d)
             self.ckp.write_log("{}x{}".format(name,scale))
-            name = name + " "*(10-len(name))
-            v = {"dataset":"{}".format(name),"scale": "x{}".format(scale)}
+            v = {"dataset":"{}".format(name + " "*(10-len(name))),
+                 "scale": "x{}".format(scale)}
             v = self.testing_core(v, d, li, save=save, finetuning=finetuning)
-            validations.append(v)
             best = self.save_psnr_checkpoint(d, li)
+            validations.append(v)
         # Finalizing.
         self.ckp.iter_is_best = best[1][0] + 1 == epoch
         if save: self.ckp.end_background()

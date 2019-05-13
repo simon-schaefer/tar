@@ -142,7 +142,7 @@ class _Dataset_(Dataset):
         pair = [_set_channel(x) for x in pair]
         # In colorization mode convert "LR" image to YCbCr and take Y-channel.
         def _entcolorize(img) -> np.ndarray:
-            return np.expand_dims(sc.rgb2ycbcr(img)[:,:,0], axis=2)
+            return np.expand_dims(sc.rgb2ycbcr(img)[:,:,0], axis=2)/255.0
 
         if self.args.type == "COLORING": pair[0] = _entcolorize(pair[1].copy())
         # Convert to torch tensor and return.

@@ -6,6 +6,7 @@
 # =============================================================================
 import argparse
 import csv
+import glob
 import imageio
 import math
 from multiprocessing import Process, Queue
@@ -122,12 +123,16 @@ class _Checkpoint_(object):
         assert len(save_list) == len(desc_list)
         for v, p in zip(save_list, desc_list):
             normalized = v[0]
-            if not self.args.no_normalize:
-                r = 255/(self.args.norm_max - self.args.norm_min)
-                normalized = normalized.add(-self.args.norm_min).mul(r)
+            r = 255/(self.args.norm_max - self.args.norm_min)
+            normalized = normalized.add(-self.args.norm_min).mul(r)
             normalized = normalized.clamp(0, 255).round()
             tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
             self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
+
+    def clear_results(self, dataset):
+        directory = self.get_path("results_{}".format(dataset.dataset.name))
+        files = glob.glob(directory + "/*.png")
+        for f in files: os.remove(f)
 
     def save_validations(self, valids: List[Dict[str,str]]):
         file_path = self.get_path('validations.csv')
