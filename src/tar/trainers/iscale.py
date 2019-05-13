@@ -55,14 +55,14 @@ class _Trainer_IScale_(_Trainer_):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         max_samples = self.args.max_test_samples
         psnrs = np.zeros((num_valid_samples, 3))
-        runtimes = np.zeros((num_valid_samples, 1))
+        runtimes = []
         for i, (lr, hr, fname) in enumerate(d):
             lr, hr = self.prepare(lr, hr)
             scale  = d.dataset.scale
             lr_out, hr_out_t = self.apply(lr, hr, scale, discretize=finetuning)
             timer_apply = misc._Timer_()
             _, hr_out_b = self.apply(lr, hr, scale, dec_input=lr)
-            runtimes[i] = timer_apply.toc()
+            runtimes.append(timer_apply.toc())
             # PSNR - Low resolution image.
             lr_out = misc.discretize(lr_out, [nmin, nmax])
             psnrs[i,0] = misc.calc_psnr(lr_out, lr, None, nmax-nmin)
@@ -85,7 +85,7 @@ class _Trainer_IScale_(_Trainer_):
             v["PSNR_{}_mdan".format(desc)]="{:.3f}".format(np.median(psnrs_i))
         log = [float(v["PSNR_{}_best".format(x)]) for x in self.log_description()]
         self.ckp.log[-1, di, :] += torch.Tensor(log)
-        v["RUNTIME"] = "{:.5f}".format(np.median(runtimes))
+        v["RUNTIME"] = "{:.8f}".format(np.median(runtimes))
         return v
 
     def log_description(self):

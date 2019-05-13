@@ -117,7 +117,7 @@ class _Trainer_(object):
             net_applying_times.append(float(v["RUNTIME"]))
             best = self.save_psnr_checkpoint(d, di)
         # Finalizing - Saving and logging.
-        self.ckp.write_log("Mean network applying time: {:.2f}ms".format(
+        self.ckp.write_log("Mean network applying time: {:.5f}ms".format(
             np.mean(net_applying_times)*1000
         ))
         if save: self.ckp.end_background()

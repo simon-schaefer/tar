@@ -47,11 +47,13 @@ class _Trainer_IColor_(_Trainer_):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         max_samples = self.args.max_test_samples
         psnrs = np.zeros((num_valid_samples, 4))
-        runtimes = np.zeros((num_valid_samples, 1))
+        runtimes = []
         for i, (gry, col, fname) in enumerate(d):
             gry, col = self.prepare(gry, col)
             scale  = d.dataset.scale
+            timer_apply = misc._Timer_()
             gry_out, col_out_t = self.apply(gry, col, discretize=finetuning)
+            runtimes.append(timer_apply.toc())
             col_cpy = col.clone()
             col_gry = (col_cpy[:,0,:,:]+col_cpy[:,1,:,:]+col_cpy[:,2,:,:])/3.0
             _,w,h = col_gry.size()
@@ -59,7 +61,6 @@ class _Trainer_IColor_(_Trainer_):
             _, col_out_g = self.apply(gry, col, dec_input=col_gry)
             timer_apply = misc._Timer_()
             _, col_out_y = self.apply(gry, col, dec_input=gry)
-            runtimes[i] = timer_apply.toc()
             # PSNR - Grey image.
             gry_out = misc.discretize(gry_out, [nmin, nmax])
             psnrs[i,0] = misc.calc_psnr(gry_out, gry, None, nmax-nmin)
@@ -85,7 +86,7 @@ class _Trainer_IColor_(_Trainer_):
             v["PSNR_{}_mdan".format(desc)]="{:.3f}".format(np.median(psnrs_i))
         log = [float(v["PSNR_{}_best".format(x)]) for x in self.log_description()]
         self.ckp.log[-1, di, :] += torch.Tensor(log)
-        v["RUNTIME"] = "{:.5f}".format(np.median(runtimes))
+        v["RUNTIME"] = "{:.8f}".format(np.median(runtimes))
         return v
 
     def log_description(self):
