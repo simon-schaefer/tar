@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : Task-aware coloratization trainer for images.
+# Description : Task-aware colorization trainer for images.
 # =============================================================================
 import argparse
 import numpy as np
@@ -49,7 +49,7 @@ class _Trainer_IColor_(_Trainer_):
         psnrs = np.zeros((num_valid_samples, 4))
         runtimes = []
         for i, (gry, col, fname) in enumerate(d):
-            gry, col = self.prepare(gry, col)
+            gry, col = self.prepare([gry, col])
             scale  = d.dataset.scale
             timer_apply = misc._Timer_()
             gry_out, col_out_t = self.apply(gry, col, discretize=finetuning)

@@ -29,8 +29,6 @@ class _Model_(nn.Module):
         self.save_models = args.save_models
         module = importlib.import_module('tar.models.' + args.model.lower())
         self.model = module.build_net().to(self.device)
-        if args.precision == "half":
-            self.model.half()
         if not args.load == "":
             load_path = self.load(
                 ckp.get_path('model'), resume=args.resume, cpu=args.cpu

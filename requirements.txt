@@ -5,3 +5,4 @@ scikit-image==0.14.2
 seaborn
 torch==1.0.1
 torchvision==0.2.1
+opencv-python

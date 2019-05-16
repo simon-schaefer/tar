@@ -7,7 +7,7 @@ max_scale=4
 ## UCL Optical Flow dataset.
 echo "UCL Optical Flow dataset ..."
 cd $SR_PROJECT_DATA_PATH
-if [ ! -d "uclOpticalFlow_v1.2" ]; then
+if [ ! -d "UCLOPTICALFLOW" ]; then
     wget http://visual.cs.ucl.ac.uk/pubs/flowConfidence/supp/uclOpticalFlow_v1.2.zip
     unzip uclOpticalFlow_v1.2.zip
     rm uclOpticalFlow_v1.2.zip
@@ -34,5 +34,7 @@ if [ ! -d "uclOpticalFlow_v1.2" ]; then
             python3 $DOWNSAMPLE_FILE $HRS $s $max_scale "LR_bicubic"
         done
     fi
+    cd $SR_PROJECT_DATA_PATH
+    mv uclOpticalFlow_v1.2 UCLOPTICALFLOW
 fi
 cd $SR_PROJECT_HOME

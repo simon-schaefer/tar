@@ -6,3 +6,4 @@ import tar.optimization
 import tar.trainer
 import tar.trainers.icolor
 import tar.trainers.iscale
+import tar.trainers.vscale

@@ -6,10 +6,10 @@
 # =============================================================================
 import os
 
-from tar.dataloader import _IDataset_
+from tar.dataloader import _VDataset_
 
 class UCLOPTICALFLOW(_VDataset_):
-    def __init__(self, args, train, scale, name="URBAN100"):
+    def __init__(self, args, train, scale, name="UCLOPTICALFLOW"):
         super(UCLOPTICALFLOW, self).__init__(args, name=name, train=train, scale=scale)
 
     def _set_filesystem(self, dir_data):

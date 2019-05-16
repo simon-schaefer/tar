@@ -21,12 +21,7 @@ from torch.utils.data.sampler import RandomSampler
 
 import tar.miscellaneous as misc
 
-# =============================================================================
-# DATASET EXTENSION.
-# =============================================================================
 class _Dataset_(Dataset):
-    """ Extension class for torch dataset module, in order to find, search,
-    load, preprocess and batch data from datasets. """
 
     def __init__(self, args, train: bool, scale: int, name: str=""):
         # Initialize super dataset class.
@@ -36,129 +31,211 @@ class _Dataset_(Dataset):
         self.name = name
         self.train = train
         self.split = 'train' if train else 'test'
-        self.do_eval = True
         self.scale = scale
-        # Scanning for files in given directories and loading images.
         self._set_filesystem(args.dir_data)
-        list_hr, list_lr = self._scan()
-        self.images_hr, self.images_lr = list_hr, list_lr
 
     # =========================================================================
     # Handling the filesystem
     # =========================================================================
-    def _scan(self) -> Tuple[List[str], List[str]]:
-        """ Scan given lists of directories for HR and LR images and return
-        list of HR and LR absolute file paths. """
-        names_hr = sorted(
-            glob.glob(self.dir_hr + "/*" + self.ext[0])
-        )
-        # For testing issues check if scale == 1, then just return HR images.
-        if self.scale == 1:
-            return names_hr, names_hr
-        # Otherwise build LR image names for every HR image.
-        names_lr = []
-        for f in names_hr:
-            filename, _ = os.path.splitext(os.path.basename(f))
-            names_lr.append(self.dir_lr + "/{}x{}{}".format(
-                filename, self.scale, self.ext[1]
-            ))
-        return names_hr, names_lr
-
     def _set_filesystem(self, directory: str):
         self.directory = os.path.join(directory, self.name)
         self.dir_hr = os.path.join(self.directory, 'HR')
         self.dir_lr = os.path.join(self.directory, 'LR_bicubic')
-        self.ext = ('.png', '.png')
 
-    def _check_and_load(self, ext: str, img: str, f):
-        if not os.path.isfile(f) or ext.find('reset') >= 0:
-            with open(f, 'wb') as _f:
-                pickle.dump(imageio.imread(img), _f)
+    def _scan(self):
+        """ Scan given lists of directories for HR and LR images and return
+        list of HR and LR absolute file paths. """
+        raise NotImplementedError
 
-    def _load_file(self, idx: int) -> Tuple[np.ndarray, np.ndarray, str]:
-        f_hr = self.images_hr[idx]
-        f_lr = self.images_lr[idx]
-        filename, _ = os.path.splitext(os.path.basename(f_hr))
-        hr, lr = imageio.imread(f_hr), imageio.imread(f_lr)
+    # =========================================================================
+    # File loading functions.
+    # =========================================================================
+    @staticmethod
+    def _get_patch(lr: np.ndarray, hr: np.ndarray,
+                   scale: int, patch_size: int, do_train: bool):
+        if do_train:
+            lh, lw = lr.shape[:2]
+            hp = patch_size
+            lp = hp // scale
+            lx = random.randrange(0, lw - lp + 1)
+            ly = random.randrange(0, lh - lp + 1)
+            hx, hy = scale * lx, scale * ly
+            lr = lr[ly:ly + lp, lx:lx + lp, :]
+            hr = hr[hy:hy + hp, hx:hx + hp, :]
+        else:
+            ih, iw = lr.shape[:2]
+            hr = hr[0:ih * scale, 0:iw * scale]
+        return lr, hr
 
-        def _expand_dimension(img: np.ndarray) -> np.ndarray:
-            if img.ndim == 2: img = np.stack((img,img,img), axis=2)
+    @staticmethod
+    def _augment(imgs: List[np.ndarray]) -> List[np.ndarray]:
+        hflip = random.random() < 0.5
+        vflip = random.random() < 0.5
+        rot90 = random.random() < 0.5
+        def _augment_x(img):
+            if hflip: img = img[:, ::-1, :]
+            if vflip: img = img[::-1, :, :]
+            if rot90: img = img.transpose(1, 0, 2)
             return img
+        return [_augment_x(x) for x in imgs]
 
-        lr, hr = _expand_dimension(lr), _expand_dimension(hr)
-        assert hr.shape[2] == lr.shape[2]
-        assert hr.shape[0] == self.scale*lr.shape[0]
-        assert hr.shape[1] == self.scale*lr.shape[1]
-        return lr, hr, filename
+    @staticmethod
+    def _expand_dimension(img: np.ndarray) -> np.ndarray:
+        if img.ndim == 2: img = np.stack((img,img,img), axis=2)
+        elif img.ndim == 3 and img.shape[2] == 4: img = img[:,:,:3]
+        return img
 
-    # =========================================================================
-    # Getter for images
-    # =========================================================================
-    def __getitem__(self, idx: int) -> Tuple[Tensor, Tensor, str]:
-        # Load image file.
-        lr, hr, filename = self._load_file(idx)
-        # Cut patches from file.
-        def _get_patch(lr: np.ndarray, hr: np.ndarray,
-                       scale: int, patch_size: int, do_train: bool):
-            if do_train:
-                lh, lw = lr.shape[:2]
-                hp = patch_size
-                lp = hp // scale
-                lx = random.randrange(0, lw - lp + 1)
-                ly = random.randrange(0, lh - lp + 1)
-                hx, hy = scale * lx, scale * ly
-                lr = lr[ly:ly + lp, lx:lx + lp, :]
-                hr = hr[hy:hy + hp, hx:hx + hp, :]
-            else:
-                ih, iw = lr.shape[:2]
-                hr = hr[0:ih * scale, 0:iw * scale]
-            return lr, hr
-
-        patch_size = self.args.patch_size
-        assert patch_size <= hr.shape[0] and patch_size <= hr.shape[1]
-        pair = _get_patch(lr, hr, self.scale, patch_size, self.train)
-        # Normalize patches from rgb_range to [norm_min, norm_max].
-        pair = [misc.normalize(x,
-                self.args.norm_min, self.args.norm_max) for x in pair]
-        # Augment patches (if flag is set).
-        if not self.args.augment:
-            hflip = random.random() < 0.5
-            vflip = random.random() < 0.5
-            rot90 = random.random() < 0.5
-
-            def _augment(img: np.ndarray) -> np.ndarray:
-                if hflip: img = img[:, ::-1, :]
-                if vflip: img = img[::-1, :, :]
-                if rot90: img = img.transpose(1, 0, 2)
-                return img
-
-            pair = [_augment(x) for x in pair]
-        # Set right number of channels.
-        def _set_channel(img) -> np.ndarray:
+    @staticmethod
+    def _set_channel(imgs) -> List[np.ndarray]:
+        def _set_channel_x(img):
             if img.ndim == 2: img = np.expand_dims(img, axis=2)
             if img.shape[2] == 1: img = np.concatenate([img] * 3, 2)
             return img
+        return [_set_channel_x(x) for x in imgs]
 
-        pair = [_set_channel(x) for x in pair]
-        # In colorization mode convert "LR" image to YCbCr and take Y-channel.
-        def _entcolorize(img) -> np.ndarray:
-            return np.expand_dims(sc.rgb2ycbcr(img)[:,:,0], axis=2)/255.0
+    def _normalize(self, imgs) -> List[np.ndarray]:
+        return [misc.normalize(x,
+                self.args.norm_min, self.args.norm_max) for x in imgs]
 
-        if self.args.type == "COLORING": pair[0] = _entcolorize(pair[1].copy())
-        # Convert to torch tensor and return.
-        def _np2Tensor(img) -> Tensor:
+    @staticmethod
+    def _np2Tensor(imgs) -> List[Tensor]:
+        def _np2Tensor_x(img):
             np_transpose = np.ascontiguousarray(img.transpose((2, 0, 1)))
             tensor = from_numpy(np_transpose).float()
             return tensor
+        return [_np2Tensor_x(x) for x in imgs]
 
-        pair_t = [_np2Tensor(x) for x in pair]
-        return pair_t[0], pair_t[1], filename
+    @staticmethod
+    def _entcolorize(img) -> np.ndarray:
+        return np.expand_dims(sc.rgb2ycbcr(img)[:,:,0], axis=2)/255.0
 
     # =========================================================================
     # Miscellaneous
     # =========================================================================
     def __len__(self) -> int:
         return len(self.images_hr)
+
+# =============================================================================
+# DATASET EXTENSION FOR IMAGES.
+# =============================================================================
+class _IDataset_(_Dataset_):
+    """ Extension class for torch dataset module, in order to find, search,
+    load, preprocess and batch images from datasets. """
+
+    def __init__(self, args, train: bool, scale: int, name: str=""):
+        self.super(_IDataset_,self).__init__(args,train,scale,name)
+        list_hr, list_lr = self._scan()
+        self.images_hr, self.images_lr = list_hr, list_lr
+
+    def _scan(self):
+        names_hr = sorted(glob.glob(self.dir_hr + "/*" + ".png"))
+        # Check if scale == 1, then just return HR images.
+        if self.scale == 1:
+            return names_hr, names_hr
+        # Otherwise build LR image names for every HR image.
+        names_lr = []
+        for f in names_hr:
+            filename, _ = os.path.splitext(os.path.basename(f))
+            names_lr.append(self.dir_lr + "/{}x{}.png".format(filename,self.scale))
+        return names_hr, names_lr
+
+    def _load_file(self, idx: int):
+        f_hr, f_lr = self.images_hr[idx], self.images_lr[idx]
+        filename, _ = os.path.splitext(os.path.basename(f_hr))
+        hr, lr = imageio.imread(f_hr), imageio.imread(f_lr)
+        lr, hr = self._expand_dimension(lr), self._expand_dimension(hr)
+        assert hr.shape[2] == lr.shape[2]
+        assert hr.shape[0] == self.scale*lr.shape[0]
+        assert hr.shape[1] == self.scale*lr.shape[1]
+        return lr, hr, filename
+
+    def __getitem__(self, idx: int):
+        # Load image file.
+        lr, hr, filename = self._load_file(idx)
+        # Cut patches from file.
+        patch_size = self.args.patch_size
+        assert patch_size <= hr.shape[0] and patch_size <= hr.shape[1]
+        pair = self._get_patch(lr, hr, self.scale, patch_size, self.train)
+        # Normalize patches from rgb_range to [norm_min, norm_max].
+        pair = self._normalize(pair)
+        # Augment patches (if flag is set).
+        if not self.args.augment: pair = self._augment(pair)
+        # Set right number of channels.
+        pair = self._set_channel(pair)
+        # In colorization mode convert "LR" image to YCbCr and take Y-channel.
+        if self.args.type == "COLORING": pair[0] = self._entcolorize(pair[1].copy())
+        # Convert to torch tensor and return.
+        pair_t = self._np2Tensor(pair)
+        return pair_t[0], pair_t[1], filename
+
+# =============================================================================
+# DATASET EXTENSION FOR FLOW DATA.
+# =============================================================================
+class _VDataset_(_Dataset_):
+    """ Extension class for torch dataset module, in order to find, search,
+    load, preprocess and batch optical flow data from datasets. """
+
+    def __init__(self, args, train: bool, scale: int, name: str=""):
+        super(_VDataset_, self).__init__(args,train,scale,name)
+        list_hr, list_lr = self._scan()
+        self.images_hr, self.images_lr = list_hr, list_lr
+
+    def _scan(self):
+        hrs = sorted(glob.glob(self.dir_hr + "/*" + ".png"))
+        hr_1 = [x for x in hrs if x.find("_1") > 0]
+        hr_2 = [x for x in hrs if x.find("_2") > 0]
+        hr_f = [x for x in hrs if x.find("_flow") > 0]
+        assert len(hr_1) == len(hr_2) == len(hr_f)
+        names_hr = [(hr_1[i], hr_2[i], hr_f[i]) for i in range(len(hr_1))]
+        # Check if scale == 1, then just return HR images.
+        if self.scale == 1:
+            return names_hr, names_hr
+        # Otherwise build LR image names for every HR image.
+        names_lr = []
+        for f in names_hr:
+            lrs = []
+            for ff in f:
+                filename, _ = os.path.splitext(os.path.basename(ff))
+                lrs.append(self.dir_lr + "/{}x{}.png".format(filename,self.scale))
+            names_lr.append(tuple(lrs))
+        return names_hr, names_lr
+
+    def _load_file(self, idx: int):
+        f_hr, f_lr = self.images_hr[idx], self.images_lr[idx]
+        lrs, hrs, filenames = [], [], []
+        for ff_hr, ff_lr in zip(f_hr, f_lr):
+            filename, _ = os.path.splitext(os.path.basename(ff_hr))
+            hr, lr = imageio.imread(ff_hr), imageio.imread(ff_lr)
+            lr = self._expand_dimension(lr)
+            hr = self._expand_dimension(hr)
+            assert hr.shape[2] == lr.shape[2]
+            assert hr.shape[0] == self.scale*lr.shape[0]
+            assert hr.shape[1] == self.scale*lr.shape[1]
+            lrs.append(lr); hrs.append(hr); filenames.append(filename)
+        return lrs, hrs, filenames
+
+    def __getitem__(self, idx: int):
+        # Load image file.
+        lrs, hrs, filenames = self._load_file(idx)
+        # Iterate over and process all files in returned array.
+        returns = []
+        for lr,hr,filename in zip(lrs, hrs, filenames):
+            # Cut patches from file.
+            patch_size = self.args.patch_size
+            assert patch_size <= hr.shape[0] and patch_size <= hr.shape[1]
+            pair = self._get_patch(lr, hr, self.scale, patch_size, self.train)
+            # Normalize patches from rgb_range to [norm_min, norm_max].
+            pair = self._normalize(pair)
+            # Augment patches (if flag is set).
+            if not self.args.augment: pair = self._augment(pair)
+            # Set right number of channels.
+            pair = self._set_channel(pair)
+            # In colorization mode convert "LR" image to YCbCr and take Y-channel.
+            if self.args.type == "COLORING": pair[0] = self._entcolorize(pair[1].copy())
+            # Convert to torch tensor and return.
+            pair_t = self._np2Tensor(pair)
+            returns.append((pair_t[0], pair_t[1], filename))
+        return tuple(returns)
 
 # =============================================================================
 # DATA LOADING CLASS.
@@ -269,8 +346,8 @@ class _Data_(object):
         )
 
     @staticmethod
-    def load_dataset(args, name: str, train: bool, scale: int) -> _Dataset_:
+    def load_dataset(args, name: str, train: bool, scale: int) -> _IDataset_:
         """ Load dataset from module (in datasets directory). Every module loaded
-        should inherit from the _Dataset_ class defined below. """
+        should inherit from the _IDataset_ class defined below. """
         m = importlib.import_module("tar.datasets." + name.lower())
         return getattr(m, name)(args, train=train, scale=scale)

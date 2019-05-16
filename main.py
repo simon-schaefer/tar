@@ -14,10 +14,12 @@ ckp     = tar.miscellaneous._Checkpoint_(args)
 loader  = tar.dataloader._Data_(args)
 loss    = tar.optimization._Loss_(args, ckp) if not args.valid_only else None
 model   = tar.modules._Model_(args, ckp)
-if args.type == "SCALING":
+if args.type == "SCALING" and args.format == "IMAGE":
    trainer = tar.trainers.iscale._Trainer_IScale_(args, loader, model, loss, ckp)
-elif args.type == "COLORING":
+elif args.type == "COLORING" and args.format == "IMAGE":
     trainer = tar.trainers.icolor._Trainer_IColor_(args, loader, model, loss, ckp)
+elif args.type == "SCALING" and args.format == "VIDEO":
+   trainer = tar.trainers.vscale._Trainer_VScale_(args, loader, model, loss, ckp)
 else:
    raise ValueError("Invalid trainer selection {}".format(args.type))
 

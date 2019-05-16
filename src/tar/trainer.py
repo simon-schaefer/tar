@@ -42,6 +42,7 @@ class _Trainer_(object):
         self.error_last = 1e8
         self.test_iter = 1
         self.valid_iter = 1
+        self.device = torch.device('cpu' if self.args.cpu else self.args.cuda_device)
 
     # =========================================================================
     # Training
@@ -63,9 +64,9 @@ class _Trainer_(object):
         self.model.train()
         # Iterate over all batches in epoch.
         timer_data, timer_model = misc._Timer_(), misc._Timer_()
-        for batch, (lr, hr, _) in enumerate(self.loader_train[scale]):
+        for batch, data in enumerate(self.loader_train[scale]):
             # Load images.
-            lr, hr = self.prepare(lr, hr)
+            lr, hr = self.prepare(data)
             timer_data.hold()
             timer_model.tic()
             # Optimization core.
@@ -134,6 +135,7 @@ class _Trainer_(object):
         """ Validation function for validate model after training on several
         (independent) datasets. Determine several metrics as PSNR and runtime
         for different scale factors and visualize them (if saving enabled). """
+        if len(self.loader_valid) == 0: return
         torch.set_grad_enabled(False)
         epoch = self.optimizer.get_last_epoch() + 1
         finetuning = epoch >= self.args.fine_tuning
@@ -208,13 +210,8 @@ class _Trainer_(object):
             )
         return best
 
-    def prepare(self, *kwargs):
-        device = torch.device('cpu' if self.args.cpu else self.args.cuda_device)
-
-        def _prepare(tensor):
-            if self.args.precision == 'half': tensor = tensor.half()
-            return tensor.to(device)
-        return [_prepare(a) for a in kwargs]
+    def prepare(self, data):
+        return [a.to(self.device) for a in data[0:2]]
 
     def step(self):
         if self.args.valid_only:

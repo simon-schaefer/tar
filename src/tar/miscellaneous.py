@@ -17,6 +17,8 @@ import sys
 import time
 from typing import Dict, List
 
+import cv2
+
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -283,6 +285,14 @@ def unnormalize(img, norm_min, norm_max):
     assert norm_max > norm_min
     norm_range = norm_max - norm_min
     return (img - norm_min)/norm_range*255.0
+
+def convert_flow_to_color(flow):
+    hsv = np.zeros((flow.shape[0],flow.shape[1],3), dtype=np.uint8)
+    hsv[:,:,1] = 255
+    mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
+    hsv[:,:,0] = ang*180/np.pi/2
+    hsv[:,:,2] = cv2.normalize(mag,None,0,255,cv2.NORM_MINMAX)
+    return cv2.cvtColor(hsv,cv2.COLOR_HSV2BGR)
 
 def is_power2(num):
     return num != 0 and ((num & (num - 1)) == 0)

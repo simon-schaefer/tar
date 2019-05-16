@@ -10,6 +10,8 @@ import os
 parser = argparse.ArgumentParser(description="tar")
 parser.add_argument("--type", type=str, default="SCALING",
                     choices=("SCALING" "COLORING"))
+parser.add_argument("--format", type=str, default="IMAGE",
+                    choices=("IMAGE", "VIDEO"))
 parser.add_argument("--template", default=".",
                     help="set various templates in option.py")
 parser.add_argument("--verbose", action="store_false",
@@ -79,9 +81,6 @@ parser.add_argument("--batch_size", type=int, default=16,
                     help="input batch size for training")
 parser.add_argument("--valid_only", action="store_true",
                     help="validate only, no training (default=False)")
-parser.add_argument("--precision", type=str, default="single",
-                    choices=("single", "half"),
-                    help="floating point precision(single | half)")
 
 # =============================================================================
 # Optimization specifications.
@@ -134,6 +133,7 @@ parser.add_argument("--print_every", type=int, default=20,
 def set_template(args):
     if args.template.find("ISCALE_AETAD_DIV2K") >= 0:
         args.model      = "AETAD"
+        args.format     = "IMAGE"
         args.type       = "SCALING"
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
@@ -142,6 +142,7 @@ def set_template(args):
 
     if args.template.find("ICOLOR_AETAD_DIV2K") >= 0:
         args.model      = "AETAD_COLOR"
+        args.format     = "IMAGE"
         args.type       = "COLORING"
         args.loss       = "COL*10*L1+GRY*1*L1"
         args.optimizer  = "ADAM"
@@ -154,6 +155,7 @@ def set_template(args):
 
     if args.template.find("ISCALE_AETAD_SMALL_DIV2K") >= 0:
         args.model      = "AETAD_SMALL"
+        args.format     = "IMAGE"
         args.type       = "SCALING"
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
@@ -162,11 +164,25 @@ def set_template(args):
 
     if args.template.find("ISCALE_AETAD_LARGE_DIV2K") >= 0:
         args.model      = "AETAD_LARGE"
+        args.format     = "IMAGE"
         args.type       = "SCALING"
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
         args.patch_size = 96
+
+    if args.template.find("VSCALE_AETAD_UCL") >= 0:
+        args.model      = "AETAD"
+        args.format     = "VIDEO"
+        args.type       = "SCALING"
+        args.loss       = "HR*1*L1+LR*1*L1+FLOW*10*L1"
+        args.optimizer  = "ADAM"
+        args.data_train = "UCLOPTICALFLOW"
+        args.data_test  = "UCLOPTICALFLOW"
+        args.data_valid = []
+        args.patch_size = 96
+        args.batch_size = 1
+        args.max_test_samples = 5
 
 # =============================================================================
 # MAIN.
