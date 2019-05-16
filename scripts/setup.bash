@@ -56,6 +56,7 @@ fi
 # Update and check datasets.
 if [ "$SHOULD_UPDATE" = true ] ; then
     bash $SR_PROJECT_SCRIPTS_PATH/install/download.bash
+    bash $SR_PROJECT_SCRIPTS_PATH/install/vdownload.bash
 fi
 if [ "$SHOULD_CHECK" = true ] ; then
     bash $SR_PROJECT_SCRIPTS_PATH/install/check.bash

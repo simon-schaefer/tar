@@ -6,9 +6,9 @@
 # =============================================================================
 import os
 
-from tar.dataloader import _Dataset_
+from tar.dataloader import _IDataset_
 
-class BSDS100(_Dataset_):
+class BSDS100(_IDataset_):
     def __init__(self, args, train, scale, name="BSDS100"):
         super(BSDS100, self).__init__(args, name=name, train=train, scale=scale)
 

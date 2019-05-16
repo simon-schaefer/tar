@@ -6,9 +6,9 @@
 # =============================================================================
 import os
 
-from tar.dataloader import _Dataset_
+from tar.dataloader import _IDataset_
 
-class VDIV2K(_Dataset_):
+class VDIV2K(_IDataset_):
     def __init__(self, args, train, scale, name="VDIV2K"):
         super(VDIV2K, self).__init__(args, name=name, train=train, scale=scale)
 

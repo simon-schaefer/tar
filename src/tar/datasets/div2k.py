@@ -6,9 +6,9 @@
 # =============================================================================
 import os
 
-from tar.dataloader import _Dataset_
+from tar.dataloader import _IDataset_
 
-class DIV2K(_Dataset_):
+class DIV2K(_IDataset_):
     def __init__(self, args, train, scale, name="DIV2K"):
         # Determining training/testing data range.
         data_range = [r.split('-') for r in args.data_range.split('/')]

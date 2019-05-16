@@ -6,9 +6,9 @@
 # =============================================================================
 import os
 
-from tar.dataloader import _Dataset_
+from tar.dataloader import _IDataset_
 
-class SET14(_Dataset_):
+class SET14(_IDataset_):
     def __init__(self, args, train, scale, name="SET14"):
         super(SET14, self).__init__(args, name=name, train=train, scale=scale)
 
