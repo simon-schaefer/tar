@@ -5,12 +5,27 @@
 # Description : CALENDAR dataset extension.
 # =============================================================================
 import os
+import glob
 
-from tar.dataloader import _IDataset_
+from tar.dataloader import _VDataset_
 
 class CALENDAR(_VDataset_):
-    def __init__(self, args, train, scale, name="BSDS100"):
+    def __init__(self, args, train, scale, name="CALENDAR"):
         super(CALENDAR, self).__init__(args, name=name, train=train, scale=scale)
+
+    def _scan(self):
+        names_hr = glob.glob(self.dir_hr + "/*" + ".png")
+        for x in range(1,len(names_hr)):
+            names_hr[x] = self.dir_hr + "/hr_" + "{:02d}".format(x) + ".png"
+        # Check if scale == 1, then just return HR images.
+        if self.scale == 1: return names_hr, names_hr
+        # Otherwise build LR image names for every HR image.
+        names_lr = []
+        for f in names_hr:
+            filename, _ = os.path.splitext(os.path.basename(f))
+            filename = filename.replace("hr", "lr")
+            names_lr.append(self.dir_lr + "/{}x{}.png".format(filename,self.scale))
+        return names_hr, names_lr
 
     def _set_filesystem(self, dir_data):
         super(CALENDAR, self)._set_filesystem(dir_data)

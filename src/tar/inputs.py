@@ -12,6 +12,8 @@ parser.add_argument("--type", type=str, default="SCALING",
                     choices=("SCALING" "COLORING"))
 parser.add_argument("--format", type=str, default="IMAGE",
                     choices=("IMAGE", "VIDEO"))
+parser.add_argument("--external", type=str, default="",
+                    choices=("SOFVSR"))
 parser.add_argument("--template", default=".",
                     help="set various templates in option.py")
 parser.add_argument("--verbose", action="store_false",
@@ -140,6 +142,16 @@ def set_template(args):
         args.data_test  = "DIV2K"
         args.patch_size = 96
 
+    if args.template.find("ISCALE_AETAD_DIV2K_4") >= 0:
+        args.model      = "AETAD"
+        args.format     = "IMAGE"
+        args.type       = "SCALING"
+        args.optimizer  = "ADAM"
+        args.data_train = "DIV2K"
+        args.data_test  = "DIV2K"
+        args.patch_size = 96
+        args.scales_train = [4]
+
     if args.template.find("ICOLOR_AETAD_DIV2K") >= 0:
         args.model      = "AETAD_COLOR"
         args.format     = "IMAGE"
@@ -171,18 +183,20 @@ def set_template(args):
         args.data_test  = "DIV2K"
         args.patch_size = 96
 
-    if args.template.find("VSCALE_AETAD_UCL") >= 0:
+    if args.template.find("VSCALE_AETAD_SOFVSR") >= 0:
         args.model      = "AETAD"
         args.format     = "VIDEO"
         args.type       = "SCALING"
-        args.loss       = "HR*1*L1+LR*1*L1+FLOW*10*L1"
+        args.loss       = "HR*1*L1+LR*10*L1+EXT*1*L1"
         args.optimizer  = "ADAM"
         args.data_train = "NTIAASPEN"
         args.data_test  = "NTIAASPEN"
         args.data_valid = "CALENDAR"
+        args.external   = "SOFVSR"
+        args.scales_train = [4]
+        args.scales_valid = [4]
         args.patch_size = 96
         args.batch_size = 6
-        args.max_test_samples = 5
 
 # =============================================================================
 # MAIN.
@@ -196,13 +210,10 @@ def reformat_to_list(inputs):
     elif type(inputs) == str: return [int(x) for x in inputs[1:-1].split(",")]
 
 # Reformat arguments.
-args.data_train = args.data_train.split("+")
-args.data_test = args.data_test.split("+")
 args.scales_train = reformat_to_list(args.scales_train)
 args.scales_guidance = reformat_to_list(args.scales_guidance)
 args.scales_valid = reformat_to_list(args.scales_valid)
 args.data_valid = args.data_valid.split(":")
-if type(args.data_test) == str: args.data_test = [args.data_test]
 for arg in vars(args):
     if vars(args)[arg] == "True":
         vars(args)[arg] = True

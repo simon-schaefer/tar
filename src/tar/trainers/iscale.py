@@ -56,7 +56,7 @@ class _Trainer_IScale_(_Trainer_):
         max_samples = self.args.max_test_samples
         psnrs = np.zeros((num_valid_samples, 3))
         runtimes = []
-        for i, (lr, hr, filename) in enumerate(d):
+        for i, (lr, hr, fname) in enumerate(d):
             lr, hr = self.prepare([lr, hr])
             scale  = d.dataset.scale
             lr_out, hr_out_t = self.apply(lr, hr, scale, discretize=finetuning)

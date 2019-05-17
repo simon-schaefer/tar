@@ -19,7 +19,7 @@ if args.type == "SCALING" and args.format == "IMAGE":
 elif args.type == "COLORING" and args.format == "IMAGE":
     trainer = tar.trainers.icolor._Trainer_IColor_(args, loader, model, loss, ckp)
 elif args.type == "SCALING" and args.format == "VIDEO":
-   trainer = tar.trainers.vscale._Trainer_VModel_(args, loader, model, loss, ckp)
+   trainer = tar.trainers.vexternal._Trainer_VExternal_(args, loader, model, loss, ckp)
 else:
    raise ValueError("Invalid trainer selection {}".format(args.type))
 

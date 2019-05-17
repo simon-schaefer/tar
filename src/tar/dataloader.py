@@ -45,7 +45,27 @@ class _Dataset_(Dataset):
     def _scan(self):
         """ Scan given lists of directories for HR and LR images and return
         list of HR and LR absolute file paths. """
-        raise NotImplementedError
+        names_hr = sorted(glob.glob(self.dir_hr + "/*" + ".png"))
+        # Check if scale == 1, then just return HR images.
+        if self.scale == 1: return names_hr, names_hr
+        # Otherwise build LR image names for every HR image.
+        names_lr = []
+        for f in names_hr:
+            filename, _ = os.path.splitext(os.path.basename(f))
+            names_lr.append(self.dir_lr + "/{}x{}.png".format(filename,self.scale))
+        return names_hr, names_lr
+
+    def _load_file(self, idx: int):
+        f_hr, f_lr = self.images_hr[idx], self.images_lr[idx]
+        filename, _ = os.path.splitext(os.path.basename(f_hr))
+        hr, lr = imageio.imread(f_hr), imageio.imread(f_lr)
+        wl, hl = lr.shape[0]//2*2, lr.shape[1]//2*2
+        lr, hr = lr[:wl,:hl,:], hr[:wl*self.scale,:hl*self.scale,:]
+        lr, hr = self._expand_dimension(lr), self._expand_dimension(hr)
+        assert hr.shape[2] == lr.shape[2]
+        assert hr.shape[0] == self.scale*lr.shape[0]
+        assert hr.shape[1] == self.scale*lr.shape[1]
+        return lr, hr, filename
 
     # =========================================================================
     # File loading functions.
@@ -127,28 +147,6 @@ class _IDataset_(_Dataset_):
         list_hr, list_lr = self._scan()
         self.images_hr, self.images_lr = list_hr, list_lr
 
-    def _scan(self):
-        names_hr = sorted(glob.glob(self.dir_hr + "/*" + ".png"))
-        # Check if scale == 1, then just return HR images.
-        if self.scale == 1:
-            return names_hr, names_hr
-        # Otherwise build LR image names for every HR image.
-        names_lr = []
-        for f in names_hr:
-            filename, _ = os.path.splitext(os.path.basename(f))
-            names_lr.append(self.dir_lr + "/{}x{}.png".format(filename,self.scale))
-        return names_hr, names_lr
-
-    def _load_file(self, idx: int):
-        f_hr, f_lr = self.images_hr[idx], self.images_lr[idx]
-        filename, _ = os.path.splitext(os.path.basename(f_hr))
-        hr, lr = imageio.imread(f_hr), imageio.imread(f_lr)
-        lr, hr = self._expand_dimension(lr), self._expand_dimension(hr)
-        assert hr.shape[2] == lr.shape[2]
-        assert hr.shape[0] == self.scale*lr.shape[0]
-        assert hr.shape[1] == self.scale*lr.shape[1]
-        return lr, hr, filename
-
     def __getitem__(self, idx: int):
         # Load image file.
         lr, hr, filename = self._load_file(idx)
@@ -180,45 +178,15 @@ class _VDataset_(_Dataset_):
         list_hr, list_lr = self._scan()
         self.images_hr, self.images_lr = list_hr, list_lr
 
-    def _scan(self):
-        hrs = sorted(glob.glob(self.dir_hr + "/*" + ".png"))
-        hr_1 = [x for x in hrs if x.find("_1") > 0]
-        hr_2 = [x for x in hrs if x.find("_2") > 0]
-        assert len(hr_1) == len(hr_2) == len(hr_f)
-        names_hr = [(hr_1[i], hr_2[i], hr_f[i]) for i in range(len(hr_1))]
-        # Check if scale == 1, then just return HR images.
-        if self.scale == 1:
-            return names_hr, names_hr
-        # Otherwise build LR image names for every HR image.
-        names_lr = []
-        for f in names_hr:
-            lrs = []
-            for ff in f:
-                filename, _ = os.path.splitext(os.path.basename(ff))
-                lrs.append(self.dir_lr + "/{}x{}.png".format(filename,self.scale))
-            names_lr.append(tuple(lrs))
-        return names_hr, names_lr
-
-    def _load_file(self, idx: int):
-        f_hr, f_lr = self.images_hr[idx], self.images_lr[idx]
-        lrs, hrs, filenames = [], [], []
-        for ff_hr, ff_lr in zip(f_hr, f_lr):
-            filename, _ = os.path.splitext(os.path.basename(ff_hr))
-            hr, lr = imageio.imread(ff_hr), imageio.imread(ff_lr)
-            lr = self._expand_dimension(lr)
-            hr = self._expand_dimension(hr)
-            assert hr.shape[2] == lr.shape[2]
-            assert hr.shape[0] == self.scale*lr.shape[0]
-            assert hr.shape[1] == self.scale*lr.shape[1]
-            lrs.append(lr); hrs.append(hr); filenames.append(filename)
-        return lrs, hrs, filenames
-
     def __getitem__(self, idx: int):
         # Load image file.
-        lrs, hrs, filenames = self._load_file(idx)
+        idx = max(min(idx, self.__len__() - 2), 1)
+        lr0, hr0, fname0 = self._load_file(idx - 1)
+        lr1, hr1, fname1 = self._load_file(idx)
+        lr2, hr2, fname2 = self._load_file(idx + 1)
         # Iterate over and process all files in returned array.
         returns = []
-        for lr,hr,filename in zip(lrs, hrs, filenames):
+        for lr,hr,filename in zip([lr0,lr1,lr2],[hr0,hr1,hr2],[fname0,fname1,fname2]):
             # Cut patches from file.
             patch_size = self.args.patch_size
             assert patch_size <= hr.shape[0] and patch_size <= hr.shape[1]
@@ -298,19 +266,18 @@ class _Data_(object):
         if args.valid_only: return
         # Load testing dataset(s), if not valid only
         for s in args.scales_train:
-            for dataset in args.data_test:
-                tset = self.load_dataset(args, dataset, train=False, scale=s)
-                sampler = RandomSampler(tset, replacement=True,
-                                        num_samples=args.max_test_samples)
-                if args.max_test_samples > len(tset): sampler = None
-                self.loader_test.append(_DataLoader_(
-                    tset, 1, num_workers=args.n_threads, sampler=sampler
-                ))
+            tset = self.load_dataset(args, args.data_test, train=False, scale=s)
+            sampler = RandomSampler(tset, replacement=True,
+                                    num_samples=args.max_test_samples)
+            if args.max_test_samples > len(tset): sampler = None
+            self.loader_test.append(_DataLoader_(
+                tset, 1, num_workers=args.n_threads, sampler=sampler
+            ))
         # Load training dataset, if not valid only. For training several
         # datasets are trained in one process and therefore, each given
         # training dataset is concatinated to one large dataset (for each scale).
         for s in args.scales_train:
-            tset = self.load_dataset(args, dataset, train=True, scale=s)
+            tset = self.load_dataset(args, args.data_train, train=True, scale=s)
             self.loader_train[s] = _DataLoader_(
                 tset, args.batch_size, shuffle=True, num_workers=args.n_threads
             )
@@ -328,25 +295,24 @@ class _Data_(object):
             ))
         if args.valid_only: return
         # Load testing dataset(s), if not valid only
-        for dataset in args.data_test:
-            tset = self.load_dataset(args, dataset, train=False, scale=1)
-            sampler = RandomSampler(tset, replacement=True,
-                                    num_samples=args.max_test_samples)
-            if args.max_test_samples > len(tset): sampler = None
-            self.loader_test.append(_DataLoader_(
-                tset, 1, num_workers=args.n_threads, sampler=sampler
-            ))
+        tset = self.load_dataset(args, args.data_test, train=False, scale=1)
+        sampler = RandomSampler(tset, replacement=True,
+                                num_samples=args.max_test_samples)
+        if args.max_test_samples > len(tset): sampler = None
+        self.loader_test.append(_DataLoader_(
+            tset, 1, num_workers=args.n_threads, sampler=sampler
+        ))
         # Load training dataset, if not valid only. For training several
         # datasets are trained in one process and therefore, each given
         # training dataset is concatinated to one large dataset.
-        tset = self.load_dataset(args, dataset, train=True, scale=1)
+        tset = self.load_dataset(args, args.data_train, train=True, scale=1)
         self.loader_train[1] = _DataLoader_(
             tset, args.batch_size, shuffle=True, num_workers=args.n_threads
         )
 
     @staticmethod
-    def load_dataset(args, name: str, train: bool, scale: int) -> _IDataset_:
+    def load_dataset(args, name: str, train: bool, scale: int):
         """ Load dataset from module (in datasets directory). Every module loaded
-        should inherit from the _IDataset_ class defined below. """
+        should inherit from the _Dataset_ class defined below. """
         m = importlib.import_module("tar.datasets." + name.lower())
         return getattr(m, name)(args, train=train, scale=scale)

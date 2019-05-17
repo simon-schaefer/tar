@@ -38,7 +38,7 @@ class _Checkpoint_(object):
         # Building model directory based on name and time.
         now = time.strftime("%H_%M_%S_%d_%b", time.gmtime())
         if not args.load:
-            tag = args.model + "_" + now
+            tag = args.template + "_" + now
             self.dir = os.path.join(os.environ['SR_PROJECT_OUTS_PATH'], tag)
         else:
             assert len(args.load.split("x")) == 2
@@ -56,8 +56,7 @@ class _Checkpoint_(object):
         os.makedirs(self.dir, exist_ok=True)
         os.makedirs(self.get_path('model'), exist_ok=True)
         # Create output directory for test datasets.
-        for d in args.data_test:
-            os.makedirs(self.get_path('results_{}'.format(d)), exist_ok=True)
+        os.makedirs(self.get_path('results_{}'.format(args.data_test)),exist_ok=True)
         # Create output directory for validation datasets.
         for d in args.data_valid:
             os.makedirs(self.get_path('results_{}'.format(d)), exist_ok=True)
@@ -72,7 +71,7 @@ class _Checkpoint_(object):
                 f.write('\n')
         # Build list containing names of test and validation datasets
         # for logging and plotting purposes.
-        self.log_datasets = self.args.data_test.copy()
+        self.log_datasets = [self.args.data_test]
         for dv in self.args.data_valid:
             for sv in self.args.scales_valid:
                 self.log_datasets.append(dv + "x" + str(sv))
@@ -86,7 +85,7 @@ class _Checkpoint_(object):
         self.write_log("... successfully built checkpoint module !")
 
     def step(self, **kwargs):
-        self.add_log(torch.zeros(1, len(self.log_datasets), 2))
+        self.add_log(torch.zeros(1, len(self.log_datasets), 4))
         return self.ready
 
     # =========================================================================
@@ -102,12 +101,14 @@ class _Checkpoint_(object):
         # Plot peak signal-to-noise ratio (PSNR) plot.
         if self.log.shape[1] != len(self.log_datasets): return
         axis = np.linspace(1, epoch, epoch)
-        labels = ("SHRT", "SLR")
+        labels = trainer.log_description()
         for id, d in enumerate(self.log_datasets):
             fig = plt.figure()
             label = "PSNR on {}".format(d)
             plt.title(label)
-            for i in range(self.log.shape[2]):
+            axes = plt.gca()
+            axes.set_ylim([0,40])
+            for i in range(len(labels)):
                 plt.plot(axis,self.log[:, id, i].numpy(),label="{}".format(labels[i]))
             plt.legend()
             plt.xlabel('Epochs')
