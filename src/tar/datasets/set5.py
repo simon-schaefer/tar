@@ -12,10 +12,6 @@ class SET5(_IDataset_):
     def __init__(self, args, train, scale, name="SET5"):
         super(SET5, self).__init__(args, name=name, train=train, scale=scale)
 
-    def _scan(self):
-        names_hr, names_lr = super(SET5, self)._scan()
-        return names_hr, names_lr
-
     def _set_filesystem(self, dir_data):
         super(SET5, self)._set_filesystem(dir_data)
         self.dir_hr = os.path.join(self.directory, 'HR')

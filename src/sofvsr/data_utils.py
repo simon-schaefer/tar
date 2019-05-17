@@ -7,23 +7,25 @@ import math
 import random
 
 class TrainsetLoader(Dataset):
-    def __init__(self, trainset_dir, upscale_factor, patch_size, n_iters):
+    def __init__(self, trainsets, upscale_factor, patch_size, n_iters):
         super(TrainsetLoader).__init__()
-        self.trainset_dir = trainset_dir
+        self.trainsets = trainsets
         self.upscale_factor = upscale_factor
         self.patch_size = patch_size
         self.n_iters = n_iters
-        self.video_list = os.listdir(trainset_dir)
 
     def __getitem__(self, idx):
-        idx_video = random.randint(0, self.video_list.__len__()-1)
+        path = os.environ["SR_PROJECT_DATA_PATH"]
+        idx_video = random.randint(0, len(self.trainsets)-1)
         idx_frame = random.randint(0, 28)
-        lr_dir = self.trainset_dir + '/' + self.video_list[idx_video]  + '/LR_bicubic/X' + str(self.upscale_factor)
-        hr_dir = self.trainset_dir + '/' + self.video_list[idx_video]  + '/HR'
+        lr_dir = os.path.join(path, self.trainsets[idx_video], "LR_bicubic")
+        lr_dir = lr_dir + '/X' + str(self.upscale_factor)
+        hr_dir = os.path.join(path, self.trainsets[idx_video], "HR")
         # read HR & LR frames
-        LR0 = Image.open(lr_dir + '/lr' + str(idx_frame) + '.png')
-        LR1 = Image.open(lr_dir + '/lr' + str(idx_frame + 1) + '.png')
-        LR2 = Image.open(lr_dir + '/lr' + str(idx_frame + 2) + '.png')
+        sc = "x" + str(self.upscale_factor)
+        LR0 = Image.open(lr_dir + '/lr' + str(idx_frame) + sc + '.png')
+        LR1 = Image.open(lr_dir + '/lr' + str(idx_frame + 1) + sc + '.png')
+        LR2 = Image.open(lr_dir + '/lr' + str(idx_frame + 2) + sc + '.png')
         HR0 = Image.open(hr_dir + '/hr' + str(idx_frame) + '.png')
         HR1 = Image.open(hr_dir + '/hr' + str(idx_frame + 1) + '.png')
         HR2 = Image.open(hr_dir + '/hr' + str(idx_frame + 2) + '.png')
@@ -56,6 +58,7 @@ class TrainsetLoader(Dataset):
         # data augmentation
         LR, HR = augumentation()(LR, HR)
         return toTensor(LR), toTensor(HR)
+
     def __len__(self):
         return self.n_iters
 
@@ -66,6 +69,7 @@ class TestsetLoader(Dataset):
         self.dataset_dir = dataset_dir
         self.upscale_factor = upscale_factor
         self.frame_list = os.listdir(self.dataset_dir + '/lr_x' + str(self.upscale_factor))
+
     def __getitem__(self, idx):
         dir = self.dataset_dir + '/lr_x' + str(self.upscale_factor)
         LR0 = Image.open(dir + '/' + 'lr_' + str(idx+1).rjust(2, '0') + '.png')
@@ -99,6 +103,7 @@ class TestsetLoader(Dataset):
         # generate Cr, Cb channels using bicubic interpolation
         _, SR_cb, SR_cr = rgb2ycbcr(LR1_bicubic)
         return LR, SR_cb, SR_cr
+
     def __len__(self):
         return self.frame_list.__len__() - 2
 

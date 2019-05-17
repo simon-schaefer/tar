@@ -123,7 +123,7 @@ class _IDataset_(_Dataset_):
     load, preprocess and batch images from datasets. """
 
     def __init__(self, args, train: bool, scale: int, name: str=""):
-        self.super(_IDataset_,self).__init__(args,train,scale,name)
+        super(_IDataset_,self).__init__(args,train,scale,name)
         list_hr, list_lr = self._scan()
         self.images_hr, self.images_lr = list_hr, list_lr
 

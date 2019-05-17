@@ -17,5 +17,4 @@
 #
 # calling exectuable.
 source /scratch_net/biwidl215/sischaef/tar/scripts/setup.bash --build
-source /scratch_net/biwidl215/sischaef/tar/scripts/cluster_setup.bash
 python3 /scratch_net/biwidl215/sischaef/tar/main.py "$@"

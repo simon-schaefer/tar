@@ -15,7 +15,7 @@ import torch
 from tar.trainer import _Trainer_
 import tar.miscellaneous as misc
 
-class _Trainer_VScale_(_Trainer_):
+class _Trainer_VModel_(_Trainer_):
     """ Trainer class for training the video super resolution using the task
     aware downscaling method, i.e. downscale to scaled image in autoencoder
     and include difference between encoded features and bicubic image to loss.
@@ -23,7 +23,7 @@ class _Trainer_VScale_(_Trainer_):
     function. """
 
     def __init__(self, args, loader, model, loss, ckp):
-        super(_Trainer_VScale_, self).__init__(args, loader, model, loss, ckp)
+        super(_Trainer_VModel_, self).__init__(args, loader, model, loss, ckp)
 
     def apply(self, lr_prev, lr, hr, scale, discretize=False, dec_input=None):
         assert misc.is_power2(scale)

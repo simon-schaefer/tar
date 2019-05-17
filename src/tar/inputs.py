@@ -38,18 +38,18 @@ parser.add_argument("--data_train", type=str, default="DIV2K",
                     choices=("DIV2K"),
                     help="training dataset name (= 1 dataset!)")
 parser.add_argument("--data_test", type=str, default="DIV2K",
-                    choices=("DIV2K"),
+                    choices=("DIV2K", "NTIAASPEN"),
                     help="testing datasets name (>= 1 dataset!)")
-parser.add_argument("--data_valid", default=["SET5","SET14","VDIV2K","URBAN100"],
-                    choices=("URBAN100","SET5","SET14","BSDS100", "VDIV2K"),
+parser.add_argument("--data_valid", default="SET5:SET14:VDIV2K:URBAN100",
+                    choices=("URBAN100","SET5","SET14","BSDS100","VDIV2K","CALENDAR"),
                     help="validation datasets names (>= 1 dataset!)")
 parser.add_argument("--data_range", type=str, default="1-700/701-800",
                     help="train/test data range")
-parser.add_argument("--scales_train", type=list, default=[2],
+parser.add_argument("--scales_train", type=str, default=[2],
                     help="super resolution scales for training/testing")
-parser.add_argument("--scales_guidance", type=list, default=[2,4],
+parser.add_argument("--scales_guidance", type=str, default=[2,4],
                     help="subset of training in which guidance image should be added")
-parser.add_argument("--scales_valid", type=list, default=[2,4],
+parser.add_argument("--scales_valid", type=str, default=[2,4],
                     help="list of validation scales")
 parser.add_argument("--patch_size", type=int, default=96,
                     help="input patch size")
@@ -177,11 +177,11 @@ def set_template(args):
         args.type       = "SCALING"
         args.loss       = "HR*1*L1+LR*1*L1+FLOW*10*L1"
         args.optimizer  = "ADAM"
-        args.data_train = "UCLOPTICALFLOW"
-        args.data_test  = "UCLOPTICALFLOW"
-        args.data_valid = []
+        args.data_train = "NTIAASPEN"
+        args.data_test  = "NTIAASPEN"
+        args.data_valid = "CALENDAR"
         args.patch_size = 96
-        args.batch_size = 1
+        args.batch_size = 6
         args.max_test_samples = 5
 
 # =============================================================================
@@ -193,7 +193,7 @@ set_template(args)
 def reformat_to_list(inputs):
     if type(inputs) == list: return inputs
     elif type(inputs) == int: return [inputs]
-    elif type(inputs) == str: return [int(x) for x in inputs.split(",")]
+    elif type(inputs) == str: return [int(x) for x in inputs[1:-1].split(",")]
 
 # Reformat arguments.
 args.data_train = args.data_train.split("+")
@@ -201,7 +201,7 @@ args.data_test = args.data_test.split("+")
 args.scales_train = reformat_to_list(args.scales_train)
 args.scales_guidance = reformat_to_list(args.scales_guidance)
 args.scales_valid = reformat_to_list(args.scales_valid)
-if type(args.data_valid) == str: args.data_valid = [args.data_valid]
+args.data_valid = args.data_valid.split(":")
 if type(args.data_test) == str: args.data_test = [args.data_test]
 for arg in vars(args):
     if vars(args)[arg] == "True":

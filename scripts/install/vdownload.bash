@@ -7,12 +7,19 @@ echo "Ntia_Aspen video dataset ..."
 if [ ! -d "NTIAASPEN" ]; then
     git clone https://github.com/LongguangWang/SOF-VSR
     HRS="$SR_PROJECT_DATA_PATH/NTIAASPEN/HR"
+    LRS="$SR_PROJECT_DATA_PATH/NTIAASPEN/LR_bicubic"
     mv SOF-VSR/data/train/ntia_Aspen NTIAASPEN
     cd NTIAASPEN
     mv hr HR
-    mkdir LR
+    mkdir LR_bicubic
     mv lr_x4_BI LR_bicubic/X4
+    for filename in $LRS/X4/*.png; do
+        mv $filename ${filename/.png/x4.png}
+    done
     python3 $DOWNSAMPLE_FILE $HRS 2 2 "LR_bicubic"
+    for filename in $LRS/X2/*.png; do
+        mv $filename ${filename/hr/lr}
+    done
     cd $SR_PROJECT_DATA_PATH
     rm -rf SOF-VSR
 fi
@@ -22,12 +29,19 @@ echo "Calendar video dataset ..."
 if [ ! -d "CALENDAR" ]; then
     git clone https://github.com/LongguangWang/SOF-VSR
     HRS="$SR_PROJECT_DATA_PATH/CALENDAR/HR"
+    LRS="$SR_PROJECT_DATA_PATH/CALENDAR/LR_bicubic"
     mv SOF-VSR/data/test/calendar CALENDAR
     cd CALENDAR
     mv hr HR
-    mkdir LR
+    mkdir LR_bicubic
     mv lr_x4 LR_bicubic/X4
+    for filename in $LRS/X4/*.png; do
+        mv $filename ${filename/.png/x4.png}
+    done
     python3 $DOWNSAMPLE_FILE $HRS 2 2 "LR_bicubic"
+    for filename in $LRS/X2/*.png; do
+        mv $filename ${filename/hr/lr}
+    done
     cd $SR_PROJECT_DATA_PATH
     rm -rf SOF-VSR
 fi

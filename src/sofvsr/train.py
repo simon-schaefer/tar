@@ -17,8 +17,10 @@ def parse_args():
     parser.add_argument('--patch_size', type=int, default=32)
     parser.add_argument('--batch_size', type=int, default=16)
     parser.add_argument('--n_iters', type=int, default=300000, help='number of iterations to train')
-    parser.add_argument('--trainset_dir', type=str, default='data/train')
-    return parser.parse_args()
+    parser.add_argument('--trainsets', type=str, default="NTIAASPEN:")
+    args = parser.parse_args()
+    args.trainsets = args.trainsets.split(":")[:-1]
+    return args
 
 def main(cfg):
     use_gpu = cfg.gpu_mode
@@ -27,8 +29,11 @@ def main(cfg):
         net.cuda()
     cudnn.benchmark = True
 
-    train_set = TrainsetLoader(cfg.trainset_dir, cfg.upscale_factor, cfg.patch_size, cfg.n_iters)
+    train_set = TrainsetLoader(cfg.trainsets, cfg.upscale_factor, cfg.patch_size, cfg.n_iters)
     train_loader = DataLoader(train_set, num_workers=4, batch_size=cfg.batch_size, shuffle=True)
+    log_dir = os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], "sofvsr")
+    log_dir = log_dir + "x" + str(cfg.upscale_factor)
+    os.makedirs(log_dir, exist_ok=True)
 
     # train
     optimizer = torch.optim.Adam(net.parameters(), lr=1e-4)
@@ -70,7 +75,9 @@ def main(cfg):
         # save checkpoint
         if idx_iter % 5000 == 0:
             print('Iteration---%6d,   loss---%f' % (idx_iter + 1, np.array(loss_list).mean()))
-            torch.save(net.state_dict(), 'log/BI_x' + str(cfg.upscale_factor) + '_iter' + str(idx_iter) + '.pth')
+            models_dir = os.path.join(log_dir, "models")
+            os.makedirs(models_dir, exist_ok=True)
+            torch.save(net.state_dict(),models_dir+'/iter'+str(idx_iter)+'.pth')
             loss_list = []
 
 def L1_regularization(image):

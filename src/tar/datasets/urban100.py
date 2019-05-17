@@ -12,10 +12,6 @@ class URBAN100(_IDataset_):
     def __init__(self, args, train, scale, name="URBAN100"):
         super(URBAN100, self).__init__(args, name=name, train=train, scale=scale)
 
-    def _scan(self):
-        names_hr, names_lr = super(URBAN100, self)._scan()
-        return names_hr, names_lr
-
     def _set_filesystem(self, dir_data):
         super(URBAN100, self)._set_filesystem(dir_data)
         self.dir_hr = os.path.join(self.directory, 'HR')

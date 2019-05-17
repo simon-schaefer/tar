@@ -12,10 +12,6 @@ class VDIV2K(_IDataset_):
     def __init__(self, args, train, scale, name="VDIV2K"):
         super(VDIV2K, self).__init__(args, name=name, train=train, scale=scale)
 
-    def _scan(self):
-        names_hr, names_lr = super(VDIV2K, self)._scan()
-        return names_hr, names_lr
-
     def _set_filesystem(self, dir_data):
         super(VDIV2K, self)._set_filesystem(dir_data)
         self.directory = os.path.join(self.args.dir_data, "DIV2K")
