@@ -286,16 +286,99 @@ def unnormalize(img, norm_min, norm_max):
     norm_range = norm_max - norm_min
     return (img - norm_min)/norm_range*255.0
 
-def convert_flow_to_color(flow):
-    hsv = np.zeros((flow.shape[0],flow.shape[1],3), dtype=np.uint8)
-    hsv[:,:,1] = 255
-    mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
-    hsv[:,:,0] = 255
-    hsv[:,:,2] = cv2.normalize(mag,None,0,255,cv2.NORM_MINMAX)
-    return cv2.cvtColor(hsv,cv2.COLOR_HSV2BGR)/255.0
-
 def is_power2(num):
     return num != 0 and ((num & (num - 1)) == 0)
 
 def all_power2(numbers):
     return all([is_power2(x) for x in numbers])
+
+
+# =============================================================================
+# Flow to color functions (https://github.com/georgegach/flow2image).
+# =============================================================================
+def convert_flow_to_color(flow):
+    u,v = _normalizeFlow(flow)
+    img = _computeColor(u, v)
+    return img
+
+def _colorWheel():
+    # Original inspiration: http://members.shaw.ca/quadibloc/other/colint.htm
+    RY = 15; YG = 6; GC = 4; CB = 11; BM = 13; MR = 6
+    ncols = RY + YG + GC + CB + BM + MR
+    colorwheel = np.zeros([ncols, 3]) # RGB
+    col = 0
+    #RY
+    colorwheel[0:RY, 0] = 255
+    colorwheel[0:RY, 1] = np.floor(255*np.arange(0, RY, 1)/RY)
+    col += RY
+    #YG
+    colorwheel[col : YG + col, 0] = 255 - np.floor(255*np.arange(0, YG, 1)/YG)
+    colorwheel[col : YG + col, 1] = 255
+    col += YG
+    #GC
+    colorwheel[col : GC + col, 1] = 255
+    colorwheel[col : GC + col, 2] = np.floor(255*np.arange(0, GC, 1)/GC)
+    col += GC
+    #CB
+    colorwheel[col : CB + col, 1] = 255 - np.floor(255*np.arange(0, CB, 1)/CB)
+    colorwheel[col : CB + col, 2] = 255
+    col += CB
+    #BM
+    colorwheel[col : BM + col, 2] = 255
+    colorwheel[col : BM + col, 0] = np.floor(255*np.arange(0, BM, 1)/BM)
+    col += BM
+    #MR
+    colorwheel[col : MR + col, 2] = 255 - np.floor(255*np.arange(0, MR, 1)/MR)
+    colorwheel[col : MR + col, 0] = 255
+    return colorwheel
+
+def _computeColor(u, v):
+    colorwheel = _colorWheel()
+    idxNans = np.where(np.logical_or(
+        np.isnan(u),
+        np.isnan(v)
+    ))
+    u[idxNans], v[idxNans] = 0, 0
+    ncols = colorwheel.shape[0]
+    radius = np.sqrt(np.multiply(u, u) + np.multiply(v, v))
+    a = np.arctan2(-v, -u) / np.pi
+    fk = (a+1) / 2 * (ncols - 1)
+    k0 = fk.astype(np.uint8)
+    k1 = k0 + 1
+    k1[k1 == ncols] = 0
+    f = fk - k0
+    img = np.empty([k1.shape[0], k1.shape[1], 3])
+    ncolors = colorwheel.shape[1]
+    for i in range(ncolors):
+        tmp = colorwheel[:, i]
+        col0 = tmp[k0] / 255
+        col1 = tmp[k1] / 255
+        col = (1-f) * col0 + f * col1
+        idx = radius <= 1
+        col[idx] = 1 - radius[idx] * (1 - col[idx])
+        col[~idx] *= 0.75
+        img[:, :, i] = np.floor(255 * col).astype(np.uint8) # RGB
+    return img.astype(np.uint8)
+
+def _normalizeFlow(flow):
+    UNKNOWN_FLOW_THRESH = 1e9
+    UNKNOWN_FLOW = 1e10
+    height, width, nBands = flow.shape
+    u = flow[:, :, 0]
+    v = flow[:, :, 1]
+    # Fix unknown flow
+    idxUnknown = np.where(np.logical_or(
+        abs(u) > UNKNOWN_FLOW_THRESH,
+        abs(v) > UNKNOWN_FLOW_THRESH
+    ))
+    u[idxUnknown], v[idxUnknown] = 0, 0
+    maxu = max([-999, np.max(u)])
+    maxv = max([-999, np.max(v)])
+    minu = max([999, np.min(u)])
+    minv = max([999, np.min(v)])
+    rad = np.sqrt(np.multiply(u, u) + np.multiply(v, v))
+    maxrad = max([-1, np.max(rad)])
+    eps = np.finfo(np.float32).eps
+    u = u/(maxrad + eps)
+    v = v/(maxrad + eps)
+    return u,v

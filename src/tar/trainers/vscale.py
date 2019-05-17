@@ -44,31 +44,17 @@ class _Trainer_VScale_(_Trainer_):
         while scl > 1:
             hr_out = self.model.model.decode(hr_out)
             scl    = scl//2
-        # Determine flow estimation based on lr_out (lr2_out) and lr1 using
-        # opencv Farneback flow estimator with default arguments.
-        prev = (lr_prev.cpu().detach().numpy()*255).astype(np.uint8)
-        curr = (lr_out.cpu().detach().numpy()*255).astype(np.uint8)
-        prev = np.reshape(prev, (prev.shape[2],prev.shape[3],3))
-        curr = np.reshape(curr, (curr.shape[2],curr.shape[3],3))
-        prev = cv2.cvtColor(prev, cv2.COLOR_RGB2GRAY)
-        curr = cv2.cvtColor(curr, cv2.COLOR_RGB2GRAY)
-        lrf_out = cv2.calcOpticalFlowFarneback(prev, curr,
-                                               None, 0.5, 3, 15, 3, 5, 1.2, 0)
-        lrf_out = misc.convert_flow_to_color(lrf_out)
-        lrf_out = np.ascontiguousarray(lrf_out.transpose((2, 0, 1)))
-        lrf_shape = lrf_out.shape
-        lrf_out = np.reshape(lrf_out,(1,lrf_shape[0],lrf_shape[1],lrf_shape[2]))
-        lrf_out = torch.from_numpy(lrf_out).float()
-        device = torch.device('cpu' if self.args.cpu else self.args.cuda_device)
-        return lr_out, hr_out, lrf_out.to(device)
+        # Apply input images to model and determine output.
+        hrm_out = None
+        return lr_out, hr_out, hrm_out
 
     def optimization_core(self, lrs, hrs, finetuning, scale):
-        lr1,lr2,lrf = lrs; hr1,hr2,hrf = hrs
-        lr_out,hr_out,lrf_out=self.apply(lr1,lr2,hr2,scale,discretize=finetuning)
+        lr1,lr2 = lrs; hr1,hr2 = hrs
+        lr_out,hr_out,hrm_out=self.apply(lr1,lr2,hr2,scale,discretize=finetuning)
         # Pass loss variables to optimizer and optimize.
         loss_kwargs = {'HR_GT': hr2,  'HR_OUT': hr_out,
                        'LR_GT': lr2,  'LR_OUT': lr_out,
-                       'FLOW_GT': lrf, 'FLOW_OUT': lrf_out}
+                       'MODEL_GT': hr2, 'MODEL_OUT': hrm_out}
         loss = self.loss(loss_kwargs)
         return loss
 
@@ -80,10 +66,10 @@ class _Trainer_VScale_(_Trainer_):
         runtimes = []
         for i, data in enumerate(d):
             lrs, hrs = self.prepare(data)
-            lr1,lr2,lrf = lrs; hr1,hr2,hrf = hrs
+            lr1,lr2 = lrs; hr1,hr2 = hrs
             scale  = d.dataset.scale
             timer_apply = misc._Timer_()
-            lr_out,hr_out,lrf_out = self.apply(lr1,lr2,hr2,scale,discretize=finetuning)
+            lr_out,hr_out,hrm_out = self.apply(lr1,lr2,hr2,scale,discretize=finetuning)
             runtimes.append(timer_apply.toc())
             # PSNR - Low resolution image.
             lr_out = misc.discretize(lr_out, [nmin, nmax])
@@ -91,16 +77,16 @@ class _Trainer_VScale_(_Trainer_):
             # PSNR - High resolution image (base: lr_out).
             hr_out = misc.discretize(hr_out, [nmin, nmax])
             psnrs[i,1] = misc.calc_psnr(hr_out, hr2, None, nmax-nmin)
-            # PSNR - Flow image.
-            psnrs[i,2] = misc.calc_psnr(lrf_out, lrf, None, nmax-nmin)
+            # PSNR - Model image.
+            psnrs[i,2] = misc.calc_psnr(hrm_out, hr2, None, nmax-nmin)
             if save:
                 filename = str(data[0][2][0]).split("_")[0]
-                slist = [hr_out, lr_out, lrf_out, lr2, hr2, lrf]
-                dlist = ["SHR", "SLR", "SLRF", "LR", "HR", "LRF"]
+                slist = [hr_out, lr_out, hrm_out, lr2, hr2]
+                dlist = ["SHR", "SLR", "SHRM", "LR", "HR"]
                 self.ckp.save_results(slist,dlist,filename,d,scale)
             #misc.progress_bar(i+1, num_valid_samples)
         # Logging PSNR values.
-        for ip, desc in enumerate(["SLR","SHR","SLRF"]):
+        for ip, desc in enumerate(["SLR","SHR","SHRM"]):
             psnrs_i = psnrs[:,ip]
             psnrs_i.sort()
             v["PSNR_{}_best".format(desc)]="{:.3f}".format(psnrs_i[-1])
@@ -113,11 +99,10 @@ class _Trainer_VScale_(_Trainer_):
     def prepare(self, data):
         lr1, hr1 = [a.to(self.device) for a in data[0][0:2]]
         lr2, hr2 = [a.to(self.device) for a in data[1][0:2]]
-        lrf, hrf = [a.to(self.device) for a in data[2][0:2]]
-        return (lr1,lr2,lrf), (hr1,hr2,hrf)
+        return (lr1,lr2), (hr1,hr2)
 
     def log_description(self):
-        return ["SLR", "SLRF"]
+        return ["SLR", "SHR", "SHRM"]
 
     def scale_current(self, epoch):
         scalestrain  = self.args.scales_train

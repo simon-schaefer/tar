@@ -169,11 +169,11 @@ class _IDataset_(_Dataset_):
         return pair_t[0], pair_t[1], filename
 
 # =============================================================================
-# DATASET EXTENSION FOR FLOW DATA.
+# DATASET EXTENSION FOR VIDEO DATA.
 # =============================================================================
 class _VDataset_(_Dataset_):
     """ Extension class for torch dataset module, in order to find, search,
-    load, preprocess and batch optical flow data from datasets. """
+    load, preprocess and batch video data from datasets. """
 
     def __init__(self, args, train: bool, scale: int, name: str=""):
         super(_VDataset_, self).__init__(args,train,scale,name)
@@ -184,7 +184,6 @@ class _VDataset_(_Dataset_):
         hrs = sorted(glob.glob(self.dir_hr + "/*" + ".png"))
         hr_1 = [x for x in hrs if x.find("_1") > 0]
         hr_2 = [x for x in hrs if x.find("_2") > 0]
-        hr_f = [x for x in hrs if x.find("_flow") > 0]
         assert len(hr_1) == len(hr_2) == len(hr_f)
         names_hr = [(hr_1[i], hr_2[i], hr_f[i]) for i in range(len(hr_1))]
         # Check if scale == 1, then just return HR images.
