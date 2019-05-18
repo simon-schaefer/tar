@@ -107,9 +107,11 @@ class _Checkpoint_(object):
             label = "PSNR on {}".format(d)
             plt.title(label)
             axes = plt.gca()
-            axes.set_ylim([0,40])
+            ymin, ymax = 15, 40
+            axes.set_ylim([0,ymax])
             for i in range(len(labels)):
-                plt.plot(axis,self.log[:, id, i].numpy(),label="{}".format(labels[i]))
+                log = torch.clamp(self.log[:, id, i], ymin+1, ymax-1)
+                plt.plot(axis,log.numpy(),label="{}".format(labels[i]))
             plt.legend()
             plt.xlabel('Epochs')
             plt.ylabel('PSNR')

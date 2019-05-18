@@ -82,7 +82,7 @@ class _Trainer_IScale_(_Trainer_):
             psnrs_i = psnrs[:,ip]
             psnrs_i.sort()
             v["PSNR_{}_best".format(desc)]="{:.3f}".format(psnrs_i[-1])
-            v["PSNR_{}_mdan".format(desc)]="{:.3f}".format(np.median(psnrs_i))
+            v["PSNR_{}_mdan".format(desc)]="{:.3f}".format(np.mean(psnrs_i))
         log = [float(v["PSNR_{}_best".format(x)]) for x in self.log_description()]
         self.ckp.log[-1, di, :] += torch.Tensor(log)
         v["RUNTIME"] = "{:.8f}".format(np.median(runtimes))

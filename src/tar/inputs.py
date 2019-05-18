@@ -89,9 +89,9 @@ parser.add_argument("--valid_only", action="store_true",
 # =============================================================================
 parser.add_argument("--lr", type=float, default=1e-3,
                     help="learning rate")
-parser.add_argument("--decay", type=str, default="100",
+parser.add_argument("--decay", type=str, default="10",
                     help="learning rate decay interval (epochs)")
-parser.add_argument("--gamma", type=float, default=0.9,
+parser.add_argument("--gamma", type=float, default=0.5,
                     help="learning rate decay factor for step decay")
 parser.add_argument("--optimizer", default="ADAM",
                     choices=("ADAM"),
