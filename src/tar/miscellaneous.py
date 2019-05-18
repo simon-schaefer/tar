@@ -85,7 +85,7 @@ class _Checkpoint_(object):
         self.write_log("... successfully built checkpoint module !")
 
     def step(self, **kwargs):
-        self.add_log(torch.zeros(1, len(self.log_datasets), 4))
+        self.add_log(torch.zeros(1, len(self.log_datasets), kwargs["nlogs"]))
         return self.ready
 
     # =========================================================================

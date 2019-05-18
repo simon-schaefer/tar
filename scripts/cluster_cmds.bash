@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Login to cluster environment.
-qrsh -l gpu=1 -l h_vmem=40G -q gpu.24h.q@*
+qrsh -l gpu=1 -l h_vmem=40G -q gpu.devel.q@*
+qrsh -l gpu=1 -l h_vmem=40G -q gpu.2h.q@*
 qrsh -l gpu=0 -q "*@biwirenderXX"
 
 # Check gpu and user.

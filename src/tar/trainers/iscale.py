@@ -89,7 +89,7 @@ class _Trainer_IScale_(_Trainer_):
         return v
 
     def log_description(self):
-        return ["SHRT", "SLR"]
+        return ["SHRT", "SHRB", "SLR"]
 
     def scale_current(self, epoch):
         scalestrain  = self.args.scales_train

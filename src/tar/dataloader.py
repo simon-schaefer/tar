@@ -59,9 +59,9 @@ class _Dataset_(Dataset):
         f_hr, f_lr = self.images_hr[idx], self.images_lr[idx]
         filename, _ = os.path.splitext(os.path.basename(f_hr))
         hr, lr = imageio.imread(f_hr), imageio.imread(f_lr)
+        lr, hr = self._expand_dimension(lr), self._expand_dimension(hr)
         wl, hl = lr.shape[0]//2*2, lr.shape[1]//2*2
         lr, hr = lr[:wl,:hl,:], hr[:wl*self.scale,:hl*self.scale,:]
-        lr, hr = self._expand_dimension(lr), self._expand_dimension(hr)
         assert hr.shape[2] == lr.shape[2]
         assert hr.shape[0] == self.scale*lr.shape[0]
         assert hr.shape[1] == self.scale*lr.shape[1]

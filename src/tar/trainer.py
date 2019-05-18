@@ -218,6 +218,7 @@ class _Trainer_(object):
             self.validation()
             return False
         else:
+            num_descs = len(self.log_description())
             epoch = self.optimizer.get_last_epoch() + 1
             if epoch > 1: self.ckp.save(self, epoch)
-            return epoch < self.num_epochs() and self.ckp.step()
+            return epoch < self.num_epochs() and self.ckp.step(nlogs=num_descs)
