@@ -193,6 +193,16 @@ def set_template(args):
         args.data_test  = "DIV2K"
         args.patch_size = 96
 
+    if args.template.find("ISCALE_AETAD_LARGE_DIV2K_4") >= 0:
+        args.model      = "AETAD_LARGE"
+        args.format     = "IMAGE"
+        args.type       = "SCALING"
+        args.optimizer  = "ADAM"
+        args.data_train = "DIV2K"
+        args.data_test  = "DIV2K"
+        args.patch_size = 96
+        args.scales_train = [4]
+
     if args.template.find("VSCALE_AETAD_SOFVSR") >= 0:
         args.model      = "AETAD"
         args.format     = "VIDEO"
