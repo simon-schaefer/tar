@@ -98,8 +98,8 @@ class _Trainer_VExternal_(_Trainer_):
             psnrs_i = psnrs[:,ip]
             psnrs_i.sort()
             v["PSNR_{}_best".format(desc)]="{:.3f}".format(psnrs_i[-1])
-            v["PSNR_{}_mdan".format(desc)]="{:.3f}".format(np.median(psnrs_i))
-        log = [float(v["PSNR_{}_best".format(x)]) for x in self.log_description()]
+            v["PSNR_{}_mean".format(desc)]="{:.3f}".format(np.mean(psnrs_i))
+        log = [float(v["PSNR_{}".format(x)]) for x in self.log_description()]
         self.ckp.log[-1, di, :] += torch.Tensor(log)
         v["RUNTIME"] = "{:.8f}".format(np.median(runtimes))
         return v
@@ -111,7 +111,8 @@ class _Trainer_VExternal_(_Trainer_):
         return (lr0,lr1,lr2), (hr0,hr1,hr2)
 
     def log_description(self):
-        return ["SLR","SHR","SHRET","SHREB"]
+        return ["SLR_best", "SLR_mean", "SHR_best", "SHR_mean",
+                "SHRET_best", "SHRET_mean", "SHREB_best", "SHREB_mean"]
 
     def scale_current(self, epoch):
         return self.args.scales_train[0]

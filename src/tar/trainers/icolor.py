@@ -83,14 +83,14 @@ class _Trainer_IColor_(_Trainer_):
             psnrs_i = psnrs[:,ip]
             psnrs_i.sort()
             v["PSNR_{}_best".format(desc)]="{:.3f}".format(psnrs_i[-1])
-            v["PSNR_{}_mdan".format(desc)]="{:.3f}".format(np.median(psnrs_i))
-        log = [float(v["PSNR_{}_best".format(x)]) for x in self.log_description()]
+            v["PSNR_{}_mean".format(desc)]="{:.3f}".format(np.mean(psnrs_i))
+        log = [float(v["PSNR_{}".format(x)]) for x in self.log_description()]
         self.ckp.log[-1, di, :] += torch.Tensor(log)
         v["RUNTIME"] = "{:.8f}".format(np.median(runtimes))
         return v
 
     def log_description(self):
-        return ["SCOLT", "SGRY"]
+        return ["SCOLT_best", "SCOLT_mean", "SGRY_best", "SGRY_mean"]
 
     def scale_current(self, epoch):
         return 1
