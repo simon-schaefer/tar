@@ -1,13 +1,73 @@
-\chapter{Introduction}
-Give an introduction to the topic you have worked on:
+\newpage
+\section{Introduction}
+\label{sec:Introduction}
+With the rise of deep learning in image processing super-resolution (SR) and image
+colorization (IC) in both the image and the video domain have received significant
+attention \cite{DLFISRAS}. While SR aims to reconstruct a high-resolution (HR)
+image from a low-resolution (LR) image, image colorization deals with the
+transformation from an uncolored, grayscale (GR) image to a RGB colored
+(COL) image.
+However, in most of the recent works (e.g. \cite{AFPATSISR}, \cite{ESRGAN},
+\cite{RBPNFVSR}, \cite{LFVSRTHROFE}) the problem of downscaling and upscaling
+or decolorization and colorization are regarded as seperate problems although
+upscaling often is preceded by downscaling, leading to a loss of information
+from the downscaling process which makes the inverse problem of SR highly
+ill-posed \cite{TAID}. Despite of the large progress in SR in the last years
+(\cite{DLFISRAS}) very specific details therefore often cannot be reconstructed,
+when interpolation is used for downsampling. However, as shown in
+\myfigref{fig:shrb_vs_shrt_x4} the downsampling method has a large impact on
+the performance of the subsequent upscaling task.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=6cm]{figures/shrb_vs_shrt_x4}
+  \includegraphics[width=6cm]{figures/cvl}
+	\caption{Comparison between an upscaled image based on bicubic downsampled
+  (left) and task-aware downsampled (right) LR image applied on the same model
+  with upscaling factor 4, for the image-domain, SET 14 dataset, and video
+  domain, CALENDAR dataset. }
+  \label{fig:shrb_vs_shrt_x4}
+\end{figure}
+
+As can be seen above a task-aware approach can dramatically improve the
+performance of existing super-resolution models. However, the research on task-
+aware downscaling methods is a very new field and therefore there still are
+a lot of unresolved issues such as the effect of noise or the feasibility of
+applying it in other domains.
+
+\newpage
+\subsection{Focus of this Work}
+For this reason this work focuses on Task-Aware-Downscaling (TAD) for several standard
+computer vision problems such as super-resolution or colorization in both the
+image and video domain, as recently purposed by Heewon Kim et. alt. (\cite{TAID})
+for the image domain only. Therefore the goals of this work are the following
 
 \begin{itemize}
- \item \textit{What is the rationale for your work?} Give a sufficient description of the problem, e.g. with a general description of the problem setting, narrowing down to the particular problem you have been working on in your thesis. Allow the reader to understand the problem setting.
- \item \textit{What is the scope of your work?} Given the above background, state briefly the focus of the work, what and how you did.
- \item \textit{How is your thesis organized?} It helps the reader to pick the interesting points by providing a small text or graph which outlines the organization of the thesis. The structure given in this document shows how the general structuring shall look like. However, you may fuse chapters or change their names according to the requirements of your thesis.
+  \item reimplement and evaluate the TAD framework purposed in (\cite{TAID})
+  \item improve the TAD framework especially with regards on accuracy
+  (PSNR) and speed in the image domain
+  \item evaluate the effect of external effects such as noise on the TAD
+  framework
+  \item extend the TAD framework to the video domain
 \end{itemize}
 
+By that to the best of our knowledge this work is the first one using deep
+learning for downscaling in the video domain.
 
-%\section{Focus of this Work}
+\subsection{Thesis Organization}
+After the problem statement \mychapterref{sec:Introduction} related works are
+introduced for both the image and video domain \mychapterref{sec:RelatedWork}.
+\mychapterref{sec:Approach} explains the methods that are used in order to
+achieve the goals described above and which are evaluated in
+\mychapterref{sec:ExperimentsandResults}. A final discussion of the results
+as well as an outlook on further work can be found in
+\mychapterref{sec:Discussion} and \mychapterref{sec:Conclusion}.
+Further visualization and experiments are shown in the abstract.
 
-%\section{Thesis Organization}
+% Give an introduction to the topic you have worked on:
+%
+% \begin{itemize}
+%  \item \textit{What is the rationale for your work?} Give a sufficient description of the problem, e.g. with a general description of the problem setting, narrowing down to the particular problem you have been working on in your thesis. Allow the reader to understand the problem setting.
+%  \item \textit{What is the scope of your work?} Given the above background, state briefly the focus of the work, what and how you did.
+%  \item \textit{How is your thesis organized?} It helps the reader to pick the interesting points by providing a small text or graph which outlines the organization of the thesis. The structure given in this document shows how the general structuring shall look like. However, you may fuse sections or change their names according to the requirements of your thesis.
+% \end{itemize}

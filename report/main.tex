@@ -1,5 +1,4 @@
-\documentclass[pdftex,11pt,headsepline,oneside]{book}
-
+\documentclass[a4paper,12pt,headsepline]{article}
 \usepackage{paralist}		% List environment
 \usepackage{color}		% For colored text
 \usepackage{times}
@@ -11,8 +10,8 @@
 % \usepackage{wrapfig}		% To wrap images
 % \usepackage{algorithmic}	% Nice algorithm environment
 % \usepackage{algorithm}
-\usepackage{fancyhdr}		% Produce the nice header
-\usepackage{fullpage} % Use the full page
+%\usepackage{fullpage} % Use the full page
+\usepackage{fancyhdr}
 \usepackage{graphicx,calc} % for pix
 \usepackage{subfigure}
 \usepackage{color}    % for coloured text
@@ -22,6 +21,7 @@
 \usepackage{longtable}
 \usepackage{colortbl}
 \usepackage{nomencl}
+\usepackage{multicol} % multiple columns
 
 \renewcommand{\vec}[1]{\mathbf{#1}}
 \newcommand{\mat}[1]{\mathtt{#1}}
@@ -40,79 +40,61 @@
 % so renewing this command allows to elegantly change the header appearance.
 \renewcommand{\MakeUppercase}{\scshape}
 
-% Set the headings' appearance in the ``fancy'' pagestyle
-\fancyhead{}
-\fancyhead[RO, LE]{\leftmark}
-\fancyfoot{}
-\fancyfoot[RO, LE]{\thepage}
+\author{Simon Schaefer}
+
+% Header definition.
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Simon Schaefer}
+\lhead{Task-Aware-Downscaling for Image and Video Domain}
+\rfoot{\thepage}
 
 % The first pages shall be empty, even no page numbering
 \begin{document}
 \pagestyle{empty} % even no page number
-
-\fancypagestyle{plain}{
-  \renewcommand{\headrulewidth}{0.0pt}
-  \fancyfoot{}
-  \fancyhead{}
-}
 
 % Title page, modify accordingly
 \input{title.tex}
 \input{abstract.tex}
 \input{ack.tex}
 
-% Chapter-pages etc. use the ``plain'' pagestyle - since we don't want to have
-% a heading at all at chapter-pages, redefine plain accordingly. Don't forget the page number.
-\fancypagestyle{plain}{
-  \renewcommand{\headrulewidth}{0.0pt}
-  \fancyfoot{}
-  \fancyfoot[RO, LE]{\thepage}
-  \fancyhead{}
-}
-
 \pagestyle{fancy}
 \pagenumbering{Roman}
 
 % Insert table of contents
+\newpage
 \tableofcontents
-% Insert list of figures
+% Insert list of figures.
+\newpage
 \listoffigures
 % Insert list of tables
-\listoftables
+%\newpage
+%\listoftables
 
-\newpage
 \pagenumbering{arabic}
 
 %% ----------------------------------------------------------------------------
-% Actual text comes here - defer it to other files and use \input{bla.tex}, ..
+% Actual text
 %% ----------------------------------------------------------------------------
 \input{intro.tex}
 \input{relatedwork.tex}
-\input{materialsandmethods.tex}
+\input{approach.tex}
 \input{experimentsandresults.tex}
 \input{discussion.tex}
 \input{conclusion.tex}
 
 %% ----------------------------------------------------------------------------
-% If Appendix is needed
+% Bibliography
 %% ----------------------------------------------------------------------------
-\appendix
-\input{appendix.tex}
-
-%% ----------------------------------------------------------------------------
-% Bibliography is stored in references.bib file, and can often be found
-% online on webpages like dblp.uni-trier.de
-%
-% To include it in your thesis, run
-%  pdflatex main
-%  bibtex main
-%  pdflatex main
-%  pdflatex main
-%
-% This ensures all references are done correctly.
-%% ----------------------------------------------------------------------------
-
+\newpage
 \bibliographystyle{plain}
 \bibliography{references}
+
+%% ----------------------------------------------------------------------------
+% If Appendix is needed
+%% ----------------------------------------------------------------------------
+\newpage
+\appendix
+\input{appendix.tex}
 
 \end{document}
