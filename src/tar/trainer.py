@@ -37,8 +37,6 @@ class _Trainer_(object):
         self.model = model
         self.loss = loss
         self.optimizer = optimization.make_optimizer(model, args)
-        if self.args.load != '':
-            self.optimizer.load(ckp.dir, epoch=len(ckp.log))
         self.error_last = 1e8
         self.test_iter = 1
         self.valid_iter = 1
@@ -214,11 +212,12 @@ class _Trainer_(object):
         return [a.to(self.device) for a in data[0:2]]
 
     def step(self):
+        num_descs = len(self.log_description())
         if self.args.valid_only:
+            self.ckp.step(nlogs=num_descs)
             self.validation()
             return False
         else:
-            num_descs = len(self.log_description())
             epoch = self.optimizer.get_last_epoch() + 1
             if epoch > 1: self.ckp.save(self, epoch)
             return epoch < self.num_epochs() and self.ckp.step(nlogs=num_descs)

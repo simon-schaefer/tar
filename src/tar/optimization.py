@@ -117,7 +117,6 @@ class _Loss_(nn.modules.loss._Loss):
             )
         # Build logging and load previous log (if required).
         self.log = torch.Tensor()
-        if args.load != "": self.load(ckp.dir, cpu=args.cpu)
         ckp.write_log("... successfully built loss module !")
 
     def forward(self, kwargs):

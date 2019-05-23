@@ -1,5 +1,3 @@
-14_59_57_18_May
-
 decay: 10
 loss: HR*10*L1+LR*1*L1
 norm_max: 1.0

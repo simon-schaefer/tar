@@ -1,5 +1,3 @@
-12_25_49_24_Mar
-
 dir_data: /scratch_net/biwidl215/sischaef/data
 model_type: TAD
 data_train: ['DIV2K']

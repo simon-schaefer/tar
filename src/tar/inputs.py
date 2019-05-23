@@ -14,7 +14,7 @@ parser.add_argument("--format", type=str, default="IMAGE",
                     choices=("IMAGE", "VIDEO"))
 parser.add_argument("--external", type=str, default="",
                     choices=("SOFVSR"))
-parser.add_argument("--template", default=".",
+parser.add_argument("--template", default="valid",
                     help="set various templates in option.py")
 parser.add_argument("--verbose", action="store_false",
                     help="print in log file and terminal (default=True)")
@@ -67,7 +67,7 @@ parser.add_argument("--augment", action="store_false",
 # =============================================================================
 # Model specifications.
 # =============================================================================
-parser.add_argument("--model", default="",
+parser.add_argument("--model", default="AETAD",
                     help="model name")
 
 # =============================================================================
@@ -117,7 +117,8 @@ parser.add_argument("--loss", type=str, default="HR*10*L1+LR*1*L1",
 # Log specifications.
 # =============================================================================
 parser.add_argument("--load", type=str, default="",
-                    help="directory to load, format [outs,models]xdir_name")
+                    help="directory to load model from, training is not \
+                    continued to not overwrite, format [outs,models]xdir_name")
 parser.add_argument("--resume", type=int, default=-2,
                     help="resume from specific checkpoint (-1=latest, -2=best)")
 parser.add_argument("--save_models", action="store_true",
@@ -205,6 +206,7 @@ def set_template(args):
 
     if args.template.find("VSCALE_AETAD_SOFVSR") >= 0:
         args.model      = "AETAD"
+        args.load       = "modelsxiscale4"
         args.format     = "VIDEO"
         args.type       = "SCALING"
         args.loss       = "HR*1*L1+LR*10*L1+EXT*1*L1"

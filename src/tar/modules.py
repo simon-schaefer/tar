@@ -29,10 +29,14 @@ class _Model_(nn.Module):
         self.save_models = args.save_models
         module = importlib.import_module('tar.models.' + args.model.lower())
         self.model = module.build_net().to(self.device)
+        # If model should be loaded from another training, check first whether
+        # the model is identical (i.e. args = args_load for "model").
         if not args.load == "":
+            if not args.model == ckp.args_load["model"]:
+                raise ValueError("Non-Identical model {} and {}".format(
+                args.model, ckp.args_load["model"]))
             load_path = self.load(
-                ckp.get_path('model'), resume=args.resume, cpu=args.cpu
-            )
+                ckp.get_load_path('model'), resume=args.resume, cpu=args.cpu)
             ckp.write_log("... loaded model from {}".format(load_path))
         print(self.model, file=ckp.log_file)
         ckp.write_log("... successfully built model {}!".format(args.model))

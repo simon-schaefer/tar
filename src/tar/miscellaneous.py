@@ -37,10 +37,13 @@ class _Checkpoint_(object):
         self.log   = torch.Tensor()
         # Building model directory based on name and time.
         now = time.strftime("%H_%M_%S_%d_%b", time.gmtime())
-        if not args.load:
-            tag = args.template + "_" + now
-            self.dir = os.path.join(os.environ['SR_PROJECT_OUTS_PATH'], tag)
-        else:
+        tag = args.template + "_" + now
+        self.dir = os.path.join(os.environ['SR_PROJECT_OUTS_PATH'], tag)
+        if args.valid_only: self.dir = self.dir + "_valid"
+        self.dir_load = None
+        # If previous training/model should be loaded, build loading path
+        # from input arguments and read loaded config file.
+        if not args.load == "":
             assert len(args.load.split("x")) == 2
             path, tag = args.load.split("x")
             assert path in ["outs", "models"]
@@ -48,10 +51,16 @@ class _Checkpoint_(object):
                 path = os.environ['SR_PROJECT_OUTS_PATH']
             else:
                 path = os.environ['SR_PROJECT_MODELS_PATH']
-            self.dir = os.path.join(path, tag)
-            if not os.path.exists(self.dir):
-                raise ValueError("Loading path %s does not exists !" % self.dir)
-            self.log = torch.load(self.get_path('psnr_log.pt'))
+            self.dir_load = os.path.join(path, tag)
+            if not os.path.exists(self.dir_load):
+                raise ValueError("Loading path %s does not exists !" % self.dir_load)
+            self.args_load = {}
+            with open(self.get_load_path("config.txt"), "r") as f:
+                for line in f:
+                    x = line.rstrip('\n')
+                    if not len(x.split(":")) == 2: continue
+                    key, val = x.split(":")
+                    self.args_load[key] = val.replace(" ", "")
         # Creating output directories for model.
         os.makedirs(self.dir, exist_ok=True)
         os.makedirs(self.get_path('model'), exist_ok=True)
@@ -63,12 +72,9 @@ class _Checkpoint_(object):
         # Create output directory for logging data and write config.
         open_type = 'a' if os.path.exists(self.get_path('log.txt')) else 'w'
         self.log_file = open(self.get_path('log.txt'), open_type)
-        if not args.valid_only:
-            with open(self.get_path('config.txt'), open_type) as f:
-                f.write(now + '\n\n')
-                for arg in vars(args):
-                    f.write('{}: {}\n'.format(arg, getattr(args, arg)))
-                f.write('\n')
+        with open(self.get_path('config.txt'), open_type) as f:
+            for arg in vars(args):
+                f.write('{}: {}\n'.format(arg, getattr(args, arg)))
         # Build list containing names of test and validation datasets
         # for logging and plotting purposes.
         self.log_datasets = [self.args.data_test]
@@ -80,8 +86,8 @@ class _Checkpoint_(object):
         self.iter_is_best = False
         self.ready        = True
         self.write_log("Building model module ...")
-        if args.load:
-            self.write_log('... continue from epoch {}...'.format(len(self.log)))
+        if not args.load == "":
+            self.write_log("... continue from model in {}...".format(self.dir_load))
         self.write_log("... successfully built checkpoint module !")
 
     def step(self, **kwargs):
@@ -193,6 +199,9 @@ class _Checkpoint_(object):
 
     def get_path(self, *subdir):
         return os.path.join(self.dir, *subdir)
+
+    def get_load_path(self, *subdir):
+        return os.path.join(self.dir_load, *subdir)
 
 # =============================================================================
 # Timer class.
