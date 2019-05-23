@@ -22,6 +22,7 @@ class _Trainer_IScale_(_Trainer_):
 
     def __init__(self, args, loader, model, loss, ckp):
         super(_Trainer_IScale_, self).__init__(args, loader, model, loss, ckp)
+        self.ckp.write_log("... successfully built iscale trainer !")
 
     def apply(self, lr, hr, scale, discretize=False, dec_input=None):
         assert misc.is_power2(scale)

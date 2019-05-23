@@ -34,6 +34,7 @@ class _Trainer_(object):
         self.loader_train = loader.loader_train
         self.loader_test  = loader.loader_test
         self.loader_valid = loader.loader_valid
+        self.check_datasets()
         self.model = model
         self.loss = loss
         self.optimizer = optimization.make_optimizer(model, args)
@@ -41,6 +42,7 @@ class _Trainer_(object):
         self.test_iter = 1
         self.valid_iter = 1
         self.device = torch.device('cpu' if self.args.cpu else self.args.cuda_device)
+        self.ckp.write_log("Building trainer module ...")
 
     # =========================================================================
     # Training
@@ -136,7 +138,7 @@ class _Trainer_(object):
         if len(self.loader_valid) == 0: return
         torch.set_grad_enabled(False)
         epoch = self.optimizer.get_last_epoch() + 1
-        finetuning = epoch >= self.args.fine_tuning
+        finetuning = epoch >= self.args.fine_tuning or self.args.valid_only
         save = self.args.save_results and self.valid_iter%self.args.save_every==0
         save = save or self.args.valid_only
         self.model.eval()
@@ -208,8 +210,19 @@ class _Trainer_(object):
             )
         return best
 
+    def check_datasets(self):
+        def _check(d, format):
+            if not d.format == format:
+                raise ValueError("Dataset {} has wrong format, is {} \
+                but should be {} !".format(d.name, d.format, format))
+
+        for d in self.loader_valid: _check(d.dataset, self.args.format)
+        if self.args.valid_only: return True
+        for d in self.loader_test: _check(d.dataset, self.args.format)
+        return True
+
     def prepare(self, data):
-        return [a.to(self.device) for a in data[0:2]]
+        return [a.to(self.device) for a in data]
 
     def step(self):
         num_descs = len(self.log_description())

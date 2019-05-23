@@ -24,8 +24,10 @@ class _Trainer_VExternal_(_Trainer_):
     def __init__(self, args, loader, model, loss, ckp):
         super(_Trainer_VExternal_, self).__init__(args,loader,model,loss,ckp)
         external = self.args.external
+        if external == "": raise ValueError("External module must not be empty !")
         use_gpu  = not self.args.cpu
         self._external = self.load_module(external,self.scale_current(0),use_gpu)
+        self.ckp.write_log("... successfully built vscale trainer !")
 
     def apply(self,lr_prev,lr,lr_next,hr,scale,discretize=False,dec_input=None):
         assert misc.is_power2(scale)
@@ -47,7 +49,8 @@ class _Trainer_VExternal_(_Trainer_):
             hr_out = self.model.model.decode(hr_out)
             scl    = scl//2
         # Apply input images to model and determine output.
-        hre_out = self._external.apply(lr_prev, lr_out, lr_next)
+        lr_ext = misc.discretize(lr_out.clone(),[nmin,nmax])
+        hre_out = self._external.apply(lr_prev, lr_ext, lr_next)
         return lr_out, hr_out, hre_out
 
     def optimization_core(self, lrs, hrs, finetuning, scale):
@@ -115,6 +118,7 @@ class _Trainer_VExternal_(_Trainer_):
                 "SHRET_best", "SHRET_mean", "SHREB_best", "SHREB_mean"]
 
     def scale_current(self, epoch):
+        assert self.args.scales_train == self.args.scales_valid
         return self.args.scales_train[0]
 
     def num_epochs(self):

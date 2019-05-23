@@ -144,6 +144,7 @@ class _IDataset_(_Dataset_):
 
     def __init__(self, args, train: bool, scale: int, name: str=""):
         super(_IDataset_,self).__init__(args,train,scale,name)
+        self.format = "IMAGE"
         list_hr, list_lr = self._scan()
         self.images_hr, self.images_lr = list_hr, list_lr
 
@@ -175,6 +176,7 @@ class _VDataset_(_Dataset_):
 
     def __init__(self, args, train: bool, scale: int, name: str=""):
         super(_VDataset_, self).__init__(args,train,scale,name)
+        self.format = "VIDEO"
         list_hr, list_lr = self._scan()
         self.images_hr, self.images_lr = list_hr, list_lr
 

@@ -43,8 +43,8 @@ parser.add_argument("--data_test", type=str, default="DIV2K",
                     choices=("DIV2K", "NTIAASPEN"),
                     help="testing datasets name (>= 1 dataset!)")
 parser.add_argument("--data_valid", default="SET5:SET14:VDIV2K:URBAN100",
-                    choices=("URBAN100","SET5","SET14","BSDS100","VDIV2K","CALENDAR"),
-                    help="validation datasets names (>= 1 dataset!)")
+                    help="validation datasets names (>= 1 dataset!), \
+                    choices=URBAN100,SET5,SET14,BSDS100,VDIV2K,CALENDAR,NTIAASPEN")
 parser.add_argument("--data_range", type=str, default="1-700/701-800",
                     help="train/test data range")
 parser.add_argument("--scales_train", type=str, default=[2],
@@ -209,7 +209,7 @@ def set_template(args):
         args.load       = "modelsxiscale4"
         args.format     = "VIDEO"
         args.type       = "SCALING"
-        args.loss       = "HR*1*L1+LR*10*L1+EXT*1*L1"
+        args.loss       = "HR*1*L1+LR*1*L1+EXT*100*L1"
         args.optimizer  = "ADAM"
         args.data_train = "NTIAASPEN"
         args.data_test  = "NTIAASPEN"

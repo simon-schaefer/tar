@@ -22,6 +22,7 @@ class _Trainer_IColor_(_Trainer_):
 
     def __init__(self, args, loader, model, loss, ckp):
         super(_Trainer_IColor_, self).__init__(args, loader, model, loss, ckp)
+        self.ckp.write_log("... successfully built icolor trainer !")
 
     def apply(self, gry, col, discretize=False, dec_input=None):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
