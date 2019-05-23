@@ -141,7 +141,6 @@ def set_template(args):
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
-        args.patch_size = 96
 
     if args.template.find("ISCALE_AETAD_DIV2K_4") >= 0:
         args.model      = "AETAD"
@@ -150,7 +149,6 @@ def set_template(args):
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
-        args.patch_size = 96
         args.scales_train = [4]
 
     if args.template.find("ICOLOR_AETAD_DIV2K") >= 0:
@@ -161,7 +159,6 @@ def set_template(args):
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
-        args.patch_size = 96
         args.scales_train = [1]
         args.scales_valid = [1]
         args.scales_guidance = [1]
@@ -173,7 +170,6 @@ def set_template(args):
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
-        args.patch_size = 96
 
     if args.template.find("ISCALE_AETAD_SMALL_DIV2K_4") >= 0:
         args.model      = "AETAD_SMALL"
@@ -182,7 +178,6 @@ def set_template(args):
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
-        args.patch_size = 96
         args.scales_train = [4]
 
     if args.template.find("ISCALE_AETAD_LARGE_DIV2K") >= 0:
@@ -192,7 +187,6 @@ def set_template(args):
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
-        args.patch_size = 96
 
     if args.template.find("ISCALE_AETAD_LARGE_DIV2K_4") >= 0:
         args.model      = "AETAD_LARGE"
@@ -201,8 +195,19 @@ def set_template(args):
         args.optimizer  = "ADAM"
         args.data_train = "DIV2K"
         args.data_test  = "DIV2K"
-        args.patch_size = 96
         args.scales_train = [4]
+
+    if args.template.find("ISCALE_AETAD_NTIAASPEN_4") >= 0:
+        args.model      = "AETAD"
+        args.format     = "IMAGE"
+        args.type       = "SCALING"
+        args.loss       = "HR*10*L1+LR*1*L1"
+        args.optimizer  = "ADAM"
+        args.data_train = "INTIAASPEN"
+        args.data_test  = "INTIAASPEN"
+        args.data_valid = "ICALENDAR"
+        args.scales_train = [4]
+        args.scales_valid = [4]
 
     if args.template.find("VSCALE_AETAD_SOFVSR") >= 0:
         args.model      = "AETAD"
@@ -217,7 +222,6 @@ def set_template(args):
         args.external   = "SOFVSR"
         args.scales_train = [4]
         args.scales_valid = [4]
-        args.patch_size = 96
         args.batch_size = 6
 
 # =============================================================================

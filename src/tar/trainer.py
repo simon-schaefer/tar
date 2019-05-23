@@ -222,7 +222,7 @@ class _Trainer_(object):
         return True
 
     def prepare(self, data):
-        return [a.to(self.device) for a in data]
+        return [a.to(self.device) for a in data[0:2]]
 
     def step(self):
         num_descs = len(self.log_description())
