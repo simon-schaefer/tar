@@ -44,7 +44,8 @@ parser.add_argument("--data_test", type=str, default="DIV2K",
                     help="testing datasets name (>= 1 dataset!)")
 parser.add_argument("--data_valid", default="SET5:SET14:VDIV2K:URBAN100",
                     help="validation datasets names (>= 1 dataset!), \
-                    choices=URBAN100,SET5,SET14,BSDS100,VDIV2K,CALENDAR,NTIAASPEN")
+                    choices=URBAN100,SET5,SET14,BSDS100,VDIV2K,CUSTOM, \
+                    CALENDAR,NTIAASPEN,ICALENDAR,INTIAASPEN")
 parser.add_argument("--data_range", type=str, default="1-700/701-800",
                     help="train/test data range")
 parser.add_argument("--scales_train", type=str, default=[2],

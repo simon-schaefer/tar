@@ -54,7 +54,6 @@ class _Trainer_IScale_(_Trainer_):
     def testing_core(self, v, d, di, save=False, finetuning=False):
         num_valid_samples = len(d)
         nmin, nmax  = self.args.norm_min, self.args.norm_max
-        max_samples = self.args.max_test_samples
         psnrs = np.zeros((num_valid_samples, 3))
         runtimes = []
         for i, (lr, hr, fname) in enumerate(d):

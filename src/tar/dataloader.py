@@ -41,6 +41,7 @@ class _Dataset_(Dataset):
         self.directory = os.path.join(directory, self.name)
         self.dir_hr = os.path.join(self.directory, 'HR')
         self.dir_lr = os.path.join(self.directory, 'LR_bicubic')
+        self.dir_lr = os.path.join(self.dir_lr, "X{}".format(self.scale))
 
     def _scan(self):
         """ Scan given lists of directories for HR and LR images and return
@@ -158,7 +159,8 @@ class _IDataset_(_Dataset_):
         # Normalize patches from rgb_range to [norm_min, norm_max].
         pair = self._normalize(pair)
         # Augment patches (if flag is set).
-        if not self.args.augment: pair = self._augment(pair)
+        if not self.args.augment and not self.args.valid_only:
+            pair = self._augment(pair)
         # Set right number of channels.
         pair = self._set_channel(pair)
         # In colorization mode convert "LR" image to YCbCr and take Y-channel.
@@ -196,7 +198,8 @@ class _VDataset_(_Dataset_):
             # Normalize patches from rgb_range to [norm_min, norm_max].
             pair = self._normalize(pair)
             # Augment patches (if flag is set).
-            if not self.args.augment: pair = self._augment(pair)
+            if not self.args.augment and not self.args.valid_only:
+                pair = self._augment(pair)
             # Set right number of channels.
             pair = self._set_channel(pair)
             # In colorization mode convert "LR" image to YCbCr and take Y-channel.
@@ -260,8 +263,8 @@ class _Data_(object):
             for s in args.scales_valid:
                 vset = self.load_dataset(args, dataset, train=False, scale=s)
                 sampler = RandomSampler(vset, replacement=True,
-                                        num_samples=args.max_test_samples)
-                if args.max_test_samples > len(vset): sampler = None
+                                        num_samples=max_samples)
+                if max_samples > len(vset): sampler = None
                 self.loader_valid.append(_DataLoader_(
                     vset, 1, num_workers=args.n_threads, sampler=sampler
                 ))
@@ -271,7 +274,7 @@ class _Data_(object):
             tset = self.load_dataset(args, args.data_test, train=False, scale=s)
             sampler = RandomSampler(tset, replacement=True,
                                     num_samples=args.max_test_samples)
-            if args.max_test_samples > len(tset): sampler = None
+            if args.max_test_samples>len(tset) or args.valid_only: sampler=None
             self.loader_test.append(_DataLoader_(
                 tset, 1, num_workers=args.n_threads, sampler=sampler
             ))
@@ -291,7 +294,7 @@ class _Data_(object):
             vset = self.load_dataset(args, dataset, train=False, scale=1)
             sampler = RandomSampler(vset, replacement=True,
                                     num_samples=args.max_test_samples)
-            if args.max_test_samples > len(vset): sampler = None
+            if args.max_test_samples>len(vset) or args.valid_only: sampler=None
             self.loader_valid.append(_DataLoader_(
                 vset, 1, num_workers=args.n_threads, sampler=sampler
             ))
@@ -314,7 +317,15 @@ class _Data_(object):
 
     @staticmethod
     def load_dataset(args, name: str, train: bool, scale: int):
-        """ Load dataset from module (in datasets directory). Every module loaded
-        should inherit from the _Dataset_ class defined below. """
-        m = importlib.import_module("tar.datasets." + name.lower())
-        return getattr(m, name)(args, train=train, scale=scale)
+        """ Load dataset from module (in datasets directory). Every module
+        loaded should inherit from the _Dataset_ class defined below. """
+        try:
+            m = importlib.import_module("tar.datasets." + name.lower())
+            return getattr(m, name)(args, train=train, scale=scale)
+        except FileNotFoundError:
+            if args.format == "IMAGE":
+                return _IDataset_(args,train=train,scale=scale,name=name.upper())
+            elif args.format == "VIDEO":
+                return _VDataset_(args,train=train,scale=scale,name=name.upper())
+            else:
+                raise ValueError("Invalid format {} !".format(args.format))
