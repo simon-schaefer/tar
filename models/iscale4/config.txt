@@ -1,0 +1,47 @@
+14_59_57_18_May
+
+decay: 10
+loss: HR*10*L1+LR*1*L1
+norm_max: 1.0
+epsilon: 1e-08
+augment: True
+lr: 0.001
+scales_train: [4]
+optimizer: ADAM
+scales_valid: [2, 4]
+model: AETAD
+momentum: 0.9
+data_valid: ['SET5', 'SET14', 'VDIV2K', 'URBAN100']
+dir_data: /scratch_net/biwidl215/sischaef/data
+n_gpus: 1
+load: 
+betas: (0.9, 0.999)
+data_range: 1-700/701-800
+gamma: 0.5
+data_train: DIV2K
+print_every: 20
+n_threads: 10
+epochs_base: 500
+fine_tuning: 400
+norm_min: 0.0
+cuda_device: cuda:0
+template: ISCALE_AETAD_DIV2K_4
+epochs_zoom: 0
+batch_size: 16
+max_test_samples: 20
+verbose: True
+external: 
+save_models: False
+format: IMAGE
+cpu: False
+valid_only: False
+save_every: 20
+gclip: 0
+type: SCALING
+save_results: True
+resume: -2
+weight_decay: 0
+data_test: DIV2K
+patch_size: 96
+scales_guidance: [2, 4]
+

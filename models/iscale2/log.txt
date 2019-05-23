@@ -1,0 +1,4050 @@
+Building model module ...
+Continue from epoch 0...
+... successfully built checkpoint module !
+Building loss module ...
+... adding MSE loss with weight=10.000000 and input type=HR
+... adding L1 loss with weight=1.000000 and input type=LR
+... successfully built loss module !
+Building model module ...
+AETAD_3D(
+  (_downscaling): Sequential(
+    (0): Conv2d(3, 8, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): Conv2d(8, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (2): _ReversePixelShuffle_(downscale_factor=2)
+  )
+  (_res_en1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_en1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_en2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_de1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_res_de1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_de2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_upscaling): Sequential(
+    (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+    (2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  )
+)
+... successfully built model module !
+Machine: GeForce GTX TITAN X
+[Epoch 1]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 1.3474][LR-L1: 0.1495][TOTAL: 1.4970]	1.2+26.7s
+[320/699]	[HR-MSE: 0.8155][LR-L1: 0.1239][TOTAL: 0.9394]	1.1+24.9s
+[480/699]	[HR-MSE: 0.5968][LR-L1: 0.1009][TOTAL: 0.6977]	1.2+12.2s
+[640/699]	[HR-MSE: 0.4785][LR-L1: 0.0839][TOTAL: 0.5623]	1.0+23.0s
+
+Evaluation 1 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 43.983 (Best: 43.983 @epoch 1)
+HR	[DIV2K x2]	PSNR: 28.785 (Best: 28.785 @epoch 1)
+Mean network applying time: 13.29ms
+Saving states ...
+Testing Total: 17.83s
+
+[Epoch 2]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.1092][LR-L1: 0.0205][TOTAL: 0.1297]	1.1+23.9s
+[320/699]	[HR-MSE: 0.1053][LR-L1: 0.0192][TOTAL: 0.1245]	1.1+21.0s
+[480/699]	[HR-MSE: 0.0980][LR-L1: 0.0178][TOTAL: 0.1157]	1.0+10.7s
+[640/699]	[HR-MSE: 0.0919][LR-L1: 0.0167][TOTAL: 0.1087]	0.9+20.7s
+
+Evaluation 2 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 47.345 (Best: 47.345 @epoch 2)
+HR	[DIV2K x2]	PSNR: 30.891 (Best: 30.891 @epoch 2)
+Mean network applying time: 8.14ms
+Saving states ...
+Testing Total: 19.20s
+
+[Epoch 3]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0680][LR-L1: 0.0132][TOTAL: 0.0812]	1.0+24.3s
+[320/699]	[HR-MSE: 0.0643][LR-L1: 0.0127][TOTAL: 0.0771]	1.1+20.5s
+[480/699]	[HR-MSE: 0.0612][LR-L1: 0.0122][TOTAL: 0.0734]	1.1+10.1s
+[640/699]	[HR-MSE: 0.0568][LR-L1: 0.0117][TOTAL: 0.0685]	0.9+21.6s
+
+Evaluation 3 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 48.165 (Best: 48.165 @epoch 3)
+HR	[DIV2K x2]	PSNR: 32.244 (Best: 32.244 @epoch 3)
+Mean network applying time: 16.57ms
+Saving states ...
+Testing Total: 19.75s
+
+[Epoch 4]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0468][LR-L1: 0.0104][TOTAL: 0.0571]	1.1+23.7s
+[320/699]	[HR-MSE: 0.0405][LR-L1: 0.0098][TOTAL: 0.0502]	1.0+21.9s
+[480/699]	[HR-MSE: 0.0373][LR-L1: 0.0092][TOTAL: 0.0465]	0.9+11.5s
+[640/699]	[HR-MSE: 0.0360][LR-L1: 0.0089][TOTAL: 0.0448]	0.7+20.8s
+
+Evaluation 4 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 52.522 (Best: 52.522 @epoch 4)
+HR	[DIV2K x2]	PSNR: 34.678 (Best: 34.678 @epoch 4)
+Mean network applying time: 16.78ms
+Saving states ...
+Testing Total: 18.16s
+
+[Epoch 5]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0302][LR-L1: 0.0073][TOTAL: 0.0375]	1.0+23.8s
+[320/699]	[HR-MSE: 0.0297][LR-L1: 0.0071][TOTAL: 0.0369]	1.1+20.0s
+[480/699]	[HR-MSE: 0.0289][LR-L1: 0.0070][TOTAL: 0.0360]	1.2+10.7s
+[640/699]	[HR-MSE: 0.0285][LR-L1: 0.0069][TOTAL: 0.0354]	0.8+21.6s
+
+Evaluation 5 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 52.228 (Best: 52.522 @epoch 4)
+HR	[DIV2K x2]	PSNR: 28.630 (Best: 34.678 @epoch 4)
+Mean network applying time: 11.44ms
+Saving states ...
+Testing Total: 20.60s
+
+[Epoch 6]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0270][LR-L1: 0.0064][TOTAL: 0.0335]	1.1+23.5s
+[320/699]	[HR-MSE: 0.0280][LR-L1: 0.0064][TOTAL: 0.0344]	1.1+22.5s
+[480/699]	[HR-MSE: 0.0272][LR-L1: 0.0063][TOTAL: 0.0335]	1.2+10.8s
+[640/699]	[HR-MSE: 0.0274][LR-L1: 0.0062][TOTAL: 0.0336]	0.9+19.2s
+
+Evaluation 6 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 54.428 (Best: 54.428 @epoch 6)
+HR	[DIV2K x2]	PSNR: 32.174 (Best: 34.678 @epoch 4)
+Mean network applying time: 14.52ms
+Saving states ...
+Testing Total: 17.76s
+
+[Epoch 7]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0301][LR-L1: 0.0059][TOTAL: 0.0360]	1.0+23.6s
+[320/699]	[HR-MSE: 0.0285][LR-L1: 0.0058][TOTAL: 0.0343]	1.0+21.0s
+[480/699]	[HR-MSE: 0.0271][LR-L1: 0.0057][TOTAL: 0.0328]	1.0+11.0s
+[640/699]	[HR-MSE: 0.0263][LR-L1: 0.0057][TOTAL: 0.0319]	0.8+21.1s
+
+Evaluation 7 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 52.251 (Best: 54.428 @epoch 6)
+HR	[DIV2K x2]	PSNR: 32.423 (Best: 34.678 @epoch 4)
+Mean network applying time: 8.12ms
+Saving states ...
+Testing Total: 20.58s
+
+[Epoch 8]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0209][LR-L1: 0.0050][TOTAL: 0.0259]	1.0+23.3s
+[320/699]	[HR-MSE: 0.0233][LR-L1: 0.0052][TOTAL: 0.0285]	1.0+19.8s
+[480/699]	[HR-MSE: 0.0234][LR-L1: 0.0051][TOTAL: 0.0285]	1.0+11.1s
+[640/699]	[HR-MSE: 0.0232][LR-L1: 0.0050][TOTAL: 0.0281]	0.9+22.0s
+
+Evaluation 8 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 54.726 (Best: 54.726 @epoch 8)
+HR	[DIV2K x2]	PSNR: 33.237 (Best: 34.678 @epoch 4)
+Mean network applying time: 11.37ms
+Saving states ...
+Testing Total: 18.90s
+
+[Epoch 9]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0251][LR-L1: 0.0049][TOTAL: 0.0300]	1.0+23.5s
+[320/699]	[HR-MSE: 0.0234][LR-L1: 0.0046][TOTAL: 0.0280]	1.1+22.4s
+[480/699]	[HR-MSE: 0.0225][LR-L1: 0.0045][TOTAL: 0.0270]	1.1+10.8s
+[640/699]	[HR-MSE: 0.0218][LR-L1: 0.0044][TOTAL: 0.0262]	0.9+21.1s
+
+Evaluation 9 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.619 (Best: 57.619 @epoch 9)
+HR	[DIV2K x2]	PSNR: 36.148 (Best: 36.148 @epoch 9)
+Mean network applying time: 11.06ms
+Saving states ...
+Testing Total: 19.22s
+
+[Epoch 10]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0216][LR-L1: 0.0044][TOTAL: 0.0259]	1.0+23.8s
+[320/699]	[HR-MSE: 0.0203][LR-L1: 0.0042][TOTAL: 0.0245]	1.0+21.0s
+[480/699]	[HR-MSE: 0.0190][LR-L1: 0.0041][TOTAL: 0.0231]	1.1+10.8s
+[640/699]	[HR-MSE: 0.0192][LR-L1: 0.0041][TOTAL: 0.0233]	0.9+20.3s
+
+Evaluation 10 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 53.221 (Best: 57.619 @epoch 9)
+HR	[DIV2K x2]	PSNR: 35.078 (Best: 36.148 @epoch 9)
+Mean network applying time: 32.85ms
+Saving states ...
+Testing Total: 62.33s
+
+[Epoch 11]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0250][LR-L1: 0.0041][TOTAL: 0.0291]	1.1+23.8s
+[320/699]	[HR-MSE: 0.0214][LR-L1: 0.0039][TOTAL: 0.0253]	1.0+20.7s
+[480/699]	[HR-MSE: 0.0205][LR-L1: 0.0037][TOTAL: 0.0242]	1.2+11.1s
+[640/699]	[HR-MSE: 0.0202][LR-L1: 0.0037][TOTAL: 0.0238]	0.9+20.4s
+
+Evaluation 11 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.882 (Best: 57.882 @epoch 11)
+HR	[DIV2K x2]	PSNR: 33.980 (Best: 36.148 @epoch 9)
+Mean network applying time: 6.54ms
+Saving states ...
+Testing Total: 19.48s
+
+[Epoch 12]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0162][LR-L1: 0.0036][TOTAL: 0.0198]	0.9+23.9s
+[320/699]	[HR-MSE: 0.0176][LR-L1: 0.0037][TOTAL: 0.0213]	1.0+20.0s
+[480/699]	[HR-MSE: 0.0179][LR-L1: 0.0038][TOTAL: 0.0217]	1.1+11.8s
+[640/699]	[HR-MSE: 0.0187][LR-L1: 0.0039][TOTAL: 0.0226]	1.0+20.3s
+
+Evaluation 12 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 56.072 (Best: 57.882 @epoch 11)
+HR	[DIV2K x2]	PSNR: 36.040 (Best: 36.148 @epoch 9)
+Mean network applying time: 17.69ms
+Saving states ...
+Testing Total: 20.08s
+
+[Epoch 13]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0161][LR-L1: 0.0035][TOTAL: 0.0196]	1.1+23.3s
+[320/699]	[HR-MSE: 0.0168][LR-L1: 0.0036][TOTAL: 0.0204]	1.0+20.6s
+[480/699]	[HR-MSE: 0.0179][LR-L1: 0.0036][TOTAL: 0.0214]	1.1+12.9s
+[640/699]	[HR-MSE: 0.0179][LR-L1: 0.0035][TOTAL: 0.0214]	0.9+19.2s
+
+Evaluation 13 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.125 (Best: 59.125 @epoch 13)
+HR	[DIV2K x2]	PSNR: 32.724 (Best: 36.148 @epoch 9)
+Mean network applying time: 13.15ms
+Saving states ...
+Testing Total: 19.87s
+
+[Epoch 14]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0164][LR-L1: 0.0031][TOTAL: 0.0195]	1.0+23.8s
+[320/699]	[HR-MSE: 0.0188][LR-L1: 0.0034][TOTAL: 0.0222]	1.1+20.3s
+[480/699]	[HR-MSE: 0.0180][LR-L1: 0.0034][TOTAL: 0.0214]	1.1+11.0s
+[640/699]	[HR-MSE: 0.0176][LR-L1: 0.0033][TOTAL: 0.0209]	0.9+22.0s
+
+Evaluation 14 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.512 (Best: 59.512 @epoch 14)
+HR	[DIV2K x2]	PSNR: 35.641 (Best: 36.148 @epoch 9)
+Mean network applying time: 18.32ms
+Saving states ...
+Testing Total: 19.90s
+
+[Epoch 15]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0176][LR-L1: 0.0030][TOTAL: 0.0206]	0.9+23.7s
+[320/699]	[HR-MSE: 0.0170][LR-L1: 0.0030][TOTAL: 0.0200]	0.9+20.6s
+[480/699]	[HR-MSE: 0.0171][LR-L1: 0.0031][TOTAL: 0.0201]	1.1+11.9s
+[640/699]	[HR-MSE: 0.0166][LR-L1: 0.0030][TOTAL: 0.0196]	0.9+21.0s
+
+Evaluation 15 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.156 (Best: 61.156 @epoch 15)
+HR	[DIV2K x2]	PSNR: 35.988 (Best: 36.148 @epoch 9)
+Mean network applying time: 13.88ms
+Saving states ...
+Testing Total: 19.27s
+
+[Epoch 16]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0190][LR-L1: 0.0028][TOTAL: 0.0218]	1.1+23.9s
+[320/699]	[HR-MSE: 0.0184][LR-L1: 0.0028][TOTAL: 0.0212]	1.2+20.8s
+[480/699]	[HR-MSE: 0.0185][LR-L1: 0.0028][TOTAL: 0.0213]	1.2+10.6s
+[640/699]	[HR-MSE: 0.0185][LR-L1: 0.0028][TOTAL: 0.0213]	0.9+20.5s
+
+Evaluation 16 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.968 (Best: 61.968 @epoch 16)
+HR	[DIV2K x2]	PSNR: 36.298 (Best: 36.298 @epoch 16)
+Mean network applying time: 8.44ms
+Saving states ...
+Testing Total: 18.51s
+
+[Epoch 17]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0177][LR-L1: 0.0030][TOTAL: 0.0207]	1.0+24.0s
+[320/699]	[HR-MSE: 0.0185][LR-L1: 0.0029][TOTAL: 0.0215]	1.1+21.1s
+[480/699]	[HR-MSE: 0.0167][LR-L1: 0.0027][TOTAL: 0.0194]	1.1+10.7s
+[640/699]	[HR-MSE: 0.0163][LR-L1: 0.0027][TOTAL: 0.0190]	0.8+20.3s
+
+Evaluation 17 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 65.677 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 34.220 (Best: 36.298 @epoch 16)
+Mean network applying time: 10.67ms
+Saving states ...
+Testing Total: 18.61s
+
+[Epoch 18]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0131][LR-L1: 0.0024][TOTAL: 0.0156]	1.1+23.4s
+[320/699]	[HR-MSE: 0.0140][LR-L1: 0.0024][TOTAL: 0.0164]	1.0+20.8s
+[480/699]	[HR-MSE: 0.0148][LR-L1: 0.0026][TOTAL: 0.0174]	1.1+11.2s
+[640/699]	[HR-MSE: 0.0149][LR-L1: 0.0025][TOTAL: 0.0174]	0.8+20.4s
+
+Evaluation 18 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.645 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 37.090 (Best: 37.090 @epoch 18)
+Mean network applying time: 16.31ms
+Saving states ...
+Testing Total: 20.35s
+
+[Epoch 19]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0174][LR-L1: 0.0027][TOTAL: 0.0201]	1.1+24.1s
+[320/699]	[HR-MSE: 0.0178][LR-L1: 0.0028][TOTAL: 0.0206]	0.9+20.2s
+[480/699]	[HR-MSE: 0.0182][LR-L1: 0.0027][TOTAL: 0.0210]	1.1+11.6s
+[640/699]	[HR-MSE: 0.0178][LR-L1: 0.0026][TOTAL: 0.0204]	0.9+20.6s
+
+Evaluation 19 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 62.114 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 36.669 (Best: 37.090 @epoch 18)
+Mean network applying time: 10.15ms
+Saving states ...
+Testing Total: 17.19s
+
+[Epoch 20]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0184][LR-L1: 0.0025][TOTAL: 0.0209]	1.0+23.7s
+[320/699]	[HR-MSE: 0.0167][LR-L1: 0.0025][TOTAL: 0.0192]	0.9+21.3s
+[480/699]	[HR-MSE: 0.0168][LR-L1: 0.0025][TOTAL: 0.0193]	0.9+13.0s
+[640/699]	[HR-MSE: 0.0176][LR-L1: 0.0026][TOTAL: 0.0201]	0.9+18.4s
+
+Evaluation 20 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 58.889 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 35.436 (Best: 37.090 @epoch 18)
+Mean network applying time: 28.30ms
+Saving states ...
+Testing Total: 64.85s
+
+[Epoch 21]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0168][LR-L1: 0.0027][TOTAL: 0.0196]	1.1+23.9s
+[320/699]	[HR-MSE: 0.0168][LR-L1: 0.0027][TOTAL: 0.0195]	1.0+21.0s
+[480/699]	[HR-MSE: 0.0158][LR-L1: 0.0025][TOTAL: 0.0183]	1.1+11.1s
+[640/699]	[HR-MSE: 0.0157][LR-L1: 0.0024][TOTAL: 0.0181]	0.8+20.7s
+
+Evaluation 21 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.638 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 37.657 (Best: 37.657 @epoch 21)
+Mean network applying time: 8.22ms
+Saving states ...
+Testing Total: 15.68s
+
+[Epoch 22]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0144][LR-L1: 0.0021][TOTAL: 0.0165]	1.0+24.1s
+[320/699]	[HR-MSE: 0.0149][LR-L1: 0.0022][TOTAL: 0.0171]	1.0+20.4s
+[480/699]	[HR-MSE: 0.0149][LR-L1: 0.0022][TOTAL: 0.0171]	1.1+10.8s
+[640/699]	[HR-MSE: 0.0149][LR-L1: 0.0022][TOTAL: 0.0171]	0.8+20.4s
+
+Evaluation 22 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.785 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 35.243 (Best: 37.657 @epoch 21)
+Mean network applying time: 12.78ms
+Saving states ...
+Testing Total: 15.49s
+
+[Epoch 23]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0161][LR-L1: 0.0021][TOTAL: 0.0182]	0.9+23.0s
+[320/699]	[HR-MSE: 0.0138][LR-L1: 0.0020][TOTAL: 0.0158]	0.9+21.0s
+[480/699]	[HR-MSE: 0.0146][LR-L1: 0.0022][TOTAL: 0.0168]	0.9+12.7s
+[640/699]	[HR-MSE: 0.0143][LR-L1: 0.0022][TOTAL: 0.0165]	0.8+19.7s
+
+Evaluation 23 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.419 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 35.435 (Best: 37.657 @epoch 21)
+Mean network applying time: 13.51ms
+Saving states ...
+Testing Total: 15.12s
+
+[Epoch 24]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0170][LR-L1: 0.0021][TOTAL: 0.0191]	1.2+24.0s
+[320/699]	[HR-MSE: 0.0159][LR-L1: 0.0021][TOTAL: 0.0180]	1.1+21.7s
+[480/699]	[HR-MSE: 0.0145][LR-L1: 0.0021][TOTAL: 0.0166]	1.2+10.0s
+[640/699]	[HR-MSE: 0.0149][LR-L1: 0.0022][TOTAL: 0.0170]	0.9+20.2s
+
+Evaluation 24 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 62.793 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 36.334 (Best: 37.657 @epoch 21)
+Mean network applying time: 14.48ms
+Saving states ...
+Testing Total: 15.49s
+
+[Epoch 25]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0127][LR-L1: 0.0019][TOTAL: 0.0146]	1.1+23.7s
+[320/699]	[HR-MSE: 0.0141][LR-L1: 0.0020][TOTAL: 0.0160]	1.0+21.4s
+[480/699]	[HR-MSE: 0.0142][LR-L1: 0.0020][TOTAL: 0.0162]	1.1+11.0s
+[640/699]	[HR-MSE: 0.0144][LR-L1: 0.0020][TOTAL: 0.0164]	0.9+20.7s
+
+Evaluation 25 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.482 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 41.031 (Best: 41.031 @epoch 25)
+Mean network applying time: 10.32ms
+Saving states ...
+Testing Total: 15.70s
+
+[Epoch 26]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0118][LR-L1: 0.0022][TOTAL: 0.0140]	1.0+23.9s
+[320/699]	[HR-MSE: 0.0124][LR-L1: 0.0022][TOTAL: 0.0147]	1.1+20.8s
+[480/699]	[HR-MSE: 0.0135][LR-L1: 0.0023][TOTAL: 0.0158]	1.1+11.2s
+[640/699]	[HR-MSE: 0.0134][LR-L1: 0.0022][TOTAL: 0.0156]	0.8+20.7s
+
+Evaluation 26 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.766 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 36.211 (Best: 41.031 @epoch 25)
+Mean network applying time: 8.32ms
+Saving states ...
+Testing Total: 11.51s
+
+[Epoch 27]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0130][LR-L1: 0.0020][TOTAL: 0.0150]	1.1+22.5s
+[320/699]	[HR-MSE: 0.0141][LR-L1: 0.0021][TOTAL: 0.0162]	1.1+21.0s
+[480/699]	[HR-MSE: 0.0134][LR-L1: 0.0021][TOTAL: 0.0155]	1.1+11.1s
+[640/699]	[HR-MSE: 0.0132][LR-L1: 0.0020][TOTAL: 0.0152]	0.9+21.0s
+
+Evaluation 27 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.060 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 37.079 (Best: 41.031 @epoch 25)
+Mean network applying time: 5.10ms
+Saving states ...
+Testing Total: 10.82s
+
+[Epoch 28]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0147][LR-L1: 0.0019][TOTAL: 0.0166]	1.0+23.0s
+[320/699]	[HR-MSE: 0.0133][LR-L1: 0.0018][TOTAL: 0.0151]	1.2+20.9s
+[480/699]	[HR-MSE: 0.0137][LR-L1: 0.0019][TOTAL: 0.0156]	1.1+11.2s
+[640/699]	[HR-MSE: 0.0137][LR-L1: 0.0019][TOTAL: 0.0157]	0.8+19.2s
+
+Evaluation 28 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 62.342 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 36.143 (Best: 41.031 @epoch 25)
+Mean network applying time: 7.44ms
+Saving states ...
+Testing Total: 11.16s
+
+[Epoch 29]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0144][LR-L1: 0.0021][TOTAL: 0.0165]	1.0+23.9s
+[320/699]	[HR-MSE: 0.0142][LR-L1: 0.0021][TOTAL: 0.0162]	1.0+21.3s
+[480/699]	[HR-MSE: 0.0136][LR-L1: 0.0020][TOTAL: 0.0156]	1.1+10.5s
+[640/699]	[HR-MSE: 0.0138][LR-L1: 0.0020][TOTAL: 0.0159]	0.8+19.7s
+
+Evaluation 29 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.620 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 32.960 (Best: 41.031 @epoch 25)
+Mean network applying time: 8.87ms
+Saving states ...
+Testing Total: 12.01s
+
+[Epoch 30]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0118][LR-L1: 0.0023][TOTAL: 0.0140]	1.1+23.7s
+[320/699]	[HR-MSE: 0.0124][LR-L1: 0.0021][TOTAL: 0.0146]	1.0+20.3s
+[480/699]	[HR-MSE: 0.0141][LR-L1: 0.0021][TOTAL: 0.0162]	1.1+10.5s
+[640/699]	[HR-MSE: 0.0135][LR-L1: 0.0020][TOTAL: 0.0155]	0.8+19.7s
+
+Evaluation 30 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 65.496 (Best: 65.677 @epoch 17)
+HR	[DIV2K x2]	PSNR: 34.096 (Best: 41.031 @epoch 25)
+Mean network applying time: 36.32ms
+Saving states ...
+Testing Total: 61.01s
+
+[Epoch 31]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0123][LR-L1: 0.0016][TOTAL: 0.0139]	1.0+23.1s
+[320/699]	[HR-MSE: 0.0147][LR-L1: 0.0019][TOTAL: 0.0165]	1.0+20.8s
+[480/699]	[HR-MSE: 0.0137][LR-L1: 0.0018][TOTAL: 0.0154]	1.1+10.6s
+[640/699]	[HR-MSE: 0.0135][LR-L1: 0.0017][TOTAL: 0.0152]	0.8+20.1s
+
+Evaluation 31 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 67.576 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 37.681 (Best: 41.031 @epoch 25)
+Mean network applying time: 5.48ms
+Saving states ...
+Testing Total: 8.74s
+
+[Epoch 32]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0139][LR-L1: 0.0016][TOTAL: 0.0156]	1.1+22.8s
+[320/699]	[HR-MSE: 0.0136][LR-L1: 0.0016][TOTAL: 0.0152]	1.1+20.1s
+[480/699]	[HR-MSE: 0.0134][LR-L1: 0.0017][TOTAL: 0.0151]	1.0+11.4s
+[640/699]	[HR-MSE: 0.0134][LR-L1: 0.0017][TOTAL: 0.0151]	0.8+20.1s
+
+Evaluation 32 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 66.023 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 34.765 (Best: 41.031 @epoch 25)
+Mean network applying time: 6.94ms
+Saving states ...
+Testing Total: 8.48s
+
+[Epoch 33]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0133][LR-L1: 0.0016][TOTAL: 0.0150]	0.9+23.0s
+[320/699]	[HR-MSE: 0.0122][LR-L1: 0.0015][TOTAL: 0.0137]	1.1+18.6s
+[480/699]	[HR-MSE: 0.0130][LR-L1: 0.0016][TOTAL: 0.0145]	0.8+13.3s
+[640/699]	[HR-MSE: 0.0131][LR-L1: 0.0016][TOTAL: 0.0147]	0.7+20.0s
+
+Evaluation 33 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 66.968 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 38.966 (Best: 41.031 @epoch 25)
+Mean network applying time: 6.36ms
+Saving states ...
+Testing Total: 7.96s
+
+[Epoch 34]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0157][LR-L1: 0.0017][TOTAL: 0.0174]	1.1+22.7s
+[320/699]	[HR-MSE: 0.0150][LR-L1: 0.0015][TOTAL: 0.0165]	1.1+20.8s
+[480/699]	[HR-MSE: 0.0154][LR-L1: 0.0015][TOTAL: 0.0169]	1.1+10.6s
+[640/699]	[HR-MSE: 0.0146][LR-L1: 0.0016][TOTAL: 0.0162]	0.9+21.1s
+
+Evaluation 34 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 65.662 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 32.989 (Best: 41.031 @epoch 25)
+Mean network applying time: 7.10ms
+Saving states ...
+Testing Total: 7.85s
+
+[Epoch 35]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0124][LR-L1: 0.0017][TOTAL: 0.0141]	1.0+23.4s
+[320/699]	[HR-MSE: 0.0129][LR-L1: 0.0017][TOTAL: 0.0147]	0.9+20.6s
+[480/699]	[HR-MSE: 0.0126][LR-L1: 0.0017][TOTAL: 0.0143]	1.1+10.5s
+[640/699]	[HR-MSE: 0.0123][LR-L1: 0.0017][TOTAL: 0.0139]	0.8+20.0s
+
+Evaluation 35 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 66.265 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 37.196 (Best: 41.031 @epoch 25)
+Mean network applying time: 7.16ms
+Saving states ...
+Testing Total: 9.63s
+
+[Epoch 36]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0151][LR-L1: 0.0016][TOTAL: 0.0167]	1.1+23.0s
+[320/699]	[HR-MSE: 0.0135][LR-L1: 0.0016][TOTAL: 0.0152]	1.0+19.5s
+[480/699]	[HR-MSE: 0.0145][LR-L1: 0.0016][TOTAL: 0.0161]	1.1+11.9s
+[640/699]	[HR-MSE: 0.0147][LR-L1: 0.0016][TOTAL: 0.0163]	0.8+19.7s
+
+Evaluation 36 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 64.236 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 38.052 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.16ms
+Saving states ...
+Testing Total: 7.47s
+
+[Epoch 37]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0118][LR-L1: 0.0015][TOTAL: 0.0133]	1.0+23.3s
+[320/699]	[HR-MSE: 0.0120][LR-L1: 0.0014][TOTAL: 0.0135]	1.0+21.2s
+[480/699]	[HR-MSE: 0.0126][LR-L1: 0.0015][TOTAL: 0.0141]	1.0+11.2s
+[640/699]	[HR-MSE: 0.0125][LR-L1: 0.0015][TOTAL: 0.0140]	0.8+19.4s
+
+Evaluation 37 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 65.901 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 34.594 (Best: 41.031 @epoch 25)
+Mean network applying time: 6.34ms
+Saving states ...
+Testing Total: 7.75s
+
+[Epoch 38]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0145][LR-L1: 0.0014][TOTAL: 0.0159]	1.1+22.1s
+[320/699]	[HR-MSE: 0.0131][LR-L1: 0.0014][TOTAL: 0.0145]	1.1+21.4s
+[480/699]	[HR-MSE: 0.0133][LR-L1: 0.0015][TOTAL: 0.0148]	1.1+10.4s
+[640/699]	[HR-MSE: 0.0125][LR-L1: 0.0016][TOTAL: 0.0141]	0.8+20.3s
+
+Evaluation 38 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.448 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 34.781 (Best: 41.031 @epoch 25)
+Mean network applying time: 4.13ms
+Saving states ...
+Testing Total: 7.67s
+
+[Epoch 39]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0106][LR-L1: 0.0020][TOTAL: 0.0125]	1.1+23.6s
+[320/699]	[HR-MSE: 0.0120][LR-L1: 0.0019][TOTAL: 0.0139]	1.0+20.5s
+[480/699]	[HR-MSE: 0.0119][LR-L1: 0.0018][TOTAL: 0.0137]	1.1+10.3s
+[640/699]	[HR-MSE: 0.0129][LR-L1: 0.0018][TOTAL: 0.0147]	0.7+19.6s
+
+Evaluation 39 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 62.901 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 33.352 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.97ms
+Saving states ...
+Testing Total: 7.45s
+
+[Epoch 40]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0111][LR-L1: 0.0016][TOTAL: 0.0127]	1.0+22.3s
+[320/699]	[HR-MSE: 0.0109][LR-L1: 0.0018][TOTAL: 0.0126]	1.0+19.5s
+[480/699]	[HR-MSE: 0.0114][LR-L1: 0.0018][TOTAL: 0.0132]	1.0+11.8s
+[640/699]	[HR-MSE: 0.0119][LR-L1: 0.0018][TOTAL: 0.0137]	0.8+20.6s
+
+Evaluation 40 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 64.467 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 35.425 (Best: 41.031 @epoch 25)
+Mean network applying time: 33.32ms
+Saving states ...
+Testing Total: 61.67s
+
+[Epoch 41]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0136][LR-L1: 0.0016][TOTAL: 0.0152]	1.1+22.5s
+[320/699]	[HR-MSE: 0.0124][LR-L1: 0.0016][TOTAL: 0.0140]	1.0+19.8s
+[480/699]	[HR-MSE: 0.0125][LR-L1: 0.0015][TOTAL: 0.0140]	1.1+11.3s
+[640/699]	[HR-MSE: 0.0126][LR-L1: 0.0015][TOTAL: 0.0141]	0.8+20.3s
+
+Evaluation 41 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 65.190 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 37.627 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.68ms
+Saving states ...
+Testing Total: 7.53s
+
+[Epoch 42]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0131][LR-L1: 0.0017][TOTAL: 0.0148]	1.1+23.5s
+[320/699]	[HR-MSE: 0.0139][LR-L1: 0.0017][TOTAL: 0.0156]	1.1+22.6s
+[480/699]	[HR-MSE: 0.0141][LR-L1: 0.0017][TOTAL: 0.0158]	1.2+11.6s
+[640/699]	[HR-MSE: 0.0134][LR-L1: 0.0016][TOTAL: 0.0150]	0.8+17.2s
+
+Evaluation 42 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 66.654 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 36.930 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.17ms
+Saving states ...
+Testing Total: 7.76s
+
+[Epoch 43]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0131][LR-L1: 0.0013][TOTAL: 0.0144]	1.1+22.6s
+[320/699]	[HR-MSE: 0.0126][LR-L1: 0.0012][TOTAL: 0.0138]	1.1+21.0s
+[480/699]	[HR-MSE: 0.0136][LR-L1: 0.0012][TOTAL: 0.0149]	1.1+10.7s
+[640/699]	[HR-MSE: 0.0134][LR-L1: 0.0013][TOTAL: 0.0147]	0.8+19.7s
+
+Evaluation 43 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 65.421 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 39.199 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.20ms
+Saving states ...
+Testing Total: 8.15s
+
+[Epoch 44]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0127][LR-L1: 0.0015][TOTAL: 0.0141]	1.0+23.4s
+[320/699]	[HR-MSE: 0.0128][LR-L1: 0.0015][TOTAL: 0.0144]	1.1+20.6s
+[480/699]	[HR-MSE: 0.0130][LR-L1: 0.0016][TOTAL: 0.0146]	1.1+10.3s
+[640/699]	[HR-MSE: 0.0125][LR-L1: 0.0016][TOTAL: 0.0141]	0.8+20.4s
+
+Evaluation 44 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 65.366 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 38.819 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.18ms
+Saving states ...
+Testing Total: 7.22s
+
+[Epoch 45]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0142][LR-L1: 0.0017][TOTAL: 0.0159]	1.0+23.2s
+[320/699]	[HR-MSE: 0.0120][LR-L1: 0.0015][TOTAL: 0.0135]	1.1+19.5s
+[480/699]	[HR-MSE: 0.0117][LR-L1: 0.0014][TOTAL: 0.0131]	1.0+11.4s
+[640/699]	[HR-MSE: 0.0129][LR-L1: 0.0014][TOTAL: 0.0143]	0.9+20.5s
+
+Evaluation 45 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 65.539 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 35.949 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.17ms
+Saving states ...
+Testing Total: 7.68s
+
+[Epoch 46]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0165][LR-L1: 0.0014][TOTAL: 0.0180]	1.2+23.3s
+[320/699]	[HR-MSE: 0.0151][LR-L1: 0.0014][TOTAL: 0.0165]	1.0+19.9s
+[480/699]	[HR-MSE: 0.0141][LR-L1: 0.0014][TOTAL: 0.0155]	1.1+12.6s
+[640/699]	[HR-MSE: 0.0141][LR-L1: 0.0014][TOTAL: 0.0155]	0.8+19.2s
+
+Evaluation 46 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 62.342 (Best: 67.576 @epoch 31)
+HR	[DIV2K x2]	PSNR: 35.526 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.16ms
+Saving states ...
+Testing Total: 7.83s
+
+[Epoch 47]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0114][LR-L1: 0.0018][TOTAL: 0.0132]	0.9+24.3s
+[320/699]	[HR-MSE: 0.0112][LR-L1: 0.0017][TOTAL: 0.0129]	1.0+21.0s
+[480/699]	[HR-MSE: 0.0122][LR-L1: 0.0016][TOTAL: 0.0138]	1.2+10.6s
+[640/699]	[HR-MSE: 0.0119][LR-L1: 0.0015][TOTAL: 0.0135]	0.8+19.4s
+
+Evaluation 47 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 69.899 (Best: 69.899 @epoch 47)
+HR	[DIV2K x2]	PSNR: 34.239 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.66ms
+Saving states ...
+Testing Total: 7.47s
+
+[Epoch 48]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0128][LR-L1: 0.0012][TOTAL: 0.0140]	1.0+22.9s
+[320/699]	[HR-MSE: 0.0139][LR-L1: 0.0012][TOTAL: 0.0151]	1.0+20.0s
+[480/699]	[HR-MSE: 0.0131][LR-L1: 0.0013][TOTAL: 0.0143]	1.1+11.0s
+[640/699]	[HR-MSE: 0.0131][LR-L1: 0.0013][TOTAL: 0.0144]	0.8+20.4s
+
+Evaluation 48 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 68.006 (Best: 69.899 @epoch 47)
+HR	[DIV2K x2]	PSNR: 36.749 (Best: 41.031 @epoch 25)
+Mean network applying time: 4.72ms
+Saving states ...
+Testing Total: 7.77s
+
+[Epoch 49]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0114][LR-L1: 0.0012][TOTAL: 0.0126]	1.0+23.1s
+[320/699]	[HR-MSE: 0.0116][LR-L1: 0.0013][TOTAL: 0.0129]	1.1+21.1s
+[480/699]	[HR-MSE: 0.0125][LR-L1: 0.0014][TOTAL: 0.0139]	1.2+10.2s
+[640/699]	[HR-MSE: 0.0123][LR-L1: 0.0014][TOTAL: 0.0137]	0.8+20.0s
+
+Evaluation 49 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 65.807 (Best: 69.899 @epoch 47)
+HR	[DIV2K x2]	PSNR: 37.063 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.19ms
+Saving states ...
+Testing Total: 7.63s
+
+[Epoch 50]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0092][LR-L1: 0.0012][TOTAL: 0.0104]	1.1+22.2s
+[320/699]	[HR-MSE: 0.0112][LR-L1: 0.0013][TOTAL: 0.0126]	1.1+21.5s
+[480/699]	[HR-MSE: 0.0125][LR-L1: 0.0014][TOTAL: 0.0139]	1.2+10.7s
+[640/699]	[HR-MSE: 0.0127][LR-L1: 0.0014][TOTAL: 0.0141]	0.7+19.8s
+
+Evaluation 50 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 64.747 (Best: 69.899 @epoch 47)
+HR	[DIV2K x2]	PSNR: 35.488 (Best: 41.031 @epoch 25)
+Mean network applying time: 30.06ms
+Saving states ...
+Testing Total: 62.36s
+
+[Epoch 51]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0113][LR-L1: 0.0014][TOTAL: 0.0128]	1.2+23.1s
+[320/699]	[HR-MSE: 0.0116][LR-L1: 0.0013][TOTAL: 0.0130]	1.2+20.7s
+[480/699]	[HR-MSE: 0.0119][LR-L1: 0.0013][TOTAL: 0.0133]	1.2+10.4s
+[640/699]	[HR-MSE: 0.0114][LR-L1: 0.0013][TOTAL: 0.0127]	0.8+20.0s
+
+Evaluation 51 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 68.465 (Best: 69.899 @epoch 47)
+HR	[DIV2K x2]	PSNR: 37.366 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.16ms
+Saving states ...
+Testing Total: 7.21s
+
+[Epoch 52]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0119][LR-L1: 0.0011][TOTAL: 0.0130]	0.9+23.0s
+[320/699]	[HR-MSE: 0.0125][LR-L1: 0.0012][TOTAL: 0.0136]	1.0+21.7s
+[480/699]	[HR-MSE: 0.0120][LR-L1: 0.0012][TOTAL: 0.0132]	1.1+10.3s
+[640/699]	[HR-MSE: 0.0118][LR-L1: 0.0012][TOTAL: 0.0129]	0.8+19.6s
+
+Evaluation 52 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 66.778 (Best: 69.899 @epoch 47)
+HR	[DIV2K x2]	PSNR: 40.622 (Best: 41.031 @epoch 25)
+Mean network applying time: 4.74ms
+Saving states ...
+Testing Total: 7.88s
+
+[Epoch 53]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0114][LR-L1: 0.0012][TOTAL: 0.0126]	1.2+23.5s
+[320/699]	[HR-MSE: 0.0116][LR-L1: 0.0012][TOTAL: 0.0127]	1.1+19.7s
+[480/699]	[HR-MSE: 0.0119][LR-L1: 0.0012][TOTAL: 0.0130]	1.2+11.6s
+[640/699]	[HR-MSE: 0.0115][LR-L1: 0.0011][TOTAL: 0.0126]	0.8+19.3s
+
+Evaluation 53 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 67.436 (Best: 69.899 @epoch 47)
+HR	[DIV2K x2]	PSNR: 35.136 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.68ms
+Saving states ...
+Testing Total: 7.56s
+
+[Epoch 54]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0111][LR-L1: 0.0010][TOTAL: 0.0121]	1.1+23.5s
+[320/699]	[HR-MSE: 0.0109][LR-L1: 0.0010][TOTAL: 0.0119]	1.2+22.7s
+[480/699]	[HR-MSE: 0.0109][LR-L1: 0.0010][TOTAL: 0.0119]	1.2+10.0s
+[640/699]	[HR-MSE: 0.0115][LR-L1: 0.0011][TOTAL: 0.0126]	0.8+19.6s
+
+Evaluation 54 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 68.977 (Best: 69.899 @epoch 47)
+HR	[DIV2K x2]	PSNR: 34.787 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.31ms
+Saving states ...
+Testing Total: 7.35s
+
+[Epoch 55]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0131][LR-L1: 0.0011][TOTAL: 0.0142]	1.1+23.4s
+[320/699]	[HR-MSE: 0.0118][LR-L1: 0.0010][TOTAL: 0.0129]	1.1+20.2s
+[480/699]	[HR-MSE: 0.0118][LR-L1: 0.0010][TOTAL: 0.0128]	1.0+11.2s
+[640/699]	[HR-MSE: 0.0122][LR-L1: 0.0011][TOTAL: 0.0132]	0.8+20.0s
+
+Evaluation 55 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 66.132 (Best: 69.899 @epoch 47)
+HR	[DIV2K x2]	PSNR: 32.628 (Best: 41.031 @epoch 25)
+Mean network applying time: 3.66ms
+Saving states ...
+Testing Total: 7.22s
+
+[Epoch 56]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0137][LR-L1: 0.0012][TOTAL: 0.0149]	0.9+22.6s
+[320/699]	[HR-MSE: 0.0136][LR-L1: 0.0011][TOTAL: 0.0148]	1.0+20.9s
+[480/699]	[HR-MSE: 0.0133][LR-L1: 0.0012][TOTAL: 0.0145]	1.1+11.2s
+[640/699]	[HR-MSE: 0.0125][LR-L1: 0.0012][TOTAL: 0.0136]	0.9+21.5s
+
+Evaluation 56 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 66.078 (Best: 69.899 @epoch 47)
+HR	[DIV2K x2]	PSNR: 34.922 (Best: 41.031 @epoch 25)
+Mean network applying time: 21.79ms
+Saving states ...
+Testing Total: 21.05s
+
+[Epoch 57]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0124][LR-L1: 0.0013][TOTAL: 0.0137]	1.0+24.2s
+[320/699]	[HR-MSE: 0.0128][LR-L1: 0.0012][TOTAL: 0.0140]	1.0+22.3s
+[480/699]	[HR-MSE: 0.0118][LR-L1: 0.0012][TOTAL: 0.0129]	1.1+11.2s
+[640/699]	[HR-MSE: 0.0121][LR-L1: 0.0012][TOTAL: 0.0133]	0.9+19.7s
+
+Evaluation 57 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 70.371 (Best: 70.371 @epoch 57)
+HR	[DIV2K x2]	PSNR: 33.279 (Best: 41.031 @epoch 25)
+Mean network applying time: 9.26ms
+Saving states ...
+Testing Total: 20.80s
+
+[Epoch 58]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0088][LR-L1: 0.0012][TOTAL: 0.0100]	1.1+24.9s
+[320/699]	[HR-MSE: 0.0106][LR-L1: 0.0011][TOTAL: 0.0117]	1.1+18.6s
+[480/699]	[HR-MSE: 0.0103][LR-L1: 0.0011][TOTAL: 0.0114]	1.1+13.4s
+[640/699]	[HR-MSE: 0.0108][LR-L1: 0.0011][TOTAL: 0.0119]	1.0+22.2s
+
+Evaluation 58 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 68.717 (Best: 70.371 @epoch 57)
+HR	[DIV2K x2]	PSNR: 36.925 (Best: 41.031 @epoch 25)
+Mean network applying time: 12.45ms
+Saving states ...
+Testing Total: 19.93s
+
+[Epoch 59]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0115][LR-L1: 0.0012][TOTAL: 0.0127]	1.2+24.0s
+[320/699]	[HR-MSE: 0.0109][LR-L1: 0.0012][TOTAL: 0.0120]	1.1+20.5s
+[480/699]	[HR-MSE: 0.0106][LR-L1: 0.0012][TOTAL: 0.0119]	1.1+11.0s
+[640/699]	[HR-MSE: 0.0109][LR-L1: 0.0012][TOTAL: 0.0121]	0.9+21.2s
+
+Evaluation 59 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 68.307 (Best: 70.371 @epoch 57)
+HR	[DIV2K x2]	PSNR: 35.048 (Best: 41.031 @epoch 25)
+Mean network applying time: 10.33ms
+Saving states ...
+Testing Total: 19.85s
+
+[Epoch 60]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0126][LR-L1: 0.0011][TOTAL: 0.0137]	1.2+25.0s
+[320/699]	[HR-MSE: 0.0117][LR-L1: 0.0013][TOTAL: 0.0130]	1.2+21.4s
+[480/699]	[HR-MSE: 0.0120][LR-L1: 0.0013][TOTAL: 0.0133]	1.2+10.7s
+[640/699]	[HR-MSE: 0.0116][LR-L1: 0.0013][TOTAL: 0.0129]	0.9+20.9s
+
+Evaluation 60 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 68.770 (Best: 70.371 @epoch 57)
+HR	[DIV2K x2]	PSNR: 36.186 (Best: 41.031 @epoch 25)
+Mean network applying time: 29.24ms
+Saving states ...
+Testing Total: 67.34s
+
+[Epoch 61]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0088][LR-L1: 0.0011][TOTAL: 0.0100]	1.1+24.5s
+[320/699]	[HR-MSE: 0.0107][LR-L1: 0.0012][TOTAL: 0.0119]	1.0+20.9s
+[480/699]	[HR-MSE: 0.0115][LR-L1: 0.0011][TOTAL: 0.0126]	1.2+10.6s
+[640/699]	[HR-MSE: 0.0117][LR-L1: 0.0011][TOTAL: 0.0128]	0.9+22.4s
+
+Evaluation 61 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 69.601 (Best: 70.371 @epoch 57)
+HR	[DIV2K x2]	PSNR: 35.987 (Best: 41.031 @epoch 25)
+Mean network applying time: 18.01ms
+Saving states ...
+Testing Total: 25.06s
+
+[Epoch 62]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0106][LR-L1: 0.0009][TOTAL: 0.0116]	1.1+25.3s
+[320/699]	[HR-MSE: 0.0104][LR-L1: 0.0010][TOTAL: 0.0114]	1.0+20.9s
+[480/699]	[HR-MSE: 0.0104][LR-L1: 0.0011][TOTAL: 0.0115]	1.1+11.1s
+[640/699]	[HR-MSE: 0.0111][LR-L1: 0.0011][TOTAL: 0.0122]	0.8+20.4s
+
+Evaluation 62 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 69.065 (Best: 70.371 @epoch 57)
+HR	[DIV2K x2]	PSNR: 34.085 (Best: 41.031 @epoch 25)
+Mean network applying time: 11.97ms
+Saving states ...
+Testing Total: 22.83s
+
+[Epoch 63]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0108][LR-L1: 0.0011][TOTAL: 0.0119]	0.9+25.6s
+[320/699]	[HR-MSE: 0.0108][LR-L1: 0.0010][TOTAL: 0.0118]	1.0+20.5s
+[480/699]	[HR-MSE: 0.0110][LR-L1: 0.0010][TOTAL: 0.0120]	1.1+11.4s
+[640/699]	[HR-MSE: 0.0111][LR-L1: 0.0011][TOTAL: 0.0122]	0.9+20.6s
+
+Evaluation 63 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 67.050 (Best: 70.371 @epoch 57)
+HR	[DIV2K x2]	PSNR: 37.385 (Best: 41.031 @epoch 25)
+Mean network applying time: 13.00ms
+Saving states ...
+Testing Total: 22.23s
+
+[Epoch 64]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0130][LR-L1: 0.0011][TOTAL: 0.0141]	1.0+24.2s
+[320/699]	[HR-MSE: 0.0134][LR-L1: 0.0012][TOTAL: 0.0145]	0.9+20.7s
+[480/699]	[HR-MSE: 0.0126][LR-L1: 0.0012][TOTAL: 0.0137]	1.0+12.7s
+[640/699]	[HR-MSE: 0.0123][LR-L1: 0.0011][TOTAL: 0.0134]	0.8+20.9s
+
+Evaluation 64 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 69.575 (Best: 70.371 @epoch 57)
+HR	[DIV2K x2]	PSNR: 37.946 (Best: 41.031 @epoch 25)
+Mean network applying time: 9.64ms
+Saving states ...
+Testing Total: 18.36s
+
+[Epoch 65]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0128][LR-L1: 0.0010][TOTAL: 0.0138]	1.0+24.5s
+[320/699]	[HR-MSE: 0.0118][LR-L1: 0.0010][TOTAL: 0.0128]	1.1+20.6s
+[480/699]	[HR-MSE: 0.0113][LR-L1: 0.0010][TOTAL: 0.0123]	1.1+11.2s
+[640/699]	[HR-MSE: 0.0112][LR-L1: 0.0010][TOTAL: 0.0122]	0.9+20.8s
+
+Evaluation 65 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 67.309 (Best: 70.371 @epoch 57)
+HR	[DIV2K x2]	PSNR: 34.461 (Best: 41.031 @epoch 25)
+Mean network applying time: 22.57ms
+Saving states ...
+Testing Total: 24.08s
+
+[Epoch 66]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0145][LR-L1: 0.0011][TOTAL: 0.0155]	1.0+23.2s
+[320/699]	[HR-MSE: 0.0118][LR-L1: 0.0010][TOTAL: 0.0128]	1.0+21.0s
+[480/699]	[HR-MSE: 0.0121][LR-L1: 0.0010][TOTAL: 0.0131]	1.0+11.4s
+[640/699]	[HR-MSE: 0.0126][LR-L1: 0.0010][TOTAL: 0.0136]	0.9+20.8s
+
+Evaluation 66 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 72.263 (Best: 72.263 @epoch 66)
+HR	[DIV2K x2]	PSNR: 35.912 (Best: 41.031 @epoch 25)
+Mean network applying time: 20.28ms
+Saving states ...
+Testing Total: 22.96s
+
+[Epoch 67]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0124][LR-L1: 0.0009][TOTAL: 0.0132]	1.0+25.1s
+[320/699]	[HR-MSE: 0.0124][LR-L1: 0.0009][TOTAL: 0.0133]	1.1+20.6s
+[480/699]	[HR-MSE: 0.0120][LR-L1: 0.0010][TOTAL: 0.0129]	1.0+12.4s
+[640/699]	[HR-MSE: 0.0115][LR-L1: 0.0010][TOTAL: 0.0125]	0.9+20.0s
+
+Evaluation 67 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 70.006 (Best: 72.263 @epoch 66)
+HR	[DIV2K x2]	PSNR: 37.988 (Best: 41.031 @epoch 25)
+Mean network applying time: 16.97ms
+Saving states ...
+Testing Total: 23.14s
+
+[Epoch 68]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0139][LR-L1: 0.0011][TOTAL: 0.0151]	1.0+23.2s
+[320/699]	[HR-MSE: 0.0140][LR-L1: 0.0011][TOTAL: 0.0151]	0.9+22.2s
+[480/699]	[HR-MSE: 0.0130][LR-L1: 0.0011][TOTAL: 0.0141]	1.1+10.7s
+[640/699]	[HR-MSE: 0.0128][LR-L1: 0.0011][TOTAL: 0.0139]	0.9+20.4s
+
+Evaluation 68 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 68.685 (Best: 72.263 @epoch 66)
+HR	[DIV2K x2]	PSNR: 34.932 (Best: 41.031 @epoch 25)
+Mean network applying time: 13.67ms
+Saving states ...
+Testing Total: 22.24s
+
+[Epoch 69]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0100][LR-L1: 0.0012][TOTAL: 0.0112]	1.2+23.8s
+[320/699]	[HR-MSE: 0.0116][LR-L1: 0.0011][TOTAL: 0.0127]	1.0+21.7s
+[480/699]	[HR-MSE: 0.0111][LR-L1: 0.0011][TOTAL: 0.0123]	1.1+10.6s
+[640/699]	[HR-MSE: 0.0112][LR-L1: 0.0011][TOTAL: 0.0124]	0.9+21.2s
+
+Evaluation 69 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 69.987 (Best: 72.263 @epoch 66)
+HR	[DIV2K x2]	PSNR: 35.979 (Best: 41.031 @epoch 25)
+Mean network applying time: 11.04ms
+Saving states ...
+Testing Total: 20.70s
+
+[Epoch 70]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0124][LR-L1: 0.0009][TOTAL: 0.0133]	1.1+25.6s
+[320/699]	[HR-MSE: 0.0132][LR-L1: 0.0009][TOTAL: 0.0141]	1.1+21.1s
+[480/699]	[HR-MSE: 0.0122][LR-L1: 0.0009][TOTAL: 0.0131]	1.2+10.9s
+[640/699]	[HR-MSE: 0.0126][LR-L1: 0.0009][TOTAL: 0.0135]	0.9+21.0s
+
+Evaluation 70 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 70.448 (Best: 72.263 @epoch 66)
+HR	[DIV2K x2]	PSNR: 36.724 (Best: 41.031 @epoch 25)
+Mean network applying time: 27.88ms
+Saving states ...
+Testing Total: 66.69s
+
+[Epoch 71]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0129][LR-L1: 0.0009][TOTAL: 0.0137]	1.0+23.6s
+[320/699]	[HR-MSE: 0.0125][LR-L1: 0.0010][TOTAL: 0.0134]	1.0+20.8s
+[480/699]	[HR-MSE: 0.0125][LR-L1: 0.0010][TOTAL: 0.0135]	1.0+11.8s
+[640/699]	[HR-MSE: 0.0124][LR-L1: 0.0010][TOTAL: 0.0134]	0.9+21.7s
+
+Evaluation 71 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 68.297 (Best: 72.263 @epoch 66)
+HR	[DIV2K x2]	PSNR: 34.304 (Best: 41.031 @epoch 25)
+Mean network applying time: 10.14ms
+Saving states ...
+Testing Total: 20.57s
+
+[Epoch 72]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0098][LR-L1: 0.0010][TOTAL: 0.0108]	1.1+26.0s
+[320/699]	[HR-MSE: 0.0112][LR-L1: 0.0010][TOTAL: 0.0122]	1.1+21.4s
+[480/699]	[HR-MSE: 0.0111][LR-L1: 0.0010][TOTAL: 0.0121]	1.1+10.6s
+[640/699]	[HR-MSE: 0.0117][LR-L1: 0.0010][TOTAL: 0.0127]	0.9+20.1s
+
+Evaluation 72 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 67.261 (Best: 72.263 @epoch 66)
+HR	[DIV2K x2]	PSNR: 34.395 (Best: 41.031 @epoch 25)
+Mean network applying time: 21.30ms
+Saving states ...
+Testing Total: 22.16s
+
+[Epoch 73]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0117][LR-L1: 0.0010][TOTAL: 0.0128]	1.1+25.5s
+[320/699]	[HR-MSE: 0.0112][LR-L1: 0.0010][TOTAL: 0.0122]	1.1+20.6s
+[480/699]	[HR-MSE: 0.0112][LR-L1: 0.0011][TOTAL: 0.0123]	1.1+10.9s
+[640/699]	[HR-MSE: 0.0113][LR-L1: 0.0010][TOTAL: 0.0123]	0.9+21.9s
+
+Evaluation 73 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 71.163 (Best: 72.263 @epoch 66)
+HR	[DIV2K x2]	PSNR: 37.265 (Best: 41.031 @epoch 25)
+Mean network applying time: 13.82ms
+Saving states ...
+Testing Total: 20.79s
+
+[Epoch 74]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0104][LR-L1: 0.0008][TOTAL: 0.0111]	1.1+24.6s
+[320/699]	[HR-MSE: 0.0113][LR-L1: 0.0008][TOTAL: 0.0121]	1.1+21.1s
+[480/699]	[HR-MSE: 0.0109][LR-L1: 0.0008][TOTAL: 0.0117]	1.0+12.1s
+[640/699]	[HR-MSE: 0.0114][LR-L1: 0.0009][TOTAL: 0.0123]	0.8+18.9s
+
+Evaluation 74 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 70.077 (Best: 72.263 @epoch 66)
+HR	[DIV2K x2]	PSNR: 36.181 (Best: 41.031 @epoch 25)
+Mean network applying time: 16.55ms
+Saving states ...
+Testing Total: 24.07s
+
+[Epoch 75]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0093][LR-L1: 0.0008][TOTAL: 0.0101]	1.1+23.8s
+[320/699]	[HR-MSE: 0.0111][LR-L1: 0.0008][TOTAL: 0.0119]	1.1+20.1s
+[480/699]	[HR-MSE: 0.0113][LR-L1: 0.0008][TOTAL: 0.0121]	1.1+12.6s
+[640/699]	[HR-MSE: 0.0112][LR-L1: 0.0008][TOTAL: 0.0121]	0.9+20.4s
+
+Evaluation 75 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 72.728 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 35.977 (Best: 41.031 @epoch 25)
+Mean network applying time: 14.35ms
+Saving states ...
+Testing Total: 16.82s
+
+[Epoch 76]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0122][LR-L1: 0.0010][TOTAL: 0.0132]	1.0+24.4s
+[320/699]	[HR-MSE: 0.0130][LR-L1: 0.0010][TOTAL: 0.0140]	1.1+20.6s
+[480/699]	[HR-MSE: 0.0122][LR-L1: 0.0010][TOTAL: 0.0133]	1.1+10.5s
+[640/699]	[HR-MSE: 0.0112][LR-L1: 0.0011][TOTAL: 0.0123]	0.9+22.9s
+
+Evaluation 76 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 68.265 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 36.412 (Best: 41.031 @epoch 25)
+Mean network applying time: 14.32ms
+Saving states ...
+Testing Total: 19.07s
+
+[Epoch 77]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0121][LR-L1: 0.0010][TOTAL: 0.0131]	1.0+23.6s
+[320/699]	[HR-MSE: 0.0109][LR-L1: 0.0009][TOTAL: 0.0118]	0.9+21.2s
+[480/699]	[HR-MSE: 0.0107][LR-L1: 0.0009][TOTAL: 0.0116]	1.0+12.0s
+[640/699]	[HR-MSE: 0.0107][LR-L1: 0.0009][TOTAL: 0.0117]	0.8+20.5s
+
+Evaluation 77 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 72.228 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 36.729 (Best: 41.031 @epoch 25)
+Mean network applying time: 19.48ms
+Saving states ...
+Testing Total: 21.17s
+
+[Epoch 78]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0116][LR-L1: 0.0011][TOTAL: 0.0127]	1.1+23.9s
+[320/699]	[HR-MSE: 0.0122][LR-L1: 0.0011][TOTAL: 0.0132]	1.2+21.8s
+[480/699]	[HR-MSE: 0.0115][LR-L1: 0.0010][TOTAL: 0.0125]	1.2+10.2s
+[640/699]	[HR-MSE: 0.0120][LR-L1: 0.0010][TOTAL: 0.0130]	1.0+20.8s
+
+Evaluation 78 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 70.221 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 34.803 (Best: 41.031 @epoch 25)
+Mean network applying time: 15.42ms
+Saving states ...
+Testing Total: 18.73s
+
+[Epoch 79]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0128][LR-L1: 0.0008][TOTAL: 0.0136]	1.2+26.0s
+[320/699]	[HR-MSE: 0.0122][LR-L1: 0.0009][TOTAL: 0.0131]	1.1+21.4s
+[480/699]	[HR-MSE: 0.0120][LR-L1: 0.0009][TOTAL: 0.0129]	1.2+10.7s
+[640/699]	[HR-MSE: 0.0113][LR-L1: 0.0009][TOTAL: 0.0122]	1.0+20.0s
+
+Evaluation 79 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 69.624 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 35.774 (Best: 41.031 @epoch 25)
+Mean network applying time: 15.60ms
+Saving states ...
+Testing Total: 21.11s
+
+[Epoch 80]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0108][LR-L1: 0.0009][TOTAL: 0.0117]	1.1+24.1s
+[320/699]	[HR-MSE: 0.0112][LR-L1: 0.0009][TOTAL: 0.0120]	1.1+20.2s
+[480/699]	[HR-MSE: 0.0108][LR-L1: 0.0008][TOTAL: 0.0117]	1.0+11.8s
+[640/699]	[HR-MSE: 0.0106][LR-L1: 0.0008][TOTAL: 0.0114]	0.8+20.8s
+
+Evaluation 80 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 68.053 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.165 (Best: 41.031 @epoch 25)
+Mean network applying time: 45.17ms
+Saving states ...
+Testing Total: 65.34s
+
+[Epoch 81]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0119][LR-L1: 0.0010][TOTAL: 0.0129]	0.8+24.0s
+[320/699]	[HR-MSE: 0.0105][LR-L1: 0.0010][TOTAL: 0.0115]	0.9+21.3s
+[480/699]	[HR-MSE: 0.0108][LR-L1: 0.0010][TOTAL: 0.0118]	1.1+11.5s
+[640/699]	[HR-MSE: 0.0110][LR-L1: 0.0009][TOTAL: 0.0119]	0.9+21.6s
+
+Evaluation 81 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 70.576 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.606 (Best: 41.031 @epoch 25)
+Mean network applying time: 12.43ms
+Saving states ...
+Testing Total: 20.83s
+
+[Epoch 82]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0106][LR-L1: 0.0009][TOTAL: 0.0114]	1.0+24.9s
+[320/699]	[HR-MSE: 0.0106][LR-L1: 0.0008][TOTAL: 0.0114]	1.0+20.1s
+[480/699]	[HR-MSE: 0.0111][LR-L1: 0.0008][TOTAL: 0.0119]	1.0+13.1s
+[640/699]	[HR-MSE: 0.0108][LR-L1: 0.0009][TOTAL: 0.0117]	0.9+21.2s
+
+Evaluation 82 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 71.662 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 35.871 (Best: 41.031 @epoch 25)
+Mean network applying time: 19.32ms
+Saving states ...
+Testing Total: 24.07s
+
+[Epoch 83]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0104][LR-L1: 0.0009][TOTAL: 0.0113]	1.0+24.3s
+[320/699]	[HR-MSE: 0.0108][LR-L1: 0.0009][TOTAL: 0.0118]	1.0+20.8s
+[480/699]	[HR-MSE: 0.0110][LR-L1: 0.0010][TOTAL: 0.0120]	1.0+11.1s
+[640/699]	[HR-MSE: 0.0109][LR-L1: 0.0010][TOTAL: 0.0119]	0.9+20.4s
+
+Evaluation 83 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 68.575 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 34.102 (Best: 41.031 @epoch 25)
+Mean network applying time: 13.43ms
+Saving states ...
+Testing Total: 21.64s
+
+[Epoch 84]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0117][LR-L1: 0.0011][TOTAL: 0.0128]	1.0+23.9s
+[320/699]	[HR-MSE: 0.0115][LR-L1: 0.0010][TOTAL: 0.0125]	1.0+21.1s
+[480/699]	[HR-MSE: 0.0122][LR-L1: 0.0010][TOTAL: 0.0132]	1.1+11.0s
+[640/699]	[HR-MSE: 0.0120][LR-L1: 0.0010][TOTAL: 0.0131]	0.9+21.1s
+
+Evaluation 84 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 71.505 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 35.545 (Best: 41.031 @epoch 25)
+Mean network applying time: 18.26ms
+Saving states ...
+Testing Total: 24.35s
+
+[Epoch 85]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0114][LR-L1: 0.0008][TOTAL: 0.0122]	1.0+24.2s
+[320/699]	[HR-MSE: 0.0108][LR-L1: 0.0008][TOTAL: 0.0116]	1.0+21.6s
+[480/699]	[HR-MSE: 0.0101][LR-L1: 0.0008][TOTAL: 0.0109]	1.0+12.2s
+[640/699]	[HR-MSE: 0.0102][LR-L1: 0.0009][TOTAL: 0.0111]	0.8+21.4s
+
+Evaluation 85 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 71.060 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.317 (Best: 41.031 @epoch 25)
+Mean network applying time: 16.87ms
+Saving states ...
+Testing Total: 20.59s
+
+[Epoch 86]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0102][LR-L1: 0.0009][TOTAL: 0.0112]	1.1+24.9s
+[320/699]	[HR-MSE: 0.0104][LR-L1: 0.0009][TOTAL: 0.0114]	1.1+22.6s
+[480/699]	[HR-MSE: 0.0123][LR-L1: 0.0010][TOTAL: 0.0132]	1.2+10.1s
+[640/699]	[HR-MSE: 0.0121][LR-L1: 0.0010][TOTAL: 0.0131]	0.9+20.2s
+
+Evaluation 86 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 68.031 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.994 (Best: 41.031 @epoch 25)
+Mean network applying time: 11.35ms
+Saving states ...
+Testing Total: 20.84s
+
+[Epoch 87]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0105][LR-L1: 0.0009][TOTAL: 0.0114]	1.1+24.2s
+[320/699]	[HR-MSE: 0.0098][LR-L1: 0.0009][TOTAL: 0.0107]	1.0+22.4s
+[480/699]	[HR-MSE: 0.0109][LR-L1: 0.0009][TOTAL: 0.0119]	1.0+11.6s
+[640/699]	[HR-MSE: 0.0113][LR-L1: 0.0009][TOTAL: 0.0122]	0.9+20.7s
+
+Evaluation 87 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 66.340 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.825 (Best: 41.031 @epoch 25)
+Mean network applying time: 14.82ms
+Saving states ...
+Testing Total: 24.32s
+
+[Epoch 88]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0118][LR-L1: 0.0011][TOTAL: 0.0129]	1.0+24.1s
+[320/699]	[HR-MSE: 0.0122][LR-L1: 0.0011][TOTAL: 0.0133]	1.1+20.7s
+[480/699]	[HR-MSE: 0.0116][LR-L1: 0.0011][TOTAL: 0.0127]	0.9+12.4s
+[640/699]	[HR-MSE: 0.0109][LR-L1: 0.0011][TOTAL: 0.0120]	1.0+20.3s
+
+Evaluation 88 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 68.289 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 36.677 (Best: 41.031 @epoch 25)
+Mean network applying time: 23.15ms
+Saving states ...
+Testing Total: 22.88s
+
+[Epoch 89]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0119][LR-L1: 0.0011][TOTAL: 0.0129]	1.2+24.0s
+[320/699]	[HR-MSE: 0.0108][LR-L1: 0.0010][TOTAL: 0.0117]	1.1+21.4s
+[480/699]	[HR-MSE: 0.0114][LR-L1: 0.0010][TOTAL: 0.0124]	1.1+10.2s
+[640/699]	[HR-MSE: 0.0109][LR-L1: 0.0010][TOTAL: 0.0119]	0.9+21.3s
+
+Evaluation 89 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 68.185 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 35.368 (Best: 41.031 @epoch 25)
+Mean network applying time: 16.95ms
+Saving states ...
+Testing Total: 23.22s
+
+[Epoch 90]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0102][LR-L1: 0.0010][TOTAL: 0.0111]	1.0+24.2s
+[320/699]	[HR-MSE: 0.0101][LR-L1: 0.0009][TOTAL: 0.0111]	1.0+21.1s
+[480/699]	[HR-MSE: 0.0099][LR-L1: 0.0009][TOTAL: 0.0108]	1.0+12.0s
+[640/699]	[HR-MSE: 0.0094][LR-L1: 0.0009][TOTAL: 0.0103]	0.8+21.3s
+
+Evaluation 90 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 69.422 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 34.312 (Best: 41.031 @epoch 25)
+Mean network applying time: 23.87ms
+Saving states ...
+Testing Total: 66.46s
+
+[Epoch 91]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0083][LR-L1: 0.0009][TOTAL: 0.0092]	1.0+24.1s
+[320/699]	[HR-MSE: 0.0097][LR-L1: 0.0010][TOTAL: 0.0108]	0.9+19.8s
+[480/699]	[HR-MSE: 0.0094][LR-L1: 0.0010][TOTAL: 0.0104]	1.0+13.9s
+[640/699]	[HR-MSE: 0.0098][LR-L1: 0.0011][TOTAL: 0.0109]	0.9+21.1s
+
+Evaluation 91 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 67.649 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.358 (Best: 41.031 @epoch 25)
+Mean network applying time: 7.80ms
+Saving states ...
+Testing Total: 21.11s
+
+[Epoch 92]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0109][LR-L1: 0.0011][TOTAL: 0.0120]	1.1+24.4s
+[320/699]	[HR-MSE: 0.0119][LR-L1: 0.0011][TOTAL: 0.0130]	1.1+20.4s
+[480/699]	[HR-MSE: 0.0108][LR-L1: 0.0011][TOTAL: 0.0119]	1.1+12.1s
+[640/699]	[HR-MSE: 0.0107][LR-L1: 0.0011][TOTAL: 0.0118]	0.9+18.9s
+
+Evaluation 92 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.868 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 36.125 (Best: 41.031 @epoch 25)
+Mean network applying time: 14.26ms
+Saving states ...
+Testing Total: 21.06s
+
+[Epoch 93]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0104][LR-L1: 0.0013][TOTAL: 0.0117]	1.0+24.6s
+[320/699]	[HR-MSE: 0.0111][LR-L1: 0.0012][TOTAL: 0.0123]	1.1+20.6s
+[480/699]	[HR-MSE: 0.0116][LR-L1: 0.0012][TOTAL: 0.0128]	1.1+11.4s
+[640/699]	[HR-MSE: 0.0112][LR-L1: 0.0012][TOTAL: 0.0124]	0.9+20.5s
+
+Evaluation 93 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 66.769 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.257 (Best: 41.031 @epoch 25)
+Mean network applying time: 16.61ms
+Saving states ...
+Testing Total: 22.05s
+
+[Epoch 94]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0100][LR-L1: 0.0012][TOTAL: 0.0112]	1.0+24.3s
+[320/699]	[HR-MSE: 0.0101][LR-L1: 0.0012][TOTAL: 0.0113]	1.0+21.9s
+[480/699]	[HR-MSE: 0.0102][LR-L1: 0.0012][TOTAL: 0.0114]	1.0+11.1s
+[640/699]	[HR-MSE: 0.0104][LR-L1: 0.0012][TOTAL: 0.0116]	0.9+20.6s
+
+Evaluation 94 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 64.813 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.576 (Best: 41.031 @epoch 25)
+Mean network applying time: 24.82ms
+Saving states ...
+Testing Total: 24.09s
+
+[Epoch 95]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0120][LR-L1: 0.0012][TOTAL: 0.0132]	1.1+24.2s
+[320/699]	[HR-MSE: 0.0100][LR-L1: 0.0011][TOTAL: 0.0111]	1.1+21.0s
+[480/699]	[HR-MSE: 0.0103][LR-L1: 0.0011][TOTAL: 0.0114]	1.2+11.2s
+[640/699]	[HR-MSE: 0.0100][LR-L1: 0.0011][TOTAL: 0.0111]	1.0+21.9s
+
+Evaluation 95 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.475 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 35.362 (Best: 41.031 @epoch 25)
+Mean network applying time: 15.43ms
+Saving states ...
+Testing Total: 21.31s
+
+[Epoch 96]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0116][LR-L1: 0.0015][TOTAL: 0.0131]	1.1+25.9s
+[320/699]	[HR-MSE: 0.0107][LR-L1: 0.0014][TOTAL: 0.0120]	0.9+20.9s
+[480/699]	[HR-MSE: 0.0098][LR-L1: 0.0013][TOTAL: 0.0111]	1.0+11.8s
+[640/699]	[HR-MSE: 0.0103][LR-L1: 0.0013][TOTAL: 0.0115]	0.9+19.9s
+
+Evaluation 96 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 64.639 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.801 (Best: 41.031 @epoch 25)
+Mean network applying time: 13.18ms
+Saving states ...
+Testing Total: 22.82s
+
+[Epoch 97]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0104][LR-L1: 0.0014][TOTAL: 0.0117]	1.1+24.4s
+[320/699]	[HR-MSE: 0.0106][LR-L1: 0.0014][TOTAL: 0.0120]	1.1+20.9s
+[480/699]	[HR-MSE: 0.0114][LR-L1: 0.0014][TOTAL: 0.0128]	1.0+11.4s
+[640/699]	[HR-MSE: 0.0108][LR-L1: 0.0014][TOTAL: 0.0122]	0.9+20.5s
+
+Evaluation 97 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 69.434 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.109 (Best: 41.031 @epoch 25)
+Mean network applying time: 9.91ms
+Saving states ...
+Testing Total: 21.86s
+
+[Epoch 98]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0094][LR-L1: 0.0013][TOTAL: 0.0107]	1.0+24.8s
+[320/699]	[HR-MSE: 0.0095][LR-L1: 0.0013][TOTAL: 0.0108]	1.1+21.5s
+[480/699]	[HR-MSE: 0.0087][LR-L1: 0.0012][TOTAL: 0.0100]	1.2+10.9s
+[640/699]	[HR-MSE: 0.0085][LR-L1: 0.0012][TOTAL: 0.0097]	0.9+19.8s
+
+Evaluation 98 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.168 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.986 (Best: 41.031 @epoch 25)
+Mean network applying time: 12.57ms
+Saving states ...
+Testing Total: 20.64s
+
+[Epoch 99]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0088][LR-L1: 0.0013][TOTAL: 0.0101]	1.1+23.9s
+[320/699]	[HR-MSE: 0.0096][LR-L1: 0.0013][TOTAL: 0.0109]	1.0+20.5s
+[480/699]	[HR-MSE: 0.0089][LR-L1: 0.0013][TOTAL: 0.0101]	0.9+13.8s
+[640/699]	[HR-MSE: 0.0095][LR-L1: 0.0013][TOTAL: 0.0108]	0.9+19.6s
+
+Evaluation 99 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.794 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 33.670 (Best: 41.031 @epoch 25)
+Mean network applying time: 22.24ms
+Saving states ...
+Testing Total: 24.76s
+
+[Epoch 100]	Learning rate: 0.0001	Finetuning: False
+[160/699]	[HR-MSE: 0.0091][LR-L1: 0.0012][TOTAL: 0.0104]	1.0+24.1s
+[320/699]	[HR-MSE: 0.0092][LR-L1: 0.0012][TOTAL: 0.0104]	1.1+22.5s
+[480/699]	[HR-MSE: 0.0091][LR-L1: 0.0012][TOTAL: 0.0103]	1.2+10.8s
+[640/699]	[HR-MSE: 0.0092][LR-L1: 0.0013][TOTAL: 0.0105]	0.9+20.9s
+
+Evaluation 100 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 72.140 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.202 (Best: 41.031 @epoch 25)
+Mean network applying time: 25.23ms
+Saving states ...
+Testing Total: 67.71s
+
+[Epoch 101]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0091][LR-L1: 0.0012][TOTAL: 0.0103]	1.1+24.9s
+[320/699]	[HR-MSE: 0.0088][LR-L1: 0.0012][TOTAL: 0.0100]	1.0+22.3s
+[480/699]	[HR-MSE: 0.0086][LR-L1: 0.0012][TOTAL: 0.0098]	1.1+10.3s
+[640/699]	[HR-MSE: 0.0087][LR-L1: 0.0012][TOTAL: 0.0099]	0.9+21.6s
+
+Evaluation 101 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.171 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.628 (Best: 41.031 @epoch 25)
+Mean network applying time: 14.21ms
+Saving states ...
+Testing Total: 23.16s
+
+[Epoch 102]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0110][LR-L1: 0.0014][TOTAL: 0.0125]	1.0+24.6s
+[320/699]	[HR-MSE: 0.0096][LR-L1: 0.0014][TOTAL: 0.0110]	1.1+21.9s
+[480/699]	[HR-MSE: 0.0098][LR-L1: 0.0014][TOTAL: 0.0112]	1.1+10.9s
+[640/699]	[HR-MSE: 0.0098][LR-L1: 0.0014][TOTAL: 0.0112]	1.0+19.8s
+
+Evaluation 102 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 64.582 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.015 (Best: 41.031 @epoch 25)
+Mean network applying time: 14.40ms
+Saving states ...
+Testing Total: 22.13s
+
+[Epoch 103]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0094][LR-L1: 0.0015][TOTAL: 0.0108]	1.0+24.8s
+[320/699]	[HR-MSE: 0.0082][LR-L1: 0.0013][TOTAL: 0.0095]	1.1+21.8s
+[480/699]	[HR-MSE: 0.0081][LR-L1: 0.0013][TOTAL: 0.0094]	1.1+10.8s
+[640/699]	[HR-MSE: 0.0085][LR-L1: 0.0013][TOTAL: 0.0099]	0.9+21.4s
+
+Evaluation 103 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 64.076 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.060 (Best: 41.031 @epoch 25)
+Mean network applying time: 14.75ms
+Saving states ...
+Testing Total: 21.87s
+
+[Epoch 104]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0070][LR-L1: 0.0012][TOTAL: 0.0082]	1.0+24.1s
+[320/699]	[HR-MSE: 0.0082][LR-L1: 0.0013][TOTAL: 0.0094]	1.1+21.6s
+[480/699]	[HR-MSE: 0.0090][LR-L1: 0.0013][TOTAL: 0.0103]	1.2+10.6s
+[640/699]	[HR-MSE: 0.0092][LR-L1: 0.0013][TOTAL: 0.0105]	1.0+21.5s
+
+Evaluation 104 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.871 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.403 (Best: 41.031 @epoch 25)
+Mean network applying time: 17.90ms
+Saving states ...
+Testing Total: 23.02s
+
+[Epoch 105]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0077][LR-L1: 0.0013][TOTAL: 0.0090]	1.0+25.1s
+[320/699]	[HR-MSE: 0.0090][LR-L1: 0.0014][TOTAL: 0.0103]	0.9+22.3s
+[480/699]	[HR-MSE: 0.0088][LR-L1: 0.0013][TOTAL: 0.0101]	1.1+10.2s
+[640/699]	[HR-MSE: 0.0088][LR-L1: 0.0013][TOTAL: 0.0102]	0.9+21.5s
+
+Evaluation 105 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.573 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 34.316 (Best: 41.031 @epoch 25)
+Mean network applying time: 22.43ms
+Saving states ...
+Testing Total: 23.67s
+
+[Epoch 106]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0080][LR-L1: 0.0014][TOTAL: 0.0094]	0.8+24.7s
+[320/699]	[HR-MSE: 0.0083][LR-L1: 0.0014][TOTAL: 0.0097]	1.0+21.0s
+[480/699]	[HR-MSE: 0.0093][LR-L1: 0.0015][TOTAL: 0.0108]	1.1+11.6s
+[640/699]	[HR-MSE: 0.0089][LR-L1: 0.0014][TOTAL: 0.0103]	1.0+21.3s
+
+Evaluation 106 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.147 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 36.964 (Best: 41.031 @epoch 25)
+Mean network applying time: 14.76ms
+Saving states ...
+Testing Total: 23.24s
+
+[Epoch 107]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0094][LR-L1: 0.0014][TOTAL: 0.0108]	1.0+24.7s
+[320/699]	[HR-MSE: 0.0094][LR-L1: 0.0015][TOTAL: 0.0109]	1.0+21.0s
+[480/699]	[HR-MSE: 0.0091][LR-L1: 0.0015][TOTAL: 0.0106]	1.1+10.6s
+[640/699]	[HR-MSE: 0.0087][LR-L1: 0.0014][TOTAL: 0.0101]	1.0+21.1s
+
+Evaluation 107 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.136 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.719 (Best: 41.031 @epoch 25)
+Mean network applying time: 16.94ms
+Saving states ...
+Testing Total: 22.38s
+
+[Epoch 108]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0111][LR-L1: 0.0017][TOTAL: 0.0128]	1.0+24.8s
+[320/699]	[HR-MSE: 0.0097][LR-L1: 0.0016][TOTAL: 0.0113]	1.0+20.0s
+[480/699]	[HR-MSE: 0.0095][LR-L1: 0.0015][TOTAL: 0.0111]	1.0+11.5s
+[640/699]	[HR-MSE: 0.0093][LR-L1: 0.0015][TOTAL: 0.0108]	0.9+20.9s
+
+Evaluation 108 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 62.767 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.556 (Best: 41.031 @epoch 25)
+Mean network applying time: 19.09ms
+Saving states ...
+Testing Total: 21.91s
+
+[Epoch 109]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0087][LR-L1: 0.0016][TOTAL: 0.0103]	1.1+24.7s
+[320/699]	[HR-MSE: 0.0085][LR-L1: 0.0016][TOTAL: 0.0101]	1.0+22.3s
+[480/699]	[HR-MSE: 0.0080][LR-L1: 0.0015][TOTAL: 0.0095]	1.1+10.7s
+[640/699]	[HR-MSE: 0.0083][LR-L1: 0.0016][TOTAL: 0.0100]	0.9+21.6s
+
+Evaluation 109 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.530 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.850 (Best: 41.031 @epoch 25)
+Mean network applying time: 18.73ms
+Saving states ...
+Testing Total: 24.12s
+
+[Epoch 110]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0071][LR-L1: 0.0016][TOTAL: 0.0087]	1.2+24.9s
+[320/699]	[HR-MSE: 0.0071][LR-L1: 0.0015][TOTAL: 0.0087]	1.1+21.9s
+[480/699]	[HR-MSE: 0.0078][LR-L1: 0.0017][TOTAL: 0.0094]	1.1+11.0s
+[640/699]	[HR-MSE: 0.0078][LR-L1: 0.0016][TOTAL: 0.0095]	1.0+21.4s
+
+Evaluation 110 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 57.761 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.909 (Best: 41.031 @epoch 25)
+Mean network applying time: 33.24ms
+Saving states ...
+Testing Total: 63.90s
+
+[Epoch 111]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0063][LR-L1: 0.0015][TOTAL: 0.0078]	1.1+24.2s
+[320/699]	[HR-MSE: 0.0067][LR-L1: 0.0015][TOTAL: 0.0083]	1.1+21.0s
+[480/699]	[HR-MSE: 0.0072][LR-L1: 0.0016][TOTAL: 0.0087]	1.0+10.9s
+[640/699]	[HR-MSE: 0.0078][LR-L1: 0.0016][TOTAL: 0.0094]	0.8+20.8s
+
+Evaluation 111 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.011 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.000 (Best: 41.031 @epoch 25)
+Mean network applying time: 18.73ms
+Saving states ...
+Testing Total: 21.23s
+
+[Epoch 112]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0091][LR-L1: 0.0018][TOTAL: 0.0110]	1.0+27.3s
+[320/699]	[HR-MSE: 0.0080][LR-L1: 0.0017][TOTAL: 0.0097]	1.0+17.8s
+[480/699]	[HR-MSE: 0.0083][LR-L1: 0.0017][TOTAL: 0.0101]	1.0+14.6s
+[640/699]	[HR-MSE: 0.0085][LR-L1: 0.0018][TOTAL: 0.0103]	0.9+20.5s
+
+Evaluation 112 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 66.051 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.611 (Best: 41.031 @epoch 25)
+Mean network applying time: 18.32ms
+Saving states ...
+Testing Total: 22.67s
+
+[Epoch 113]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0074][LR-L1: 0.0018][TOTAL: 0.0092]	1.0+24.7s
+[320/699]	[HR-MSE: 0.0072][LR-L1: 0.0017][TOTAL: 0.0089]	1.1+20.5s
+[480/699]	[HR-MSE: 0.0077][LR-L1: 0.0018][TOTAL: 0.0095]	1.1+11.9s
+[640/699]	[HR-MSE: 0.0074][LR-L1: 0.0017][TOTAL: 0.0092]	0.9+21.0s
+
+Evaluation 113 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.027 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 36.297 (Best: 41.031 @epoch 25)
+Mean network applying time: 11.92ms
+Saving states ...
+Testing Total: 23.68s
+
+[Epoch 114]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0068][LR-L1: 0.0017][TOTAL: 0.0084]	1.1+25.0s
+[320/699]	[HR-MSE: 0.0082][LR-L1: 0.0018][TOTAL: 0.0101]	1.2+21.4s
+[480/699]	[HR-MSE: 0.0077][LR-L1: 0.0018][TOTAL: 0.0095]	1.1+10.5s
+[640/699]	[HR-MSE: 0.0076][LR-L1: 0.0017][TOTAL: 0.0093]	1.1+20.6s
+
+Evaluation 114 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.737 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 36.558 (Best: 41.031 @epoch 25)
+Mean network applying time: 9.39ms
+Saving states ...
+Testing Total: 18.90s
+
+[Epoch 115]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0091][LR-L1: 0.0020][TOTAL: 0.0112]	1.1+23.4s
+[320/699]	[HR-MSE: 0.0089][LR-L1: 0.0020][TOTAL: 0.0109]	1.1+21.4s
+[480/699]	[HR-MSE: 0.0081][LR-L1: 0.0019][TOTAL: 0.0100]	1.1+11.3s
+[640/699]	[HR-MSE: 0.0078][LR-L1: 0.0019][TOTAL: 0.0096]	0.9+20.1s
+
+Evaluation 115 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.239 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.111 (Best: 41.031 @epoch 25)
+Mean network applying time: 13.64ms
+Saving states ...
+Testing Total: 22.60s
+
+[Epoch 116]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0074][LR-L1: 0.0020][TOTAL: 0.0094]	1.1+25.4s
+[320/699]	[HR-MSE: 0.0080][LR-L1: 0.0020][TOTAL: 0.0100]	1.0+21.0s
+[480/699]	[HR-MSE: 0.0074][LR-L1: 0.0019][TOTAL: 0.0093]	1.1+11.0s
+[640/699]	[HR-MSE: 0.0078][LR-L1: 0.0020][TOTAL: 0.0098]	0.9+21.0s
+
+Evaluation 116 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.855 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.408 (Best: 41.031 @epoch 25)
+Mean network applying time: 16.41ms
+Saving states ...
+Testing Total: 22.00s
+
+[Epoch 117]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	0.9+25.5s
+[320/699]	[HR-MSE: 0.0060][LR-L1: 0.0018][TOTAL: 0.0078]	1.0+20.0s
+[480/699]	[HR-MSE: 0.0067][LR-L1: 0.0019][TOTAL: 0.0085]	1.1+11.9s
+[640/699]	[HR-MSE: 0.0070][LR-L1: 0.0019][TOTAL: 0.0089]	0.9+20.2s
+
+Evaluation 117 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.246 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.765 (Best: 41.031 @epoch 25)
+Mean network applying time: 11.39ms
+Saving states ...
+Testing Total: 21.72s
+
+[Epoch 118]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0073][LR-L1: 0.0018][TOTAL: 0.0091]	1.0+24.1s
+[320/699]	[HR-MSE: 0.0070][LR-L1: 0.0019][TOTAL: 0.0089]	0.9+20.7s
+[480/699]	[HR-MSE: 0.0069][LR-L1: 0.0019][TOTAL: 0.0088]	1.1+12.0s
+[640/699]	[HR-MSE: 0.0070][LR-L1: 0.0019][TOTAL: 0.0089]	1.0+21.0s
+
+Evaluation 118 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.912 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.859 (Best: 41.031 @epoch 25)
+Mean network applying time: 18.69ms
+Saving states ...
+Testing Total: 23.19s
+
+[Epoch 119]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0062][LR-L1: 0.0019][TOTAL: 0.0082]	1.1+24.7s
+[320/699]	[HR-MSE: 0.0071][LR-L1: 0.0020][TOTAL: 0.0091]	1.1+21.3s
+[480/699]	[HR-MSE: 0.0075][LR-L1: 0.0020][TOTAL: 0.0095]	1.2+10.7s
+[640/699]	[HR-MSE: 0.0071][LR-L1: 0.0020][TOTAL: 0.0091]	0.9+21.9s
+
+Evaluation 119 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.211 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 42.402 (Best: 42.402 @epoch 119)
+Mean network applying time: 15.42ms
+Saving states ...
+Testing Total: 23.27s
+
+[Epoch 120]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0082][LR-L1: 0.0021][TOTAL: 0.0103]	1.0+25.2s
+[320/699]	[HR-MSE: 0.0070][LR-L1: 0.0020][TOTAL: 0.0090]	1.1+22.9s
+[480/699]	[HR-MSE: 0.0072][LR-L1: 0.0020][TOTAL: 0.0093]	1.0+10.9s
+[640/699]	[HR-MSE: 0.0072][LR-L1: 0.0020][TOTAL: 0.0093]	0.9+20.8s
+
+Evaluation 120 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 57.845 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.116 (Best: 42.402 @epoch 119)
+Mean network applying time: 38.61ms
+Saving states ...
+Testing Total: 64.22s
+
+[Epoch 121]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0071][LR-L1: 0.0020][TOTAL: 0.0090]	1.1+25.9s
+[320/699]	[HR-MSE: 0.0066][LR-L1: 0.0019][TOTAL: 0.0085]	1.1+21.9s
+[480/699]	[HR-MSE: 0.0070][LR-L1: 0.0019][TOTAL: 0.0090]	1.1+10.9s
+[640/699]	[HR-MSE: 0.0072][LR-L1: 0.0020][TOTAL: 0.0091]	1.0+19.6s
+
+Evaluation 121 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.341 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.725 (Best: 42.402 @epoch 119)
+Mean network applying time: 13.28ms
+Saving states ...
+Testing Total: 21.34s
+
+[Epoch 122]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0072][LR-L1: 0.0020][TOTAL: 0.0092]	1.1+24.4s
+[320/699]	[HR-MSE: 0.0067][LR-L1: 0.0020][TOTAL: 0.0087]	1.1+20.6s
+[480/699]	[HR-MSE: 0.0069][LR-L1: 0.0020][TOTAL: 0.0089]	1.1+9.7s
+[640/699]	[HR-MSE: 0.0067][LR-L1: 0.0020][TOTAL: 0.0086]	0.9+22.1s
+
+Evaluation 122 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 56.171 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.886 (Best: 42.402 @epoch 119)
+Mean network applying time: 15.47ms
+Saving states ...
+Testing Total: 23.55s
+
+[Epoch 123]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0071][LR-L1: 0.0020][TOTAL: 0.0092]	1.0+25.1s
+[320/699]	[HR-MSE: 0.0062][LR-L1: 0.0019][TOTAL: 0.0081]	1.1+20.2s
+[480/699]	[HR-MSE: 0.0064][LR-L1: 0.0019][TOTAL: 0.0083]	1.0+11.4s
+[640/699]	[HR-MSE: 0.0064][LR-L1: 0.0019][TOTAL: 0.0083]	0.9+22.3s
+
+Evaluation 123 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.419 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.852 (Best: 42.402 @epoch 119)
+Mean network applying time: 13.68ms
+Saving states ...
+Testing Total: 21.81s
+
+[Epoch 124]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0088][LR-L1: 0.0023][TOTAL: 0.0111]	1.1+24.5s
+[320/699]	[HR-MSE: 0.0082][LR-L1: 0.0022][TOTAL: 0.0105]	1.1+21.4s
+[480/699]	[HR-MSE: 0.0076][LR-L1: 0.0021][TOTAL: 0.0096]	1.1+11.3s
+[640/699]	[HR-MSE: 0.0071][LR-L1: 0.0020][TOTAL: 0.0091]	1.0+20.6s
+
+Evaluation 124 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 56.895 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.108 (Best: 42.402 @epoch 119)
+Mean network applying time: 17.18ms
+Saving states ...
+Testing Total: 22.74s
+
+[Epoch 125]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0068][LR-L1: 0.0022][TOTAL: 0.0090]	1.1+24.3s
+[320/699]	[HR-MSE: 0.0066][LR-L1: 0.0021][TOTAL: 0.0087]	1.0+22.0s
+[480/699]	[HR-MSE: 0.0069][LR-L1: 0.0021][TOTAL: 0.0090]	1.2+11.3s
+[640/699]	[HR-MSE: 0.0070][LR-L1: 0.0021][TOTAL: 0.0091]	0.9+19.9s
+
+Evaluation 125 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.471 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.994 (Best: 42.402 @epoch 119)
+Mean network applying time: 15.76ms
+Saving states ...
+Testing Total: 23.25s
+
+[Epoch 126]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0074]	0.9+24.2s
+[320/699]	[HR-MSE: 0.0060][LR-L1: 0.0018][TOTAL: 0.0078]	1.0+19.2s
+[480/699]	[HR-MSE: 0.0066][LR-L1: 0.0019][TOTAL: 0.0085]	1.1+12.8s
+[640/699]	[HR-MSE: 0.0061][LR-L1: 0.0018][TOTAL: 0.0080]	0.9+20.8s
+
+Evaluation 126 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.924 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.689 (Best: 42.402 @epoch 119)
+Mean network applying time: 22.83ms
+Saving states ...
+Testing Total: 23.47s
+
+[Epoch 127]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0069][LR-L1: 0.0019][TOTAL: 0.0088]	1.1+23.6s
+[320/699]	[HR-MSE: 0.0065][LR-L1: 0.0020][TOTAL: 0.0085]	1.1+21.6s
+[480/699]	[HR-MSE: 0.0061][LR-L1: 0.0019][TOTAL: 0.0080]	1.1+12.5s
+[640/699]	[HR-MSE: 0.0064][LR-L1: 0.0020][TOTAL: 0.0083]	1.0+20.2s
+
+Evaluation 127 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 58.997 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.358 (Best: 42.402 @epoch 119)
+Mean network applying time: 17.13ms
+Saving states ...
+Testing Total: 22.01s
+
+[Epoch 128]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0069][LR-L1: 0.0021][TOTAL: 0.0090]	1.0+24.2s
+[320/699]	[HR-MSE: 0.0062][LR-L1: 0.0019][TOTAL: 0.0081]	1.0+20.7s
+[480/699]	[HR-MSE: 0.0063][LR-L1: 0.0020][TOTAL: 0.0083]	1.1+10.2s
+[640/699]	[HR-MSE: 0.0062][LR-L1: 0.0019][TOTAL: 0.0081]	0.9+21.6s
+
+Evaluation 128 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 55.214 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.857 (Best: 42.402 @epoch 119)
+Mean network applying time: 14.19ms
+Saving states ...
+Testing Total: 22.30s
+
+[Epoch 129]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0065][LR-L1: 0.0019][TOTAL: 0.0084]	1.1+24.2s
+[320/699]	[HR-MSE: 0.0061][LR-L1: 0.0019][TOTAL: 0.0081]	1.1+20.7s
+[480/699]	[HR-MSE: 0.0058][LR-L1: 0.0019][TOTAL: 0.0077]	1.1+11.3s
+[640/699]	[HR-MSE: 0.0060][LR-L1: 0.0019][TOTAL: 0.0080]	0.9+22.2s
+
+Evaluation 129 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 58.476 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.420 (Best: 42.402 @epoch 119)
+Mean network applying time: 15.98ms
+Saving states ...
+Testing Total: 21.17s
+
+[Epoch 130]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0065][LR-L1: 0.0020][TOTAL: 0.0085]	1.1+24.1s
+[320/699]	[HR-MSE: 0.0073][LR-L1: 0.0022][TOTAL: 0.0095]	1.0+21.1s
+[480/699]	[HR-MSE: 0.0068][LR-L1: 0.0021][TOTAL: 0.0089]	1.2+11.0s
+[640/699]	[HR-MSE: 0.0066][LR-L1: 0.0021][TOTAL: 0.0086]	1.0+21.2s
+
+Evaluation 130 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 60.666 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.861 (Best: 42.402 @epoch 119)
+Mean network applying time: 21.87ms
+Saving states ...
+Testing Total: 57.90s
+
+[Epoch 131]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0078][LR-L1: 0.0023][TOTAL: 0.0102]	1.0+24.6s
+[320/699]	[HR-MSE: 0.0066][LR-L1: 0.0021][TOTAL: 0.0087]	1.0+19.2s
+[480/699]	[HR-MSE: 0.0066][LR-L1: 0.0021][TOTAL: 0.0086]	0.9+13.1s
+[640/699]	[HR-MSE: 0.0063][LR-L1: 0.0020][TOTAL: 0.0083]	0.9+21.6s
+
+Evaluation 131 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.515 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.449 (Best: 42.402 @epoch 119)
+Mean network applying time: 11.15ms
+Saving states ...
+Testing Total: 19.32s
+
+[Epoch 132]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	1.0+24.3s
+[320/699]	[HR-MSE: 0.0067][LR-L1: 0.0020][TOTAL: 0.0086]	1.2+23.6s
+[480/699]	[HR-MSE: 0.0065][LR-L1: 0.0020][TOTAL: 0.0085]	1.2+11.1s
+[640/699]	[HR-MSE: 0.0065][LR-L1: 0.0020][TOTAL: 0.0086]	1.0+20.3s
+
+Evaluation 132 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.487 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 35.662 (Best: 42.402 @epoch 119)
+Mean network applying time: 18.32ms
+Saving states ...
+Testing Total: 25.12s
+
+[Epoch 133]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0054][LR-L1: 0.0019][TOTAL: 0.0073]	1.1+24.9s
+[320/699]	[HR-MSE: 0.0061][LR-L1: 0.0020][TOTAL: 0.0080]	1.1+20.4s
+[480/699]	[HR-MSE: 0.0062][LR-L1: 0.0020][TOTAL: 0.0082]	1.2+10.5s
+[640/699]	[HR-MSE: 0.0063][LR-L1: 0.0020][TOTAL: 0.0083]	0.9+21.0s
+
+Evaluation 133 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.573 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.613 (Best: 42.402 @epoch 119)
+Mean network applying time: 19.77ms
+Saving states ...
+Testing Total: 20.45s
+
+[Epoch 134]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0074]	1.1+24.3s
+[320/699]	[HR-MSE: 0.0061][LR-L1: 0.0019][TOTAL: 0.0080]	0.9+20.9s
+[480/699]	[HR-MSE: 0.0060][LR-L1: 0.0019][TOTAL: 0.0079]	1.0+11.8s
+[640/699]	[HR-MSE: 0.0062][LR-L1: 0.0019][TOTAL: 0.0081]	0.9+21.2s
+
+Evaluation 134 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.842 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.140 (Best: 42.402 @epoch 119)
+Mean network applying time: 11.96ms
+Saving states ...
+Testing Total: 24.89s
+
+[Epoch 135]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0054][LR-L1: 0.0019][TOTAL: 0.0074]	1.1+24.6s
+[320/699]	[HR-MSE: 0.0059][LR-L1: 0.0019][TOTAL: 0.0079]	1.0+21.2s
+[480/699]	[HR-MSE: 0.0059][LR-L1: 0.0019][TOTAL: 0.0078]	1.1+11.6s
+[640/699]	[HR-MSE: 0.0059][LR-L1: 0.0019][TOTAL: 0.0078]	1.0+21.3s
+
+Evaluation 135 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.119 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.767 (Best: 42.402 @epoch 119)
+Mean network applying time: 18.77ms
+Saving states ...
+Testing Total: 17.91s
+
+[Epoch 136]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0080][LR-L1: 0.0023][TOTAL: 0.0102]	1.0+24.4s
+[320/699]	[HR-MSE: 0.0079][LR-L1: 0.0022][TOTAL: 0.0102]	1.1+21.6s
+[480/699]	[HR-MSE: 0.0068][LR-L1: 0.0021][TOTAL: 0.0089]	1.2+12.2s
+[640/699]	[HR-MSE: 0.0067][LR-L1: 0.0021][TOTAL: 0.0087]	1.0+20.2s
+
+Evaluation 136 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.806 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 36.689 (Best: 42.402 @epoch 119)
+Mean network applying time: 21.11ms
+Saving states ...
+Testing Total: 24.70s
+
+[Epoch 137]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	1.1+24.3s
+[320/699]	[HR-MSE: 0.0057][LR-L1: 0.0019][TOTAL: 0.0076]	1.1+21.5s
+[480/699]	[HR-MSE: 0.0057][LR-L1: 0.0020][TOTAL: 0.0077]	1.2+10.7s
+[640/699]	[HR-MSE: 0.0061][LR-L1: 0.0020][TOTAL: 0.0082]	1.0+21.3s
+
+Evaluation 137 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.404 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.794 (Best: 42.402 @epoch 119)
+Mean network applying time: 21.89ms
+Saving states ...
+Testing Total: 22.55s
+
+[Epoch 138]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0066][LR-L1: 0.0020][TOTAL: 0.0087]	1.0+23.0s
+[320/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	0.9+21.5s
+[480/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	1.0+12.6s
+[640/699]	[HR-MSE: 0.0060][LR-L1: 0.0018][TOTAL: 0.0078]	1.0+20.0s
+
+Evaluation 138 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 58.871 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.822 (Best: 42.402 @epoch 119)
+Mean network applying time: 17.76ms
+Saving states ...
+Testing Total: 25.36s
+
+[Epoch 139]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0081][LR-L1: 0.0020][TOTAL: 0.0101]	1.0+26.1s
+[320/699]	[HR-MSE: 0.0063][LR-L1: 0.0018][TOTAL: 0.0082]	1.0+21.2s
+[480/699]	[HR-MSE: 0.0063][LR-L1: 0.0019][TOTAL: 0.0081]	1.1+10.3s
+[640/699]	[HR-MSE: 0.0060][LR-L1: 0.0018][TOTAL: 0.0079]	0.9+21.6s
+
+Evaluation 139 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.960 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 41.999 (Best: 42.402 @epoch 119)
+Mean network applying time: 20.24ms
+Saving states ...
+Testing Total: 23.97s
+
+[Epoch 140]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0058][LR-L1: 0.0019][TOTAL: 0.0077]	1.1+24.5s
+[320/699]	[HR-MSE: 0.0062][LR-L1: 0.0020][TOTAL: 0.0082]	1.0+20.1s
+[480/699]	[HR-MSE: 0.0062][LR-L1: 0.0020][TOTAL: 0.0083]	1.0+11.8s
+[640/699]	[HR-MSE: 0.0060][LR-L1: 0.0020][TOTAL: 0.0080]	0.8+22.0s
+
+Evaluation 140 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 59.954 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.492 (Best: 42.402 @epoch 119)
+Mean network applying time: 30.01ms
+Saving states ...
+Testing Total: 60.58s
+
+[Epoch 141]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0066][LR-L1: 0.0020][TOTAL: 0.0086]	1.2+24.6s
+[320/699]	[HR-MSE: 0.0061][LR-L1: 0.0019][TOTAL: 0.0080]	1.1+22.4s
+[480/699]	[HR-MSE: 0.0061][LR-L1: 0.0019][TOTAL: 0.0079]	1.1+11.4s
+[640/699]	[HR-MSE: 0.0063][LR-L1: 0.0019][TOTAL: 0.0082]	1.0+20.0s
+
+Evaluation 141 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.366 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 41.403 (Best: 42.402 @epoch 119)
+Mean network applying time: 11.95ms
+Saving states ...
+Testing Total: 21.03s
+
+[Epoch 142]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0062][LR-L1: 0.0021][TOTAL: 0.0082]	1.2+24.6s
+[320/699]	[HR-MSE: 0.0061][LR-L1: 0.0020][TOTAL: 0.0081]	1.1+21.3s
+[480/699]	[HR-MSE: 0.0060][LR-L1: 0.0020][TOTAL: 0.0080]	1.2+11.1s
+[640/699]	[HR-MSE: 0.0057][LR-L1: 0.0019][TOTAL: 0.0076]	1.0+21.0s
+
+Evaluation 142 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.302 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.098 (Best: 42.402 @epoch 119)
+Mean network applying time: 22.11ms
+Saving states ...
+Testing Total: 24.90s
+
+[Epoch 143]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0060][LR-L1: 0.0020][TOTAL: 0.0080]	1.0+25.0s
+[320/699]	[HR-MSE: 0.0062][LR-L1: 0.0020][TOTAL: 0.0081]	1.0+20.3s
+[480/699]	[HR-MSE: 0.0062][LR-L1: 0.0020][TOTAL: 0.0082]	1.1+12.1s
+[640/699]	[HR-MSE: 0.0065][LR-L1: 0.0020][TOTAL: 0.0085]	0.8+22.4s
+
+Evaluation 143 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.276 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.660 (Best: 42.402 @epoch 119)
+Mean network applying time: 21.80ms
+Saving states ...
+Testing Total: 24.68s
+
+[Epoch 144]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0046][LR-L1: 0.0017][TOTAL: 0.0063]	1.1+24.4s
+[320/699]	[HR-MSE: 0.0057][LR-L1: 0.0019][TOTAL: 0.0076]	1.1+23.3s
+[480/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0076]	1.2+11.0s
+[640/699]	[HR-MSE: 0.0061][LR-L1: 0.0019][TOTAL: 0.0080]	1.0+19.9s
+
+Evaluation 144 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.804 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.196 (Best: 42.402 @epoch 119)
+Mean network applying time: 11.36ms
+Saving states ...
+Testing Total: 24.32s
+
+[Epoch 145]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0061][LR-L1: 0.0020][TOTAL: 0.0080]	0.9+25.8s
+[320/699]	[HR-MSE: 0.0055][LR-L1: 0.0019][TOTAL: 0.0074]	1.0+20.3s
+[480/699]	[HR-MSE: 0.0064][LR-L1: 0.0020][TOTAL: 0.0083]	1.1+13.5s
+[640/699]	[HR-MSE: 0.0063][LR-L1: 0.0020][TOTAL: 0.0083]	1.0+19.4s
+
+Evaluation 145 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 62.588 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.960 (Best: 42.402 @epoch 119)
+Mean network applying time: 16.91ms
+Saving states ...
+Testing Total: 24.85s
+
+[Epoch 146]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0075]	0.9+25.3s
+[320/699]	[HR-MSE: 0.0053][LR-L1: 0.0018][TOTAL: 0.0071]	1.0+20.5s
+[480/699]	[HR-MSE: 0.0052][LR-L1: 0.0019][TOTAL: 0.0070]	0.9+12.9s
+[640/699]	[HR-MSE: 0.0053][LR-L1: 0.0019][TOTAL: 0.0072]	0.9+20.7s
+
+Evaluation 146 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.503 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.146 (Best: 42.402 @epoch 119)
+Mean network applying time: 9.13ms
+Saving states ...
+Testing Total: 22.46s
+
+[Epoch 147]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0069][LR-L1: 0.0021][TOTAL: 0.0089]	0.9+24.4s
+[320/699]	[HR-MSE: 0.0058][LR-L1: 0.0019][TOTAL: 0.0077]	1.0+21.0s
+[480/699]	[HR-MSE: 0.0057][LR-L1: 0.0018][TOTAL: 0.0075]	1.1+11.5s
+[640/699]	[HR-MSE: 0.0060][LR-L1: 0.0019][TOTAL: 0.0079]	1.1+22.0s
+
+Evaluation 147 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.105 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 36.647 (Best: 42.402 @epoch 119)
+Mean network applying time: 22.25ms
+Saving states ...
+Testing Total: 24.14s
+
+[Epoch 148]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0064][LR-L1: 0.0019][TOTAL: 0.0083]	1.1+25.5s
+[320/699]	[HR-MSE: 0.0064][LR-L1: 0.0019][TOTAL: 0.0083]	1.1+21.9s
+[480/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	1.2+11.4s
+[640/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	1.1+21.7s
+
+Evaluation 148 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.719 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.838 (Best: 42.402 @epoch 119)
+Mean network applying time: 21.98ms
+Saving states ...
+Testing Total: 24.22s
+
+[Epoch 149]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0061][LR-L1: 0.0020][TOTAL: 0.0081]	1.0+24.4s
+[320/699]	[HR-MSE: 0.0067][LR-L1: 0.0020][TOTAL: 0.0087]	1.0+22.7s
+[480/699]	[HR-MSE: 0.0064][LR-L1: 0.0020][TOTAL: 0.0083]	1.1+10.9s
+[640/699]	[HR-MSE: 0.0066][LR-L1: 0.0020][TOTAL: 0.0087]	0.9+21.6s
+
+Evaluation 149 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 58.690 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.161 (Best: 42.402 @epoch 119)
+Mean network applying time: 15.64ms
+Saving states ...
+Testing Total: 25.37s
+
+[Epoch 150]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0053][LR-L1: 0.0019][TOTAL: 0.0071]	1.1+25.2s
+[320/699]	[HR-MSE: 0.0062][LR-L1: 0.0019][TOTAL: 0.0081]	0.9+21.2s
+[480/699]	[HR-MSE: 0.0057][LR-L1: 0.0018][TOTAL: 0.0075]	1.1+11.9s
+[640/699]	[HR-MSE: 0.0059][LR-L1: 0.0019][TOTAL: 0.0078]	0.9+20.6s
+
+Evaluation 150 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 58.525 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.957 (Best: 42.402 @epoch 119)
+Mean network applying time: 28.31ms
+Saving states ...
+Testing Total: 56.71s
+
+[Epoch 151]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0075][LR-L1: 0.0022][TOTAL: 0.0097]	1.2+24.0s
+[320/699]	[HR-MSE: 0.0065][LR-L1: 0.0021][TOTAL: 0.0085]	1.1+21.5s
+[480/699]	[HR-MSE: 0.0062][LR-L1: 0.0021][TOTAL: 0.0083]	1.1+10.9s
+[640/699]	[HR-MSE: 0.0060][LR-L1: 0.0020][TOTAL: 0.0081]	1.0+20.7s
+
+Evaluation 151 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 58.864 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 36.908 (Best: 42.402 @epoch 119)
+Mean network applying time: 14.91ms
+Saving states ...
+Testing Total: 22.66s
+
+[Epoch 152]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0053][LR-L1: 0.0020][TOTAL: 0.0073]	1.0+25.2s
+[320/699]	[HR-MSE: 0.0059][LR-L1: 0.0020][TOTAL: 0.0079]	1.0+20.6s
+[480/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0075]	1.1+13.1s
+[640/699]	[HR-MSE: 0.0060][LR-L1: 0.0020][TOTAL: 0.0079]	0.9+21.2s
+
+Evaluation 152 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.722 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.902 (Best: 42.402 @epoch 119)
+Mean network applying time: 9.13ms
+Saving states ...
+Testing Total: 20.95s
+
+[Epoch 153]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0062][LR-L1: 0.0021][TOTAL: 0.0082]	1.1+24.0s
+[320/699]	[HR-MSE: 0.0058][LR-L1: 0.0020][TOTAL: 0.0077]	1.1+21.6s
+[480/699]	[HR-MSE: 0.0053][LR-L1: 0.0019][TOTAL: 0.0072]	1.2+10.7s
+[640/699]	[HR-MSE: 0.0057][LR-L1: 0.0019][TOTAL: 0.0076]	1.0+21.4s
+
+Evaluation 153 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.709 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.452 (Best: 42.402 @epoch 119)
+Mean network applying time: 14.96ms
+Saving states ...
+Testing Total: 22.95s
+
+[Epoch 154]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0058][LR-L1: 0.0019][TOTAL: 0.0078]	1.1+25.4s
+[320/699]	[HR-MSE: 0.0061][LR-L1: 0.0019][TOTAL: 0.0081]	1.1+21.2s
+[480/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0074]	1.2+11.3s
+[640/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0074]	1.0+21.1s
+
+Evaluation 154 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.328 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.664 (Best: 42.402 @epoch 119)
+Mean network applying time: 17.78ms
+Saving states ...
+Testing Total: 21.12s
+
+[Epoch 155]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0051][LR-L1: 0.0018][TOTAL: 0.0069]	1.0+25.2s
+[320/699]	[HR-MSE: 0.0053][LR-L1: 0.0018][TOTAL: 0.0071]	1.1+22.8s
+[480/699]	[HR-MSE: 0.0054][LR-L1: 0.0019][TOTAL: 0.0073]	1.1+10.5s
+[640/699]	[HR-MSE: 0.0052][LR-L1: 0.0018][TOTAL: 0.0070]	0.9+21.2s
+
+Evaluation 155 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 56.570 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.931 (Best: 42.402 @epoch 119)
+Mean network applying time: 19.79ms
+Saving states ...
+Testing Total: 24.41s
+
+[Epoch 156]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0057][LR-L1: 0.0019][TOTAL: 0.0077]	1.0+24.2s
+[320/699]	[HR-MSE: 0.0061][LR-L1: 0.0018][TOTAL: 0.0079]	1.1+21.3s
+[480/699]	[HR-MSE: 0.0062][LR-L1: 0.0019][TOTAL: 0.0080]	1.0+10.8s
+[640/699]	[HR-MSE: 0.0060][LR-L1: 0.0019][TOTAL: 0.0078]	1.0+21.8s
+
+Evaluation 156 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.901 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.374 (Best: 42.402 @epoch 119)
+Mean network applying time: 18.35ms
+Saving states ...
+Testing Total: 25.10s
+
+[Epoch 157]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0066][LR-L1: 0.0020][TOTAL: 0.0086]	0.9+24.4s
+[320/699]	[HR-MSE: 0.0064][LR-L1: 0.0020][TOTAL: 0.0084]	0.9+19.2s
+[480/699]	[HR-MSE: 0.0057][LR-L1: 0.0019][TOTAL: 0.0076]	1.0+14.9s
+[640/699]	[HR-MSE: 0.0057][LR-L1: 0.0019][TOTAL: 0.0076]	1.0+21.7s
+
+Evaluation 157 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.396 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 41.707 (Best: 42.402 @epoch 119)
+Mean network applying time: 18.31ms
+Saving states ...
+Testing Total: 20.65s
+
+[Epoch 158]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0065][LR-L1: 0.0020][TOTAL: 0.0085]	1.0+24.5s
+[320/699]	[HR-MSE: 0.0058][LR-L1: 0.0020][TOTAL: 0.0078]	1.1+21.8s
+[480/699]	[HR-MSE: 0.0057][LR-L1: 0.0020][TOTAL: 0.0077]	1.1+10.6s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0020][TOTAL: 0.0076]	0.9+20.4s
+
+Evaluation 158 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.216 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.491 (Best: 42.402 @epoch 119)
+Mean network applying time: 16.26ms
+Saving states ...
+Testing Total: 23.47s
+
+[Epoch 159]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0068][LR-L1: 0.0020][TOTAL: 0.0088]	1.1+24.6s
+[320/699]	[HR-MSE: 0.0066][LR-L1: 0.0019][TOTAL: 0.0086]	1.1+21.8s
+[480/699]	[HR-MSE: 0.0065][LR-L1: 0.0019][TOTAL: 0.0084]	1.1+10.9s
+[640/699]	[HR-MSE: 0.0061][LR-L1: 0.0019][TOTAL: 0.0080]	0.9+21.3s
+
+Evaluation 159 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.193 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.683 (Best: 42.402 @epoch 119)
+Mean network applying time: 17.64ms
+Saving states ...
+Testing Total: 24.91s
+
+[Epoch 160]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0065][LR-L1: 0.0021][TOTAL: 0.0086]	1.1+25.3s
+[320/699]	[HR-MSE: 0.0063][LR-L1: 0.0019][TOTAL: 0.0082]	1.2+22.0s
+[480/699]	[HR-MSE: 0.0061][LR-L1: 0.0019][TOTAL: 0.0080]	1.1+11.1s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0074]	1.0+21.6s
+
+Evaluation 160 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 61.453 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.611 (Best: 42.402 @epoch 119)
+Mean network applying time: 32.17ms
+Saving states ...
+Testing Total: 60.00s
+
+[Epoch 161]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0069][LR-L1: 0.0021][TOTAL: 0.0090]	1.0+24.3s
+[320/699]	[HR-MSE: 0.0065][LR-L1: 0.0020][TOTAL: 0.0086]	1.0+21.2s
+[480/699]	[HR-MSE: 0.0062][LR-L1: 0.0020][TOTAL: 0.0082]	1.1+11.3s
+[640/699]	[HR-MSE: 0.0063][LR-L1: 0.0020][TOTAL: 0.0083]	0.9+20.8s
+
+Evaluation 161 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.059 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.176 (Best: 42.402 @epoch 119)
+Mean network applying time: 16.00ms
+Saving states ...
+Testing Total: 24.31s
+
+[Epoch 162]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0044][LR-L1: 0.0017][TOTAL: 0.0061]	1.0+24.5s
+[320/699]	[HR-MSE: 0.0047][LR-L1: 0.0018][TOTAL: 0.0065]	0.9+20.5s
+[480/699]	[HR-MSE: 0.0050][LR-L1: 0.0019][TOTAL: 0.0069]	1.0+11.4s
+[640/699]	[HR-MSE: 0.0051][LR-L1: 0.0019][TOTAL: 0.0070]	0.9+21.7s
+
+Evaluation 162 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.799 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.493 (Best: 42.402 @epoch 119)
+Mean network applying time: 20.85ms
+Saving states ...
+Testing Total: 25.29s
+
+[Epoch 163]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	1.2+25.7s
+[320/699]	[HR-MSE: 0.0060][LR-L1: 0.0020][TOTAL: 0.0080]	1.1+21.0s
+[480/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0076]	1.2+10.6s
+[640/699]	[HR-MSE: 0.0055][LR-L1: 0.0019][TOTAL: 0.0074]	1.0+21.4s
+
+Evaluation 163 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 62.545 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.017 (Best: 42.402 @epoch 119)
+Mean network applying time: 9.53ms
+Saving states ...
+Testing Total: 20.84s
+
+[Epoch 164]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0073]	1.0+24.6s
+[320/699]	[HR-MSE: 0.0059][LR-L1: 0.0018][TOTAL: 0.0076]	1.0+23.0s
+[480/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	1.2+10.3s
+[640/699]	[HR-MSE: 0.0061][LR-L1: 0.0019][TOTAL: 0.0080]	1.0+20.0s
+
+Evaluation 164 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.049 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.822 (Best: 42.402 @epoch 119)
+Mean network applying time: 16.97ms
+Saving states ...
+Testing Total: 22.86s
+
+[Epoch 165]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0059][LR-L1: 0.0017][TOTAL: 0.0076]	1.1+25.0s
+[320/699]	[HR-MSE: 0.0060][LR-L1: 0.0018][TOTAL: 0.0078]	1.0+21.4s
+[480/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	1.1+11.8s
+[640/699]	[HR-MSE: 0.0057][LR-L1: 0.0018][TOTAL: 0.0075]	1.0+22.0s
+
+Evaluation 165 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.767 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.166 (Best: 42.402 @epoch 119)
+Mean network applying time: 15.11ms
+Saving states ...
+Testing Total: 21.41s
+
+[Epoch 166]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0072]	1.1+25.9s
+[320/699]	[HR-MSE: 0.0055][LR-L1: 0.0019][TOTAL: 0.0073]	1.0+20.9s
+[480/699]	[HR-MSE: 0.0058][LR-L1: 0.0019][TOTAL: 0.0078]	1.0+10.6s
+[640/699]	[HR-MSE: 0.0059][LR-L1: 0.0019][TOTAL: 0.0078]	1.0+21.9s
+
+Evaluation 166 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 62.745 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 36.490 (Best: 42.402 @epoch 119)
+Mean network applying time: 15.50ms
+Saving states ...
+Testing Total: 21.93s
+
+[Epoch 167]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0064][LR-L1: 0.0018][TOTAL: 0.0082]	1.1+24.5s
+[320/699]	[HR-MSE: 0.0063][LR-L1: 0.0019][TOTAL: 0.0082]	1.1+21.4s
+[480/699]	[HR-MSE: 0.0059][LR-L1: 0.0018][TOTAL: 0.0077]	1.1+10.8s
+[640/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0077]	1.0+21.6s
+
+Evaluation 167 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.311 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.736 (Best: 42.402 @epoch 119)
+Mean network applying time: 16.99ms
+Saving states ...
+Testing Total: 24.70s
+
+[Epoch 168]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0067][LR-L1: 0.0020][TOTAL: 0.0087]	1.1+25.4s
+[320/699]	[HR-MSE: 0.0063][LR-L1: 0.0019][TOTAL: 0.0083]	1.0+21.6s
+[480/699]	[HR-MSE: 0.0058][LR-L1: 0.0019][TOTAL: 0.0077]	1.1+10.5s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0075]	0.9+21.3s
+
+Evaluation 168 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.876 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.487 (Best: 42.402 @epoch 119)
+Mean network applying time: 14.39ms
+Saving states ...
+Testing Total: 22.92s
+
+[Epoch 169]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0075]	1.0+25.4s
+[320/699]	[HR-MSE: 0.0060][LR-L1: 0.0020][TOTAL: 0.0079]	1.0+20.9s
+[480/699]	[HR-MSE: 0.0058][LR-L1: 0.0020][TOTAL: 0.0078]	1.0+11.3s
+[640/699]	[HR-MSE: 0.0057][LR-L1: 0.0019][TOTAL: 0.0077]	0.9+20.2s
+
+Evaluation 169 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 56.770 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.174 (Best: 42.402 @epoch 119)
+Mean network applying time: 15.97ms
+Saving states ...
+Testing Total: 24.59s
+
+[Epoch 170]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0048][LR-L1: 0.0017][TOTAL: 0.0064]	1.1+25.4s
+[320/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	1.1+21.1s
+[480/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0074]	1.1+10.8s
+[640/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	0.9+20.6s
+
+Evaluation 170 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 63.669 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.931 (Best: 42.402 @epoch 119)
+Mean network applying time: 31.16ms
+Saving states ...
+Testing Total: 59.93s
+
+[Epoch 171]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0050][LR-L1: 0.0018][TOTAL: 0.0068]	1.2+26.8s
+[320/699]	[HR-MSE: 0.0055][LR-L1: 0.0019][TOTAL: 0.0074]	1.1+19.6s
+[480/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0075]	1.1+11.8s
+[640/699]	[HR-MSE: 0.0057][LR-L1: 0.0019][TOTAL: 0.0076]	1.0+20.7s
+
+Evaluation 171 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 66.513 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.159 (Best: 42.402 @epoch 119)
+Mean network applying time: 17.72ms
+Saving states ...
+Testing Total: 24.90s
+
+[Epoch 172]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0064][LR-L1: 0.0018][TOTAL: 0.0082]	1.1+24.2s
+[320/699]	[HR-MSE: 0.0061][LR-L1: 0.0018][TOTAL: 0.0079]	1.0+19.5s
+[480/699]	[HR-MSE: 0.0063][LR-L1: 0.0019][TOTAL: 0.0082]	0.9+13.2s
+[640/699]	[HR-MSE: 0.0063][LR-L1: 0.0019][TOTAL: 0.0082]	0.9+20.8s
+
+Evaluation 172 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.680 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.348 (Best: 42.402 @epoch 119)
+Mean network applying time: 12.61ms
+Saving states ...
+Testing Total: 23.33s
+
+[Epoch 173]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0059][LR-L1: 0.0019][TOTAL: 0.0077]	1.0+24.7s
+[320/699]	[HR-MSE: 0.0060][LR-L1: 0.0019][TOTAL: 0.0079]	1.1+21.7s
+[480/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0074]	1.2+9.6s
+[640/699]	[HR-MSE: 0.0053][LR-L1: 0.0018][TOTAL: 0.0072]	0.8+21.8s
+
+Evaluation 173 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.076 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.189 (Best: 42.402 @epoch 119)
+Mean network applying time: 13.38ms
+Saving states ...
+Testing Total: 22.86s
+
+[Epoch 174]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0059][LR-L1: 0.0019][TOTAL: 0.0079]	1.0+24.5s
+[320/699]	[HR-MSE: 0.0060][LR-L1: 0.0020][TOTAL: 0.0080]	1.1+20.3s
+[480/699]	[HR-MSE: 0.0061][LR-L1: 0.0019][TOTAL: 0.0080]	1.1+11.6s
+[640/699]	[HR-MSE: 0.0060][LR-L1: 0.0019][TOTAL: 0.0079]	0.9+19.9s
+
+Evaluation 174 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.819 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.659 (Best: 42.402 @epoch 119)
+Mean network applying time: 16.26ms
+Saving states ...
+Testing Total: 19.91s
+
+[Epoch 175]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0058][LR-L1: 0.0019][TOTAL: 0.0077]	1.1+25.3s
+[320/699]	[HR-MSE: 0.0058][LR-L1: 0.0019][TOTAL: 0.0077]	1.0+21.3s
+[480/699]	[HR-MSE: 0.0060][LR-L1: 0.0019][TOTAL: 0.0080]	1.2+10.9s
+[640/699]	[HR-MSE: 0.0062][LR-L1: 0.0019][TOTAL: 0.0081]	0.8+21.8s
+
+Evaluation 175 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 58.607 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.757 (Best: 42.402 @epoch 119)
+Mean network applying time: 8.96ms
+Saving states ...
+Testing Total: 22.75s
+
+[Epoch 176]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0072][LR-L1: 0.0019][TOTAL: 0.0091]	0.9+24.5s
+[320/699]	[HR-MSE: 0.0062][LR-L1: 0.0019][TOTAL: 0.0081]	1.0+22.6s
+[480/699]	[HR-MSE: 0.0060][LR-L1: 0.0019][TOTAL: 0.0079]	1.1+9.6s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0075]	1.0+21.6s
+
+Evaluation 176 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.776 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 36.806 (Best: 42.402 @epoch 119)
+Mean network applying time: 12.54ms
+Saving states ...
+Testing Total: 22.48s
+
+[Epoch 177]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0066]	1.0+24.5s
+[320/699]	[HR-MSE: 0.0052][LR-L1: 0.0018][TOTAL: 0.0070]	0.9+21.4s
+[480/699]	[HR-MSE: 0.0050][LR-L1: 0.0017][TOTAL: 0.0067]	1.0+11.2s
+[640/699]	[HR-MSE: 0.0052][LR-L1: 0.0018][TOTAL: 0.0070]	0.9+20.3s
+
+Evaluation 177 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.206 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.395 (Best: 42.402 @epoch 119)
+Mean network applying time: 16.50ms
+Saving states ...
+Testing Total: 20.72s
+
+[Epoch 178]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0055][LR-L1: 0.0020][TOTAL: 0.0075]	1.0+24.7s
+[320/699]	[HR-MSE: 0.0052][LR-L1: 0.0019][TOTAL: 0.0071]	1.1+21.2s
+[480/699]	[HR-MSE: 0.0059][LR-L1: 0.0019][TOTAL: 0.0078]	1.0+11.7s
+[640/699]	[HR-MSE: 0.0060][LR-L1: 0.0020][TOTAL: 0.0080]	0.9+20.8s
+
+Evaluation 178 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.340 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.633 (Best: 42.402 @epoch 119)
+Mean network applying time: 18.46ms
+Saving states ...
+Testing Total: 21.85s
+
+[Epoch 179]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0064][LR-L1: 0.0020][TOTAL: 0.0084]	1.1+23.9s
+[320/699]	[HR-MSE: 0.0060][LR-L1: 0.0019][TOTAL: 0.0079]	1.0+21.8s
+[480/699]	[HR-MSE: 0.0057][LR-L1: 0.0018][TOTAL: 0.0076]	1.0+11.6s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0075]	0.8+20.8s
+
+Evaluation 179 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.250 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.105 (Best: 42.402 @epoch 119)
+Mean network applying time: 20.65ms
+Saving states ...
+Testing Total: 22.57s
+
+[Epoch 180]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0054][LR-L1: 0.0017][TOTAL: 0.0071]	1.0+24.0s
+[320/699]	[HR-MSE: 0.0052][LR-L1: 0.0018][TOTAL: 0.0070]	1.1+22.5s
+[480/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	1.1+10.5s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0074]	1.0+21.1s
+
+Evaluation 180 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 63.385 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.820 (Best: 42.402 @epoch 119)
+Mean network applying time: 29.81ms
+Saving states ...
+Testing Total: 59.41s
+
+[Epoch 181]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0047][LR-L1: 0.0018][TOTAL: 0.0065]	1.1+24.1s
+[320/699]	[HR-MSE: 0.0050][LR-L1: 0.0018][TOTAL: 0.0067]	1.0+22.6s
+[480/699]	[HR-MSE: 0.0057][LR-L1: 0.0018][TOTAL: 0.0075]	1.1+10.6s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0075]	0.9+20.7s
+
+Evaluation 181 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.443 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.527 (Best: 42.402 @epoch 119)
+Mean network applying time: 18.44ms
+Saving states ...
+Testing Total: 21.95s
+
+[Epoch 182]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0048][LR-L1: 0.0017][TOTAL: 0.0065]	0.9+24.3s
+[320/699]	[HR-MSE: 0.0050][LR-L1: 0.0018][TOTAL: 0.0068]	0.8+22.0s
+[480/699]	[HR-MSE: 0.0047][LR-L1: 0.0017][TOTAL: 0.0065]	1.0+13.3s
+[640/699]	[HR-MSE: 0.0048][LR-L1: 0.0017][TOTAL: 0.0065]	1.0+21.6s
+
+Evaluation 182 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 56.672 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.101 (Best: 42.402 @epoch 119)
+Mean network applying time: 23.06ms
+Saving states ...
+Testing Total: 25.24s
+
+[Epoch 183]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0051][LR-L1: 0.0019][TOTAL: 0.0069]	0.9+24.9s
+[320/699]	[HR-MSE: 0.0052][LR-L1: 0.0019][TOTAL: 0.0071]	1.1+20.8s
+[480/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0066]	1.1+11.9s
+[640/699]	[HR-MSE: 0.0050][LR-L1: 0.0017][TOTAL: 0.0067]	0.9+20.5s
+
+Evaluation 183 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 58.199 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.247 (Best: 42.402 @epoch 119)
+Mean network applying time: 16.55ms
+Saving states ...
+Testing Total: 24.11s
+
+[Epoch 184]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0067][LR-L1: 0.0018][TOTAL: 0.0085]	1.1+26.3s
+[320/699]	[HR-MSE: 0.0061][LR-L1: 0.0018][TOTAL: 0.0079]	1.1+20.3s
+[480/699]	[HR-MSE: 0.0059][LR-L1: 0.0018][TOTAL: 0.0077]	1.2+11.4s
+[640/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	0.9+20.0s
+
+Evaluation 184 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 62.533 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.196 (Best: 42.402 @epoch 119)
+Mean network applying time: 17.38ms
+Saving states ...
+Testing Total: 24.72s
+
+[Epoch 185]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0057][LR-L1: 0.0018][TOTAL: 0.0076]	1.1+24.5s
+[320/699]	[HR-MSE: 0.0059][LR-L1: 0.0018][TOTAL: 0.0077]	1.0+21.0s
+[480/699]	[HR-MSE: 0.0057][LR-L1: 0.0018][TOTAL: 0.0074]	1.0+11.7s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0074]	1.0+21.1s
+
+Evaluation 185 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 55.872 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.665 (Best: 42.402 @epoch 119)
+Mean network applying time: 12.32ms
+Saving states ...
+Testing Total: 20.66s
+
+[Epoch 186]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0040][LR-L1: 0.0016][TOTAL: 0.0056]	1.1+25.2s
+[320/699]	[HR-MSE: 0.0044][LR-L1: 0.0016][TOTAL: 0.0060]	1.1+22.6s
+[480/699]	[HR-MSE: 0.0053][LR-L1: 0.0018][TOTAL: 0.0071]	1.2+10.9s
+[640/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	0.9+20.9s
+
+Evaluation 186 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.627 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.283 (Best: 42.402 @epoch 119)
+Mean network applying time: 15.88ms
+Saving states ...
+Testing Total: 23.90s
+
+[Epoch 187]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0058][LR-L1: 0.0019][TOTAL: 0.0077]	1.1+25.3s
+[320/699]	[HR-MSE: 0.0052][LR-L1: 0.0018][TOTAL: 0.0070]	1.0+19.6s
+[480/699]	[HR-MSE: 0.0054][LR-L1: 0.0019][TOTAL: 0.0073]	1.0+11.6s
+[640/699]	[HR-MSE: 0.0057][LR-L1: 0.0019][TOTAL: 0.0076]	0.8+20.9s
+
+Evaluation 187 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.304 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.126 (Best: 42.402 @epoch 119)
+Mean network applying time: 12.96ms
+Saving states ...
+Testing Total: 24.33s
+
+[Epoch 188]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0057][LR-L1: 0.0019][TOTAL: 0.0075]	1.1+24.0s
+[320/699]	[HR-MSE: 0.0051][LR-L1: 0.0017][TOTAL: 0.0069]	1.1+22.3s
+[480/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	1.2+10.5s
+[640/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	1.0+21.3s
+
+Evaluation 188 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.435 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.782 (Best: 42.402 @epoch 119)
+Mean network applying time: 13.85ms
+Saving states ...
+Testing Total: 22.15s
+
+[Epoch 189]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	0.9+25.5s
+[320/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0066]	1.0+22.3s
+[480/699]	[HR-MSE: 0.0050][LR-L1: 0.0018][TOTAL: 0.0068]	1.1+11.8s
+[640/699]	[HR-MSE: 0.0053][LR-L1: 0.0018][TOTAL: 0.0071]	0.9+21.6s
+
+Evaluation 189 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.420 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.414 (Best: 42.402 @epoch 119)
+Mean network applying time: 22.34ms
+Saving states ...
+Testing Total: 23.59s
+
+[Epoch 190]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	1.1+23.4s
+[320/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0066]	1.0+21.0s
+[480/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	1.0+12.3s
+[640/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	0.9+20.7s
+
+Evaluation 190 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 63.278 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 41.388 (Best: 42.402 @epoch 119)
+Mean network applying time: 28.37ms
+Saving states ...
+Testing Total: 59.44s
+
+[Epoch 191]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0059][LR-L1: 0.0020][TOTAL: 0.0079]	1.0+25.5s
+[320/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0075]	1.1+20.6s
+[480/699]	[HR-MSE: 0.0053][LR-L1: 0.0018][TOTAL: 0.0071]	1.1+11.1s
+[640/699]	[HR-MSE: 0.0051][LR-L1: 0.0018][TOTAL: 0.0068]	0.9+22.1s
+
+Evaluation 191 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.573 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.503 (Best: 42.402 @epoch 119)
+Mean network applying time: 14.79ms
+Saving states ...
+Testing Total: 24.59s
+
+[Epoch 192]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0074]	1.0+24.3s
+[320/699]	[HR-MSE: 0.0059][LR-L1: 0.0019][TOTAL: 0.0077]	1.2+22.2s
+[480/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	1.2+10.5s
+[640/699]	[HR-MSE: 0.0053][LR-L1: 0.0017][TOTAL: 0.0070]	1.0+21.0s
+
+Evaluation 192 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.427 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 41.657 (Best: 42.402 @epoch 119)
+Mean network applying time: 11.48ms
+Saving states ...
+Testing Total: 21.80s
+
+[Epoch 193]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0064][LR-L1: 0.0018][TOTAL: 0.0082]	1.1+25.1s
+[320/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0075]	1.1+20.9s
+[480/699]	[HR-MSE: 0.0057][LR-L1: 0.0018][TOTAL: 0.0074]	1.1+10.8s
+[640/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0072]	0.8+20.7s
+
+Evaluation 193 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.992 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.464 (Best: 42.402 @epoch 119)
+Mean network applying time: 13.55ms
+Saving states ...
+Testing Total: 25.08s
+
+[Epoch 194]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0051][LR-L1: 0.0018][TOTAL: 0.0069]	1.1+25.2s
+[320/699]	[HR-MSE: 0.0058][LR-L1: 0.0019][TOTAL: 0.0077]	1.1+21.2s
+[480/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0075]	1.2+11.4s
+[640/699]	[HR-MSE: 0.0058][LR-L1: 0.0019][TOTAL: 0.0077]	1.0+21.5s
+
+Evaluation 194 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 58.174 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.974 (Best: 42.402 @epoch 119)
+Mean network applying time: 18.44ms
+Saving states ...
+Testing Total: 24.36s
+
+[Epoch 195]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0047][LR-L1: 0.0017][TOTAL: 0.0064]	1.2+23.5s
+[320/699]	[HR-MSE: 0.0053][LR-L1: 0.0016][TOTAL: 0.0069]	1.1+21.7s
+[480/699]	[HR-MSE: 0.0053][LR-L1: 0.0016][TOTAL: 0.0069]	1.1+10.8s
+[640/699]	[HR-MSE: 0.0055][LR-L1: 0.0017][TOTAL: 0.0072]	1.0+21.5s
+
+Evaluation 195 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.805 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.471 (Best: 42.402 @epoch 119)
+Mean network applying time: 22.49ms
+Saving states ...
+Testing Total: 20.11s
+
+[Epoch 196]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0051][LR-L1: 0.0017][TOTAL: 0.0068]	1.1+24.9s
+[320/699]	[HR-MSE: 0.0051][LR-L1: 0.0017][TOTAL: 0.0068]	1.1+21.6s
+[480/699]	[HR-MSE: 0.0053][LR-L1: 0.0018][TOTAL: 0.0071]	1.2+12.4s
+[640/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	1.0+22.1s
+
+Evaluation 196 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 56.199 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.717 (Best: 42.402 @epoch 119)
+Mean network applying time: 11.39ms
+Saving states ...
+Testing Total: 20.04s
+
+[Epoch 197]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0052][LR-L1: 0.0017][TOTAL: 0.0069]	1.0+26.0s
+[320/699]	[HR-MSE: 0.0050][LR-L1: 0.0017][TOTAL: 0.0067]	1.1+19.8s
+[480/699]	[HR-MSE: 0.0052][LR-L1: 0.0018][TOTAL: 0.0069]	1.1+13.1s
+[640/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	0.9+20.0s
+
+Evaluation 197 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.674 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.189 (Best: 42.402 @epoch 119)
+Mean network applying time: 16.36ms
+Saving states ...
+Testing Total: 22.60s
+
+[Epoch 198]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0074]	1.0+24.6s
+[320/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	1.0+21.3s
+[480/699]	[HR-MSE: 0.0052][LR-L1: 0.0018][TOTAL: 0.0069]	1.0+11.8s
+[640/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	0.9+20.5s
+
+Evaluation 198 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.520 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.034 (Best: 42.402 @epoch 119)
+Mean network applying time: 14.21ms
+Saving states ...
+Testing Total: 23.96s
+
+[Epoch 199]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	1.0+24.9s
+[320/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	0.9+21.3s
+[480/699]	[HR-MSE: 0.0056][LR-L1: 0.0017][TOTAL: 0.0073]	1.1+11.8s
+[640/699]	[HR-MSE: 0.0053][LR-L1: 0.0017][TOTAL: 0.0071]	0.9+21.1s
+
+Evaluation 199 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 64.046 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.387 (Best: 42.402 @epoch 119)
+Mean network applying time: 20.27ms
+Saving states ...
+Testing Total: 24.28s
+
+[Epoch 200]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0064][LR-L1: 0.0020][TOTAL: 0.0085]	1.1+25.8s
+[320/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0074]	1.0+20.1s
+[480/699]	[HR-MSE: 0.0053][LR-L1: 0.0018][TOTAL: 0.0071]	1.0+13.5s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0075]	0.9+21.3s
+
+Evaluation 200 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 58.529 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.617 (Best: 42.402 @epoch 119)
+Mean network applying time: 23.90ms
+Saving states ...
+Testing Total: 58.85s
+
+[Epoch 201]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0044][LR-L1: 0.0017][TOTAL: 0.0060]	1.1+24.2s
+[320/699]	[HR-MSE: 0.0053][LR-L1: 0.0017][TOTAL: 0.0070]	1.1+20.6s
+[480/699]	[HR-MSE: 0.0054][LR-L1: 0.0017][TOTAL: 0.0072]	1.0+11.7s
+[640/699]	[HR-MSE: 0.0054][LR-L1: 0.0017][TOTAL: 0.0072]	0.9+21.3s
+
+Evaluation 201 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 53.973 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.562 (Best: 42.402 @epoch 119)
+Mean network applying time: 17.60ms
+Saving states ...
+Testing Total: 24.69s
+
+[Epoch 202]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0062][LR-L1: 0.0019][TOTAL: 0.0080]	1.0+25.5s
+[320/699]	[HR-MSE: 0.0063][LR-L1: 0.0020][TOTAL: 0.0083]	1.0+20.2s
+[480/699]	[HR-MSE: 0.0057][LR-L1: 0.0019][TOTAL: 0.0076]	0.9+14.3s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0074]	0.7+19.4s
+
+Evaluation 202 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.831 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.509 (Best: 42.402 @epoch 119)
+Mean network applying time: 26.15ms
+Saving states ...
+Testing Total: 24.85s
+
+[Epoch 203]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0048][LR-L1: 0.0017][TOTAL: 0.0065]	1.1+25.9s
+[320/699]	[HR-MSE: 0.0047][LR-L1: 0.0017][TOTAL: 0.0064]	1.0+21.8s
+[480/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0066]	1.1+10.6s
+[640/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0066]	1.0+20.1s
+
+Evaluation 203 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.322 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 41.248 (Best: 42.402 @epoch 119)
+Mean network applying time: 25.48ms
+Saving states ...
+Testing Total: 24.74s
+
+[Epoch 204]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0067][LR-L1: 0.0018][TOTAL: 0.0085]	1.1+24.2s
+[320/699]	[HR-MSE: 0.0062][LR-L1: 0.0018][TOTAL: 0.0080]	1.0+19.9s
+[480/699]	[HR-MSE: 0.0063][LR-L1: 0.0019][TOTAL: 0.0082]	1.0+12.1s
+[640/699]	[HR-MSE: 0.0060][LR-L1: 0.0018][TOTAL: 0.0078]	1.0+20.5s
+
+Evaluation 204 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 62.493 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.687 (Best: 42.402 @epoch 119)
+Mean network applying time: 22.46ms
+Saving states ...
+Testing Total: 24.55s
+
+[Epoch 205]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0052][LR-L1: 0.0017][TOTAL: 0.0069]	1.2+26.1s
+[320/699]	[HR-MSE: 0.0061][LR-L1: 0.0018][TOTAL: 0.0079]	1.0+20.1s
+[480/699]	[HR-MSE: 0.0060][LR-L1: 0.0018][TOTAL: 0.0077]	1.1+11.5s
+[640/699]	[HR-MSE: 0.0063][LR-L1: 0.0019][TOTAL: 0.0082]	0.9+20.9s
+
+Evaluation 205 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.743 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.986 (Best: 42.402 @epoch 119)
+Mean network applying time: 22.48ms
+Saving states ...
+Testing Total: 23.61s
+
+[Epoch 206]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0071]	1.0+24.8s
+[320/699]	[HR-MSE: 0.0058][LR-L1: 0.0019][TOTAL: 0.0077]	1.1+21.6s
+[480/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0072]	1.1+10.7s
+[640/699]	[HR-MSE: 0.0052][LR-L1: 0.0017][TOTAL: 0.0069]	0.9+21.1s
+
+Evaluation 206 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.953 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.708 (Best: 42.402 @epoch 119)
+Mean network applying time: 12.40ms
+Saving states ...
+Testing Total: 19.93s
+
+[Epoch 207]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0059][LR-L1: 0.0020][TOTAL: 0.0079]	1.0+24.4s
+[320/699]	[HR-MSE: 0.0051][LR-L1: 0.0018][TOTAL: 0.0069]	1.1+20.3s
+[480/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0066]	1.1+12.9s
+[640/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0066]	0.9+22.3s
+
+Evaluation 207 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.996 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.912 (Best: 42.402 @epoch 119)
+Mean network applying time: 17.29ms
+Saving states ...
+Testing Total: 23.50s
+
+[Epoch 208]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0043][LR-L1: 0.0017][TOTAL: 0.0060]	0.9+25.2s
+[320/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	1.1+21.3s
+[480/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0074]	1.1+11.1s
+[640/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	0.9+20.8s
+
+Evaluation 208 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.555 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.790 (Best: 42.402 @epoch 119)
+Mean network applying time: 11.83ms
+Saving states ...
+Testing Total: 22.52s
+
+[Epoch 209]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0067][LR-L1: 0.0020][TOTAL: 0.0087]	1.1+25.1s
+[320/699]	[HR-MSE: 0.0061][LR-L1: 0.0019][TOTAL: 0.0080]	1.1+20.7s
+[480/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0074]	1.1+11.6s
+[640/699]	[HR-MSE: 0.0052][LR-L1: 0.0017][TOTAL: 0.0070]	0.9+20.6s
+
+Evaluation 209 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.067 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 41.646 (Best: 42.402 @epoch 119)
+Mean network applying time: 19.56ms
+Saving states ...
+Testing Total: 20.50s
+
+[Epoch 210]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0046][LR-L1: 0.0017][TOTAL: 0.0063]	1.0+24.3s
+[320/699]	[HR-MSE: 0.0051][LR-L1: 0.0017][TOTAL: 0.0069]	1.0+21.3s
+[480/699]	[HR-MSE: 0.0051][LR-L1: 0.0017][TOTAL: 0.0068]	1.1+10.5s
+[640/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0066]	0.8+22.2s
+
+Evaluation 210 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 64.198 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.550 (Best: 42.402 @epoch 119)
+Mean network applying time: 21.84ms
+Saving states ...
+Testing Total: 58.47s
+
+[Epoch 211]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0061][LR-L1: 0.0018][TOTAL: 0.0079]	1.1+24.1s
+[320/699]	[HR-MSE: 0.0061][LR-L1: 0.0018][TOTAL: 0.0078]	0.9+20.8s
+[480/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	1.1+11.8s
+[640/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	1.0+21.1s
+
+Evaluation 211 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.680 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.616 (Best: 42.402 @epoch 119)
+Mean network applying time: 16.68ms
+Saving states ...
+Testing Total: 24.52s
+
+[Epoch 212]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0065]	1.0+25.3s
+[320/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0074]	1.0+20.7s
+[480/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	1.1+11.4s
+[640/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	0.9+21.0s
+
+Evaluation 212 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.535 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.698 (Best: 42.402 @epoch 119)
+Mean network applying time: 11.41ms
+Saving states ...
+Testing Total: 21.32s
+
+[Epoch 213]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0059][LR-L1: 0.0019][TOTAL: 0.0078]	1.0+24.8s
+[320/699]	[HR-MSE: 0.0057][LR-L1: 0.0018][TOTAL: 0.0076]	1.2+21.0s
+[480/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0074]	1.2+10.7s
+[640/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	0.9+21.3s
+
+Evaluation 213 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 56.749 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.305 (Best: 42.402 @epoch 119)
+Mean network applying time: 20.45ms
+Saving states ...
+Testing Total: 23.79s
+
+[Epoch 214]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0044][LR-L1: 0.0016][TOTAL: 0.0060]	1.0+25.6s
+[320/699]	[HR-MSE: 0.0047][LR-L1: 0.0017][TOTAL: 0.0064]	1.2+21.4s
+[480/699]	[HR-MSE: 0.0047][LR-L1: 0.0017][TOTAL: 0.0064]	1.2+10.7s
+[640/699]	[HR-MSE: 0.0046][LR-L1: 0.0017][TOTAL: 0.0063]	0.9+21.5s
+
+Evaluation 214 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 70.394 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 41.082 (Best: 42.402 @epoch 119)
+Mean network applying time: 16.10ms
+Saving states ...
+Testing Total: 22.86s
+
+[Epoch 215]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0052][LR-L1: 0.0017][TOTAL: 0.0068]	1.0+24.4s
+[320/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0066]	1.0+21.4s
+[480/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0065]	1.2+11.5s
+[640/699]	[HR-MSE: 0.0053][LR-L1: 0.0017][TOTAL: 0.0070]	0.9+21.0s
+
+Evaluation 215 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.156 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.618 (Best: 42.402 @epoch 119)
+Mean network applying time: 15.18ms
+Saving states ...
+Testing Total: 21.16s
+
+[Epoch 216]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0040][LR-L1: 0.0017][TOTAL: 0.0058]	1.2+25.1s
+[320/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	1.1+21.4s
+[480/699]	[HR-MSE: 0.0061][LR-L1: 0.0018][TOTAL: 0.0079]	1.1+10.5s
+[640/699]	[HR-MSE: 0.0058][LR-L1: 0.0018][TOTAL: 0.0076]	0.9+22.2s
+
+Evaluation 216 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 64.535 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.983 (Best: 42.402 @epoch 119)
+Mean network applying time: 11.96ms
+Saving states ...
+Testing Total: 22.12s
+
+[Epoch 217]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0052][LR-L1: 0.0018][TOTAL: 0.0069]	1.1+24.2s
+[320/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0066]	1.0+21.2s
+[480/699]	[HR-MSE: 0.0052][LR-L1: 0.0018][TOTAL: 0.0070]	1.1+12.0s
+[640/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0072]	0.9+21.4s
+
+Evaluation 217 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.895 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.202 (Best: 42.402 @epoch 119)
+Mean network applying time: 13.64ms
+Saving states ...
+Testing Total: 22.81s
+
+[Epoch 218]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0059][LR-L1: 0.0018][TOTAL: 0.0077]	1.0+24.4s
+[320/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0073]	1.1+20.7s
+[480/699]	[HR-MSE: 0.0057][LR-L1: 0.0018][TOTAL: 0.0075]	1.1+11.9s
+[640/699]	[HR-MSE: 0.0054][LR-L1: 0.0017][TOTAL: 0.0072]	0.9+18.3s
+
+Evaluation 218 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.781 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.853 (Best: 42.402 @epoch 119)
+Mean network applying time: 12.87ms
+Saving states ...
+Testing Total: 21.08s
+
+[Epoch 219]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0050][LR-L1: 0.0017][TOTAL: 0.0067]	1.1+24.3s
+[320/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0074]	1.1+21.6s
+[480/699]	[HR-MSE: 0.0056][LR-L1: 0.0019][TOTAL: 0.0074]	1.1+10.9s
+[640/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	1.0+20.8s
+
+Evaluation 219 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.542 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.339 (Best: 42.402 @epoch 119)
+Mean network applying time: 11.34ms
+Saving states ...
+Testing Total: 20.38s
+
+[Epoch 220]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0046][LR-L1: 0.0016][TOTAL: 0.0062]	1.0+23.4s
+[320/699]	[HR-MSE: 0.0053][LR-L1: 0.0018][TOTAL: 0.0071]	1.1+21.5s
+[480/699]	[HR-MSE: 0.0051][LR-L1: 0.0018][TOTAL: 0.0069]	1.2+10.6s
+[640/699]	[HR-MSE: 0.0051][LR-L1: 0.0017][TOTAL: 0.0068]	1.0+20.8s
+
+Evaluation 220 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 61.046 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.571 (Best: 42.402 @epoch 119)
+Mean network applying time: 24.76ms
+Saving states ...
+Testing Total: 56.96s
+
+[Epoch 221]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0053][LR-L1: 0.0017][TOTAL: 0.0070]	1.1+24.3s
+[320/699]	[HR-MSE: 0.0051][LR-L1: 0.0017][TOTAL: 0.0068]	1.1+20.8s
+[480/699]	[HR-MSE: 0.0049][LR-L1: 0.0017][TOTAL: 0.0066]	1.1+11.0s
+[640/699]	[HR-MSE: 0.0048][LR-L1: 0.0017][TOTAL: 0.0065]	0.9+20.2s
+
+Evaluation 221 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.053 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.836 (Best: 42.402 @epoch 119)
+Mean network applying time: 15.07ms
+Saving states ...
+Testing Total: 20.49s
+
+[Epoch 222]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0061][LR-L1: 0.0018][TOTAL: 0.0079]	1.0+24.1s
+[320/699]	[HR-MSE: 0.0060][LR-L1: 0.0018][TOTAL: 0.0078]	1.0+20.4s
+[480/699]	[HR-MSE: 0.0055][LR-L1: 0.0017][TOTAL: 0.0072]	0.9+12.1s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0073]	0.8+20.4s
+
+Evaluation 222 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 57.292 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.702 (Best: 42.402 @epoch 119)
+Mean network applying time: 17.96ms
+Saving states ...
+Testing Total: 22.08s
+
+[Epoch 223]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0052][LR-L1: 0.0017][TOTAL: 0.0068]	1.0+25.5s
+[320/699]	[HR-MSE: 0.0048][LR-L1: 0.0016][TOTAL: 0.0064]	1.2+19.9s
+[480/699]	[HR-MSE: 0.0052][LR-L1: 0.0017][TOTAL: 0.0069]	1.0+11.4s
+[640/699]	[HR-MSE: 0.0049][LR-L1: 0.0016][TOTAL: 0.0066]	0.9+20.1s
+
+Evaluation 223 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 63.884 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.444 (Best: 42.402 @epoch 119)
+Mean network applying time: 12.31ms
+Saving states ...
+Testing Total: 21.49s
+
+[Epoch 224]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0045][LR-L1: 0.0016][TOTAL: 0.0061]	1.1+23.9s
+[320/699]	[HR-MSE: 0.0054][LR-L1: 0.0017][TOTAL: 0.0071]	1.0+22.0s
+[480/699]	[HR-MSE: 0.0058][LR-L1: 0.0017][TOTAL: 0.0076]	1.1+10.4s
+[640/699]	[HR-MSE: 0.0054][LR-L1: 0.0017][TOTAL: 0.0071]	0.9+22.6s
+
+Evaluation 224 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 64.184 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.032 (Best: 42.402 @epoch 119)
+Mean network applying time: 16.84ms
+Saving states ...
+Testing Total: 20.55s
+
+[Epoch 225]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0063][LR-L1: 0.0017][TOTAL: 0.0080]	1.1+23.7s
+[320/699]	[HR-MSE: 0.0056][LR-L1: 0.0016][TOTAL: 0.0072]	1.0+21.5s
+[480/699]	[HR-MSE: 0.0057][LR-L1: 0.0017][TOTAL: 0.0075]	1.1+10.4s
+[640/699]	[HR-MSE: 0.0052][LR-L1: 0.0017][TOTAL: 0.0069]	0.9+21.1s
+
+Evaluation 225 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.520 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 41.009 (Best: 42.402 @epoch 119)
+Mean network applying time: 23.22ms
+Saving states ...
+Testing Total: 22.67s
+
+[Epoch 226]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0053][LR-L1: 0.0017][TOTAL: 0.0070]	1.0+23.6s
+[320/699]	[HR-MSE: 0.0054][LR-L1: 0.0017][TOTAL: 0.0071]	1.0+21.8s
+[480/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	1.0+12.1s
+[640/699]	[HR-MSE: 0.0055][LR-L1: 0.0017][TOTAL: 0.0072]	0.9+20.7s
+
+Evaluation 226 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.804 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.343 (Best: 42.402 @epoch 119)
+Mean network applying time: 16.58ms
+Saving states ...
+Testing Total: 20.74s
+
+[Epoch 227]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	1.2+24.4s
+[320/699]	[HR-MSE: 0.0053][LR-L1: 0.0017][TOTAL: 0.0070]	1.1+20.3s
+[480/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	1.1+11.3s
+[640/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	0.9+21.1s
+
+Evaluation 227 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.708 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.365 (Best: 42.402 @epoch 119)
+Mean network applying time: 23.40ms
+Saving states ...
+Testing Total: 22.86s
+
+[Epoch 228]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0057][LR-L1: 0.0018][TOTAL: 0.0076]	1.1+24.0s
+[320/699]	[HR-MSE: 0.0054][LR-L1: 0.0017][TOTAL: 0.0071]	1.0+21.3s
+[480/699]	[HR-MSE: 0.0054][LR-L1: 0.0017][TOTAL: 0.0072]	1.2+10.2s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0017][TOTAL: 0.0073]	1.0+20.9s
+
+Evaluation 228 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 61.385 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 41.433 (Best: 42.402 @epoch 119)
+Mean network applying time: 15.13ms
+Saving states ...
+Testing Total: 22.78s
+
+[Epoch 229]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0044][LR-L1: 0.0016][TOTAL: 0.0059]	1.0+23.9s
+[320/699]	[HR-MSE: 0.0047][LR-L1: 0.0016][TOTAL: 0.0063]	1.0+20.9s
+[480/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0074]	1.1+11.1s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0018][TOTAL: 0.0073]	0.9+20.7s
+
+Evaluation 229 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.427 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.198 (Best: 42.402 @epoch 119)
+Mean network applying time: 18.33ms
+Saving states ...
+Testing Total: 21.58s
+
+[Epoch 230]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0053][LR-L1: 0.0018][TOTAL: 0.0071]	1.1+24.8s
+[320/699]	[HR-MSE: 0.0051][LR-L1: 0.0018][TOTAL: 0.0069]	1.1+22.6s
+[480/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0072]	1.2+9.7s
+[640/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	0.9+20.7s
+
+Evaluation 230 (saving_results=True) ...
+
+LR	[DIV2K x2]	PSNR: 64.055 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 39.931 (Best: 42.402 @epoch 119)
+Mean network applying time: 32.17ms
+Saving states ...
+Testing Total: 54.88s
+
+[Epoch 231]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0057][LR-L1: 0.0019][TOTAL: 0.0076]	1.2+25.4s
+[320/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	1.2+22.3s
+[480/699]	[HR-MSE: 0.0055][LR-L1: 0.0018][TOTAL: 0.0073]	1.1+10.3s
+[640/699]	[HR-MSE: 0.0053][LR-L1: 0.0017][TOTAL: 0.0071]	1.0+19.9s
+
+Evaluation 231 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 64.081 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.647 (Best: 42.402 @epoch 119)
+Mean network applying time: 20.54ms
+Saving states ...
+Testing Total: 20.24s
+
+[Epoch 232]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0042][LR-L1: 0.0014][TOTAL: 0.0057]	1.0+23.9s
+[320/699]	[HR-MSE: 0.0052][LR-L1: 0.0016][TOTAL: 0.0068]	1.0+21.6s
+[480/699]	[HR-MSE: 0.0053][LR-L1: 0.0016][TOTAL: 0.0069]	1.2+10.6s
+[640/699]	[HR-MSE: 0.0053][LR-L1: 0.0016][TOTAL: 0.0069]	1.0+21.5s
+
+Evaluation 232 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 60.369 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 41.292 (Best: 42.402 @epoch 119)
+Mean network applying time: 17.77ms
+Saving states ...
+Testing Total: 21.31s
+
+[Epoch 233]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0052][LR-L1: 0.0017][TOTAL: 0.0070]	0.9+24.7s
+[320/699]	[HR-MSE: 0.0052][LR-L1: 0.0016][TOTAL: 0.0068]	1.0+19.4s
+[480/699]	[HR-MSE: 0.0055][LR-L1: 0.0017][TOTAL: 0.0072]	0.8+12.7s
+[640/699]	[HR-MSE: 0.0053][LR-L1: 0.0017][TOTAL: 0.0070]	0.8+21.2s
+
+Evaluation 233 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 62.167 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.934 (Best: 42.402 @epoch 119)
+Mean network applying time: 18.69ms
+Saving states ...
+Testing Total: 20.23s
+
+[Epoch 234]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0052][LR-L1: 0.0017][TOTAL: 0.0069]	1.0+24.8s
+[320/699]	[HR-MSE: 0.0054][LR-L1: 0.0018][TOTAL: 0.0071]	1.0+22.1s
+[480/699]	[HR-MSE: 0.0059][LR-L1: 0.0018][TOTAL: 0.0076]	1.1+10.2s
+[640/699]	[HR-MSE: 0.0056][LR-L1: 0.0017][TOTAL: 0.0074]	0.8+21.1s
+
+Evaluation 234 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.575 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 37.985 (Best: 42.402 @epoch 119)
+Mean network applying time: 17.74ms
+Saving states ...
+Testing Total: 19.05s
+
+[Epoch 235]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0044][LR-L1: 0.0016][TOTAL: 0.0060]	1.0+24.0s
+[320/699]	[HR-MSE: 0.0052][LR-L1: 0.0017][TOTAL: 0.0069]	1.1+21.5s
+[480/699]	[HR-MSE: 0.0053][LR-L1: 0.0017][TOTAL: 0.0070]	1.2+10.4s
+[640/699]	[HR-MSE: 0.0053][LR-L1: 0.0017][TOTAL: 0.0071]	1.0+21.0s
+
+Evaluation 235 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.005 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 40.298 (Best: 42.402 @epoch 119)
+Mean network applying time: 15.38ms
+Saving states ...
+Testing Total: 22.19s
+
+[Epoch 236]	Learning rate: 9.900000000000001e-05	Finetuning: False
+[160/699]	[HR-MSE: 0.0049][LR-L1: 0.0016][TOTAL: 0.0065]	1.0+24.8s
+[320/699]	[HR-MSE: 0.0057][LR-L1: 0.0016][TOTAL: 0.0074]	1.0+20.9s
+[480/699]	[HR-MSE: 0.0053][LR-L1: 0.0016][TOTAL: 0.0069]	1.1+11.4s
+[640/699]	[HR-MSE: 0.0051][LR-L1: 0.0016][TOTAL: 0.0067]	0.8+21.6s
+
+Evaluation 236 (saving_results=False) ...
+
+LR	[DIV2K x2]	PSNR: 59.610 (Best: 72.728 @epoch 75)
+HR	[DIV2K x2]	PSNR: 38.567 (Best: 42.402 @epoch 119)
+Mean network applying time: 24.17ms
+Saving states ...
+Testing Total: 24.30s
+
+Building model module ...
+... continue from epoch 236...
+... successfully built checkpoint module !
+Building model module ...
+... loaded model from /scratch_net/biwidl215/sischaef/tar/models/tad_working_well/model/model_best.pt
+AETRIAL_1D_NOSR(
+  (_encode_seq): Sequential(
+    (0): Conv2d(1, 16, kernel_size=(3, 3), stride=(3, 3), padding=(1, 1))
+    (1): ReLU(inplace)
+    (2): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+    (3): Conv2d(16, 8, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1))
+    (4): ReLU(inplace)
+    (5): MaxPool2d(kernel_size=2, stride=1, padding=0, dilation=1, ceil_mode=False)
+  )
+  (_decode_seq): Sequential(
+    (0): ConvTranspose2d(8, 16, kernel_size=(3, 3), stride=(2, 2))
+    (1): ReLU(inplace)
+    (2): ConvTranspose2d(16, 8, kernel_size=(5, 5), stride=(3, 3), padding=(1, 1))
+    (3): ReLU(inplace)
+    (4): ConvTranspose2d(8, 1, kernel_size=(2, 2), stride=(2, 2), padding=(1, 1))
+    (5): Tanh()
+  )
+)
+... successfully built model module !
+Building model module ...
+... continue from epoch 236...
+... successfully built checkpoint module !
+Building model module ...
+... loaded model from /scratch_net/biwidl215/sischaef/tar/models/tad_working_well/model/model_best.pt
+AETAD_3D(
+  (_downscaling): Sequential(
+    (0): Conv2d(3, 8, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): Conv2d(8, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (2): _ReversePixelShuffle_(downscale_factor=2)
+  )
+  (_res_en1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_en1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_en2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_de1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_res_de1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_de2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_upscaling): Sequential(
+    (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+    (2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  )
+)
+... successfully built model module !
+Machine: GeForce GTX TITAN X
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Validating model ...
+
+URBAN100x2
+
+SET5x2
+
+SET14x2
+
+BSDS100x2
+Building model module ...
+... continue from epoch 236...
+... successfully built checkpoint module !
+Building model module ...
+... loaded model from /scratch_net/biwidl215/sischaef/tar/models/tad_working_well/model/model_best.pt
+AETAD_3D(
+  (_downscaling): Sequential(
+    (0): Conv2d(3, 8, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): Conv2d(8, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (2): _ReversePixelShuffle_(downscale_factor=2)
+  )
+  (_res_en1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_en1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_en2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_de1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_res_de1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_de2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_upscaling): Sequential(
+    (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+    (2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  )
+)
+... successfully built model module !
+Machine: Tesla K40c
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Validating model ...
+
+URBAN100x2
+
+SET5x2
+
+SET14x2
+
+BSDS100x2
+Building model module ...
+... continue from epoch 236...
+... successfully built checkpoint module !
+Building model module ...
+... loaded model from /scratch_net/biwidl215/sischaef/tar/models/tad_working_well/model/model_best.pt
+AETAD_3D(
+  (_downscaling): Sequential(
+    (0): Conv2d(3, 8, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): Conv2d(8, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (2): _ReversePixelShuffle_(downscale_factor=2)
+  )
+  (_res_en1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_en1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_en2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_de1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_res_de1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_de2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_upscaling): Sequential(
+    (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+    (2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  )
+)
+... successfully built model module !
+Machine: Tesla K40c
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Validating model ...
+
+URBAN100x2
+
+SET5x2
+
+SET14x2
+
+BSDS100x2
+Building model module ...
+... continue from epoch 236...
+... successfully built checkpoint module !
+Building model module ...
+... loaded model from /scratch_net/biwidl215/sischaef/tar/models/tad_working_well/model/model_best.pt
+AETAD_3D(
+  (_downscaling): Sequential(
+    (0): Conv2d(3, 8, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): Conv2d(8, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (2): _ReversePixelShuffle_(downscale_factor=2)
+  )
+  (_res_en1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_en1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_en2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_de1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_res_de1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_de2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_upscaling): Sequential(
+    (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+    (2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  )
+)
+... successfully built model module !
+Machine: Tesla K40c
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Validating model ...
+
+URBAN100x2
+
+SET5x2
+
+SET14x2
+
+BSDS100x2
+Building model module ...
+... continue from epoch 236...
+... successfully built checkpoint module !
+Building model module ...
+... loaded model from /scratch_net/biwidl215/sischaef/tar/models/tad_working_well/model/model_best.pt
+AETAD_3D(
+  (_downscaling): Sequential(
+    (0): Conv2d(3, 8, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): Conv2d(8, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (2): _ReversePixelShuffle_(downscale_factor=2)
+  )
+  (_res_en1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_en1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_en2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_de1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_res_de1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_de2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_upscaling): Sequential(
+    (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+    (2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  )
+)
+... successfully built model module !
+Machine: Tesla K40c
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Validating model ...
+
+URBAN100x2
+
+SET5x2
+
+SET14x2
+
+BSDS100x2
+Building model module ...
+... continue from epoch 236...
+... successfully built checkpoint module !
+Building model module ...
+... loaded model from /scratch_net/biwidl215/sischaef/tar/models/tad_working_well/model/model_best.pt
+AETAD_3D(
+  (_downscaling): Sequential(
+    (0): Conv2d(3, 8, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): Conv2d(8, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (2): _ReversePixelShuffle_(downscale_factor=2)
+  )
+  (_res_en1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_en1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_en2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_de1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_res_de1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_de2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_upscaling): Sequential(
+    (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+    (2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  )
+)
+... successfully built model module !
+Machine: Tesla K40c
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Validating model ...
+
+URBAN100x2
+
+SET5x2
+
+SET14x2
+
+BSDS100x2
+Building model module ...
+... continue from epoch 236...
+... successfully built checkpoint module !
+Building model module ...
+... loaded model from /scratch_net/biwidl215/sischaef/tar/models/tad_working_well/model/model_best.pt
+AETAD_3D(
+  (_downscaling): Sequential(
+    (0): Conv2d(3, 8, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): Conv2d(8, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (2): _ReversePixelShuffle_(downscale_factor=2)
+  )
+  (_res_en1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_en1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_en2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_de1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_res_de1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_de2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_upscaling): Sequential(
+    (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+    (2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  )
+)
+... successfully built model module !
+Machine: Tesla K40c
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Validating model ...
+
+URBAN100x2
+
+SET5x2
+
+SET14x2
+
+BSDS100x2
+Building model module ...
+... continue from epoch 236...
+... successfully built checkpoint module !
+Building model module ...
+... loaded model from /scratch_net/biwidl215/sischaef/tar/models/tad_working_well/model/model_best.pt
+AETAD_3D(
+  (_downscaling): Sequential(
+    (0): Conv2d(3, 8, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): Conv2d(8, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (2): _ReversePixelShuffle_(downscale_factor=2)
+  )
+  (_res_en1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_en3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_en1): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_en2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_conv_de1): Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_res_de1): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de2): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_res_de3): _Resblock_(
+    channels=64
+    (filter_block): Sequential(
+      (0): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (1): ReLU(inplace)
+      (2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    )
+  )
+  (_conv_de2): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (_upscaling): Sequential(
+    (0): Conv2d(64, 256, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=2)
+    (2): Conv2d(64, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  )
+)
+... successfully built model module !
+Machine: Tesla K40c
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Validating model ...
+
+URBAN100x2
+
+SET5x2
+
+SET14x2
+
+BSDS100x2

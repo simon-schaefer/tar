@@ -107,7 +107,7 @@ class _Checkpoint_(object):
             label = "PSNR on {}".format(d)
             plt.title(label)
             axes = plt.gca()
-            ymin, ymax = 15, 40
+            ymin, ymax = 15, 60
             axes.set_ylim([0,ymax])
             for i in range(len(labels)):
                 log = torch.clamp(self.log[:, id, i], ymin+1, ymax-1)
