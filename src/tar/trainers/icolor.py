@@ -44,7 +44,7 @@ class _Trainer_IColor_(_Trainer_):
         return loss
 
     def testing_core(self, v, d, di, save=False, finetuning=False):
-        num_valid_samples = len(d)
+        num_valid_samples = d.dataset.sample_size
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         psnrs = np.zeros((num_valid_samples, 4))
         for i, (gry, col, fname) in enumerate(d):
@@ -96,9 +96,9 @@ class _Trainer_IColor_(_Trainer_):
             self.apply(lr, hr, scale, discretize=False, dec_input=lr)
             runtimes[1,i] = timer_apply.toc()
             runtimes[2,i] = max(runtimes[0,i] - runtimes[1,i], 0.0)
-        v["RUNTIME_AL"] = "{:.8f}".format(np.min(runtimes[0,:], axis=0))
-        v["RUNTIME_UP"] = "{:.8f}".format(np.min(runtimes[1,:], axis=0))
-        v["RUNTIME_DW"] = "{:.8f}".format(np.min(runtimes[2,:], axis=0))
+        v["RUNTIME_AL"] = "{:.8f}".format(np.median(runtimes[0,:], axis=0))
+        v["RUNTIME_UP"] = "{:.8f}".format(np.median(runtimes[1,:], axis=0))
+        v["RUNTIME_DW"] = "{:.8f}".format(np.median(runtimes[2,:], axis=0))
         return v
 
     def log_description(self):

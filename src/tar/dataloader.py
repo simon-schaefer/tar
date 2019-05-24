@@ -33,6 +33,10 @@ class _Dataset_(Dataset):
         self.split = 'train' if train else 'test'
         self.scale = scale
         self._set_filesystem(args.dir_data)
+        list_hr, list_lr = self._scan()
+        self.images_hr, self.images_lr = list_hr, list_lr
+        max_samples = self.args.max_test_samples
+        self.sample_size = min(self.__len__(), max_samples)
 
     # =========================================================================
     # Handling the filesystem
@@ -136,6 +140,10 @@ class _Dataset_(Dataset):
     def __len__(self) -> int:
         return len(self.images_hr)
 
+    def is_sampled(self) -> bool:
+        max_samples = self.args.max_test_samples
+        return not self.args.valid_only and self.sample_size == max_samples
+
 # =============================================================================
 # DATASET EXTENSION FOR IMAGES.
 # =============================================================================
@@ -146,8 +154,6 @@ class _IDataset_(_Dataset_):
     def __init__(self, args, train: bool, scale: int, name: str=""):
         super(_IDataset_,self).__init__(args,train,scale,name)
         self.format = "IMAGE"
-        list_hr, list_lr = self._scan()
-        self.images_hr, self.images_lr = list_hr, list_lr
 
     def __getitem__(self, idx: int):
         # Load image file.
@@ -179,8 +185,6 @@ class _VDataset_(_Dataset_):
     def __init__(self, args, train: bool, scale: int, name: str=""):
         super(_VDataset_, self).__init__(args,train,scale,name)
         self.format = "VIDEO"
-        list_hr, list_lr = self._scan()
-        self.images_hr, self.images_lr = list_hr, list_lr
 
     def __getitem__(self, idx: int):
         # Load image file.
@@ -263,7 +267,7 @@ class _Data_(object):
                 vset = self.load_dataset(args, dataset, train=False, scale=s)
                 sampler = RandomSampler(vset, replacement=True,
                                         num_samples=args.max_test_samples)
-                if args.max_test_samples>len(vset) or args.valid_only: sampler=None
+                if not vset.is_sampled(): sampler = None
                 self.loader_valid.append(_DataLoader_(
                     vset, 1, num_workers=args.n_threads, sampler=sampler
                 ))
@@ -285,7 +289,7 @@ class _Data_(object):
             vset = self.load_dataset(args, dataset, train=False, scale=1)
             sampler = RandomSampler(vset, replacement=True,
                                     num_samples=args.max_test_samples)
-            if args.max_test_samples>len(vset) or args.valid_only: sampler=None
+            if not vset.is_sampled(): sampler = None
             self.loader_valid.append(_DataLoader_(
                 vset, 1, num_workers=args.n_threads, sampler=sampler
             ))
