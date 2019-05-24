@@ -57,6 +57,7 @@ class _Trainer_IScale_(_Trainer_):
         for ip, desc in enumerate(["SLR","SHRT","SHRB"]):
             psnrs_i = psnrs[:,ip]
             psnrs_i.sort()
+            print(psnrs_i)
             v["PSNR_{}_best".format(desc)]="{:.3f}".format(psnrs_i[-1])
             v["PSNR_{}_mean".format(desc)]="{:.3f}".format(np.mean(psnrs_i))
         log = [float(v["PSNR_{}".format(x)]) for x in self.log_description()]

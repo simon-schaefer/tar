@@ -5,16 +5,16 @@ path = os.path.split(__file__)[0]
 
 config = {
     'batch_size' : 32,
-    'val_batch_size':2,
-    'num_iters':1000000000,
+    'val_batch_size': 1,
+    'num_iters': 1000000,
     'seed' : 1,
-    'lr':3.16e-4,
+    'lr': 3.16e-4,
 
-    'lr_update_step':37500,
-    'test_cycle':10,
+    'lr_update_step':375,
+    'test_cycle': 200,
 
     'cuda' : True,
-    'gpus' :1,
+    'gpus' : 1,
     'gpuargs' : {'num_workers': 4,
                'pin_memory' : True
               },
@@ -40,7 +40,7 @@ config = {
     },
     'image_folder_val' : {
         'root' : '%s/' % path,
-        'file' : os.path.join(os.environ["SR_PROJECT_DATA_PATH"], "DIV2K/DIV2K_train_HR/*.png"),
+        'file' : os.path.join(os.environ["SR_PROJECT_DATA_PATH"], "CUSTOM/HR/*.png"),
         'replicates': 1,
         'train':False
     },

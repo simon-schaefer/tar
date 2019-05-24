@@ -48,19 +48,14 @@ class Image_from_folder(data.Dataset):
         self.render_size = []
         self.gt_images = []
         self.rr = Random_Rotate(9)
-
         self.train = args['train']
         self.gt_images = glob(args['file'])
-
         if not self.train:
-            #only choose 300 images for validation
-            self.gt_images = random.sample( self.gt_images, 300)
+            num_sampels = min(len(self.gt_images)-1,30)
+            self.gt_images = random.sample(self.gt_images, num_sampels)
         self.size = len(self.gt_images)
-
         self.frame_size = frame_utils.read_gen(self.gt_images[0]).shape
-
-        if  (self.frame_size[0]%64) or (self.frame_size[1]%64):
-
+        if (self.frame_size[0]%64) or (self.frame_size[1]%64):
             self.render_size.append( ((self.frame_size[0])//64)  *64)
             self.render_size.append( ( (self.frame_size[1])//64)  * 64)
         else:
@@ -68,23 +63,14 @@ class Image_from_folder(data.Dataset):
             self.render_size.append( self.frame_size[1])
 
     def __getitem__(self, index):
-
         index = index % self.size
         img = frame_utils.read_gen(self.gt_images[index])
-
-        if self.train:
-            img = resize(img ,(224, 224)) 
-        else:
-            img = resize(img, self.render_size)
-
-        img = rgb2lab(img)   
-
+        if self.train: img = resize(img ,(224, 224))
+        else: img = resize(img, self.render_size)
+        img = rgb2lab(img)
         img = np.array(img).transpose(2,0,1)
         img = torch.from_numpy(img.astype(np.float32))
-
-        return   img
+        return img
 
     def __len__(self):
         return self.size * self.replicates
-
-

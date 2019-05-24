@@ -125,8 +125,8 @@ class Solver(object):
 
             print('training %d iters,loss is %.4f' % ( global_iteration, loss))
             # Decay learning rates.
+            self.record_iters = global_iteration
             if (global_iteration+1) % self.lr_update_step == 0:
-                self.record_iters = global_iteration
                 if self.lr > 1e-8:
                     self.lr *= 0.316
                 self.update_lr(self.lr )
@@ -173,7 +173,7 @@ class Solver(object):
 
         for global_iteration in range(len_record):
             # Each epoch has a training and validation phase
-            print('completed %d of %d' % (global_iteration, len_record))
+            print('completed %d of %d' % (global_iteration+1, len_record))
             # Iterate over data.
             gt = next(data_iter)
 
@@ -190,7 +190,7 @@ class Solver(object):
 
             full_rs_output, wei_output, enc_gt = self.model(gt)
             loss = self.criterion(wei_output ,enc_gt)
-            test_loss += loss.data[0]
+            test_loss += loss.data.item()
 
             gt_img_l = gt[:,:1,:,:]
             # _, _, H_orig, W_orig = gt_img_l.data.shape
