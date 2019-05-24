@@ -64,10 +64,6 @@ class _Checkpoint_(object):
         # Creating output directories for model.
         os.makedirs(self.dir, exist_ok=True)
         if not args.valid_only: os.makedirs(self.get_path('model'),exist_ok=True)
-        # Create output directory for test datasets.
-        if not args.valid_only:
-            test_path = self.get_path("results_{}".format(args.data_test))
-            os.makedirs(test_path, exist_ok=True)
         # Create output directory for validation datasets.
         for d in args.data_valid:
             valid_path = self.get_path("results_{}".format(d))
@@ -80,7 +76,7 @@ class _Checkpoint_(object):
                 f.write('{}: {}\n'.format(arg, getattr(args, arg)))
         # Build list containing names of test and validation datasets
         # for logging and plotting purposes.
-        self.log_datasets = [self.args.data_test]
+        self.log_datasets = []
         for dv in self.args.data_valid:
             for sv in self.args.scales_valid:
                 self.log_datasets.append(dv + "x" + str(sv))
@@ -142,6 +138,32 @@ class _Checkpoint_(object):
             normalized = normalized.clamp(0, 255).round()
             tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
             self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
+
+    def save_pertubation(self, eps, psnrs, labels):
+        fig = plt.figure()
+        plt.title("Perturbation")
+        for i in range(len(labels)):
+            plt.plot(eps, psnrs[i,:], label="{}".format(labels[i]))
+        plt.legend()
+        plt.xlabel('Perturbation (white Gaussian noise)')
+        plt.ylabel('PSNR')
+        plt.grid(True)
+        plt.savefig(self.get_path("perturbation.pdf"))
+        plt.close(fig)
+
+    def save_runtimes(self, all, up, down):
+        """ Plots average runtimes [s] of overall pipeline, upscaling and
+        downscaling using matplotlib barplot. """
+        fig = plt.figure()
+        plt.title("Average Runtimes")
+        performance    = [all*1000, up*1000, down*1000]
+        objects, y_pos = ("overall", "up", "down"), np.arange(len(performance))
+        plt.bar(y_pos, performance, align='center', alpha=0.5)
+        plt.xticks(y_pos, objects)
+        plt.ylabel("RUNTIME [ms]")
+        plt.grid(True)
+        plt.savefig(self.get_path("runtime.pdf"))
+        plt.close(fig)
 
     def clear_results(self, dataset):
         directory = self.get_path("results_{}".format(dataset.dataset.name))

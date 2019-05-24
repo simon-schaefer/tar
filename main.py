@@ -27,6 +27,5 @@ device = torch.device('cpu' if args.cpu else args.cuda_device)
 ckp.write_log("Machine: {}".format(torch.cuda.get_device_name(None)))
 while trainer.step():
     trainer.train()
-    trainer.test()
     trainer.validation()
 ckp.done()

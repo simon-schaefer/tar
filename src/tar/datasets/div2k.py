@@ -11,11 +11,8 @@ from tar.dataloader import _IDataset_
 class DIV2K(_IDataset_):
     def __init__(self, args, train, scale, name="DIV2K"):
         # Determining training/testing data range.
-        data_range = [r.split('-') for r in args.data_range.split('/')]
-        if not train and len(data_range) > 1: data_range = data_range[1]
-        else: data_range = data_range[0]
-        self.begin, self.end = list(map(lambda x: int(x), data_range))
-        # Initialization of dataset class. 
+        self.begin, self.end = 1, 800
+        # Initialization of dataset class.
         super(DIV2K, self).__init__(args, name=name, train=train, scale=scale)
 
     def _scan(self):

@@ -30,24 +30,9 @@ class _Trainer_VExternal_(_Trainer_):
         self.ckp.write_log("... successfully built vscale trainer !")
 
     def apply(self,lr_prev,lr,lr_next,hr,scale,discretize=False,dec_input=None):
-        assert misc.is_power2(scale)
-        scl, hr_in, hr_out, lr_out = 1, hr.clone(), None, None
-        nmin, nmax  = self.args.norm_min, self.args.norm_max
-        # Downsample image until output (decoded image) has the
-        # the right scale, add to LR image and discretize.
-        if dec_input is None:
-            while scl < scale:
-                lr_out = self.model.model.encode(hr_in)
-                hr_in, scl = lr_out, scl*2
-            if scale in self.args.scales_guidance: lr_out=torch.add(lr_out, lr)
-            if discretize:
-                lr_out = misc.discretize(lr_out,[nmin,nmax])
-        else: lr_out, scl = dec_input, scale
-        # Upscale resulting LR_OUT image until decoding output has right scale.
-        hr_out = lr_out.clone()
-        while scl > 1:
-            hr_out = self.model.model.decode(hr_out)
-            scl    = scl//2
+        lr_out, hr_out = super(_Trainer_VExternal_, self).apply(
+            lr,hr,scale,discretize,dec_input
+        )
         # Apply input images to model and determine output.
         lr_ext = misc.discretize(lr_out.clone(),[nmin,nmax])
         hre_out = self._external.apply(lr_prev, lr_ext, lr_next)
@@ -68,15 +53,12 @@ class _Trainer_VExternal_(_Trainer_):
         num_valid_samples = len(d)
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         psnrs = np.zeros((num_valid_samples, 4))
-        runtimes = []
         for i, data in enumerate(d):
             lrs, hrs = self.prepare(data)
             lr0,lr1,lr2 = lrs; hr0,hr1,hr2 = hrs
             scale  = d.dataset.scale
-            timer_apply = misc._Timer_()
             lr_out,hr_out,hrm_out = self.apply(lr0,lr1,lr2,hr1,
                                                scale,discretize=finetuning)
-            runtimes.append(timer_apply.toc())
             _,_,hrm_out2 = self.apply(lr0,lr1,lr2,hr1,
                                      scale,discretize=finetuning,
                                      dec_input=lr1)
@@ -103,8 +85,41 @@ class _Trainer_VExternal_(_Trainer_):
             v["PSNR_{}_mean".format(desc)]="{:.3f}".format(np.mean(psnrs_i))
         log = [float(v["PSNR_{}".format(x)]) for x in self.log_description()]
         self.ckp.log[-1, di, :] += torch.Tensor(log)
-        v["RUNTIME"] = "{:.8f}".format(np.median(runtimes))
+        # Determine runtimes for up and downscaling and overall.
+        runtimes = np.zeros((3, min(len(d),10)))
+        for i, (lr, hr, fname) in enumerate(d):
+            if i >= runtimes.shape[1]: break
+            lrs, hrs = self.prepare(data)
+            lr0,lr1,lr2 = lrs; hr0,hr1,hr2 = hrs
+            scale  = d.dataset.scale
+            timer_apply = misc._Timer_()
+            self.apply(lr0,lr1,lr2,hr1,scale,discretize=False)
+            runtimes[0,i] = timer_apply.toc()
+            timer_apply = misc._Timer_()
+            self.apply(lr0,lr1,lr2,hr1,scale,discretize=False,dec_input=lr1)
+            runtimes[1,i] = timer_apply.toc()
+            runtimes[2,i] = max(runtimes[0,i] - runtimes[1,i], 0.0)
+        v["RUNTIME_AL"] = "{:.8f}".format(np.min(runtimes[0,:], axis=0))
+        v["RUNTIME_UP"] = "{:.8f}".format(np.min(runtimes[1,:], axis=0))
+        v["RUNTIME_DW"] = "{:.8f}".format(np.min(runtimes[2,:], axis=0))
         return v
+
+    def perturbation_core(self, dataset):
+        eps   = np.linspace(0.0, 0.2, num=10).tolist()
+        psnrs = np.zeros((len(d),len(eps)))
+        nmin, nmax  = self.args.norm_min, self.args.norm_max
+        for id, data in enumerate(d):
+            for ie, e in enumerate(eps):
+                lrs, hrs = self.prepare(data)
+                lr0,lr1,lr2 = lrs; hr0,hr1,hr2 = hrs
+                scale  = d.dataset.scale
+                lr_out,_,_=self.apply(lr0,lr1,lr2,hr1, scale, discretize=True)
+                error = torch.normal(mean=0.0,std=torch.ones(lr_out.size())*e)
+                lr_out = lr_out + error.to(self.device)
+                _,hr_out_eps,_=self.apply(lr0,lr1,lr2,hr1,scale,dec_input=lr_out)
+                hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
+                psnrs[id,ie] = misc.calc_psnr(hr_out_eps, hr, None, nmax-nmin)
+        return eps, psnrs.mean(axis=0)
 
     def prepare(self, data):
         lr0, hr0 = [a.to(self.device) for a in data[0][0:2]]
@@ -122,8 +137,3 @@ class _Trainer_VExternal_(_Trainer_):
 
     def num_epochs(self):
         return self.args.epochs_base
-
-    @staticmethod
-    def load_module(model_name, scale, use_gpu=True):
-        m = importlib.import_module(model_name.lower() + ".apply")
-        return getattr(m, model_name)(scale, use_gpu)

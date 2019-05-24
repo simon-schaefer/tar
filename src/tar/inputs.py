@@ -37,20 +37,15 @@ parser.add_argument("--n_gpus", type=int, default=1,
 parser.add_argument("--dir_data", type=str, default=os.environ["SR_PROJECT_DATA_PATH"],
                     help="dataset directory")
 parser.add_argument("--data_train", type=str, default="DIV2K",
-                    choices=("DIV2K"),
-                    help="training dataset name (= 1 dataset!)")
-parser.add_argument("--data_test", type=str, default="DIV2K",
                     choices=("DIV2K", "NTIAASPEN"),
-                    help="testing datasets name (>= 1 dataset!)")
-parser.add_argument("--data_valid", default="SET5:SET14:VDIV2K:URBAN100",
+                    help="training dataset name (= 1 dataset!)")
+parser.add_argument("--data_valid", default="SET5:SET14",
                     help="validation datasets names (>= 1 dataset!), \
                     choices=URBAN100,SET5,SET14,BSDS100,VDIV2K,CUSTOM, \
-                    CALENDAR,NTIAASPEN,ICALENDAR,INTIAASPEN")
-parser.add_argument("--data_range", type=str, default="1-700/701-800",
-                    help="train/test data range")
+                    CALENDAR,NTIAASPEN,WALK,CITY,FOLIAGE")
 parser.add_argument("--scales_train", type=str, default=[2],
                     help="super resolution scales for training/testing")
-parser.add_argument("--scales_guidance", type=str, default=[2,4],
+parser.add_argument("--scales_guidance", type=str, default=[1,2,4,8,16],
                     help="subset of training in which guidance image should be added")
 parser.add_argument("--scales_valid", type=str, default=[2,4],
                     help="list of validation scales")
@@ -62,8 +57,8 @@ parser.add_argument("--norm_min", type=float, default=0.0,
                     help="normalization lower border")
 parser.add_argument("--norm_max", type=float, default=1.0,
                     help="normalization upper border")
-parser.add_argument("--augment", action="store_false",
-                    help="not use data augmentation (default=True)")
+parser.add_argument("--no_augment", action="store_true",
+                    help="use data augmentation (default=False)")
 
 # =============================================================================
 # Model specifications.
@@ -90,9 +85,9 @@ parser.add_argument("--valid_only", action="store_true",
 # =============================================================================
 parser.add_argument("--lr", type=float, default=1e-3,
                     help="learning rate")
-parser.add_argument("--decay", type=str, default="10",
+parser.add_argument("--decay", type=str, default="20-100-200",
                     help="learning rate decay interval (epochs)")
-parser.add_argument("--gamma", type=float, default=0.5,
+parser.add_argument("--gamma", type=float, default=0.25,
                     help="learning rate decay factor for step decay")
 parser.add_argument("--optimizer", default="ADAM",
                     choices=("ADAM"),
@@ -135,91 +130,52 @@ parser.add_argument("--print_every", type=int, default=20,
 # TEMPLATES.
 # =============================================================================
 def set_template(args):
-    if args.template.find("ISCALE_AETAD_DIV2K") >= 0:
-        args.model      = "AETAD"
-        args.format     = "IMAGE"
-        args.type       = "SCALING"
-        args.optimizer  = "ADAM"
-        args.data_train = "DIV2K"
-        args.data_test  = "DIV2K"
 
-    if args.template.find("ISCALE_AETAD_DIV2K_4") >= 0:
-        args.model      = "AETAD"
-        args.format     = "IMAGE"
-        args.type       = "SCALING"
-        args.optimizer  = "ADAM"
+    # Training dataset.
+    if args.template.count("DIV2K") > 0:
         args.data_train = "DIV2K"
-        args.data_test  = "DIV2K"
+    if args.template.count("NTIAASPEN") > 0:
+        args.data_train = "NTIAASPEN"
+        args.data_valid = "CALENDAR"
+    if args.template.count("INTIAASPEN") > 0:
+        args.data_train = "INTIAASPEN"
+        args.data_valid = "CALENDAR"
+    # Model.
+    if args.template.count("AETAD") > 0:
+        args.model      = "AETAD"
+    if args.template.count("AETAD_SMALL") > 0:
+        args.model      = "AETAD_SMALL"
+    if args.template.count("AETAD_LARGE") > 0:
+        args.model      = "AETAD_LARGE"
+    # Type.
+    if args.template.count("ISCALE") > 0:
+        args.type       = "SCALING"
+        args.format     = "IMAGE"
+    elif args.template.count("VSCALE") > 0:
+        args.type       = "SCALING"
+        args.format     = "VIDEO"
+    elif args.template.count("ICOLOR") > 0:
+        args.type       = "COLORING"
+        args.format     = "IMAGE"
+        args.model      = "AETAD_COLOR"
+    # Scales.
+    if args.template.count("_4") > 0:
         args.scales_train = [4]
 
+    # Specific types.
     if args.template.find("ICOLOR_AETAD_DIV2K") >= 0:
-        args.model      = "AETAD_COLOR"
-        args.format     = "IMAGE"
-        args.type       = "COLORING"
-        args.loss       = "COL*10*L1+GRY*1*L1"
-        args.optimizer  = "ADAM"
-        args.data_train = "DIV2K"
-        args.data_test  = "DIV2K"
+        args.loss         = "COL*10*L1+GRY*1*L1"
         args.scales_train = [1]
         args.scales_valid = [1]
-        args.scales_guidance = [1]
-
-    if args.template.find("ISCALE_AETAD_SMALL_DIV2K") >= 0:
-        args.model      = "AETAD_SMALL"
-        args.format     = "IMAGE"
-        args.type       = "SCALING"
-        args.optimizer  = "ADAM"
-        args.data_train = "DIV2K"
-        args.data_test  = "DIV2K"
-
-    if args.template.find("ISCALE_AETAD_SMALL_DIV2K_4") >= 0:
-        args.model      = "AETAD_SMALL"
-        args.format     = "IMAGE"
-        args.type       = "SCALING"
-        args.optimizer  = "ADAM"
-        args.data_train = "DIV2K"
-        args.data_test  = "DIV2K"
-        args.scales_train = [4]
-
-    if args.template.find("ISCALE_AETAD_LARGE_DIV2K") >= 0:
-        args.model      = "AETAD_LARGE"
-        args.format     = "IMAGE"
-        args.type       = "SCALING"
-        args.optimizer  = "ADAM"
-        args.data_train = "DIV2K"
-        args.data_test  = "DIV2K"
-
-    if args.template.find("ISCALE_AETAD_LARGE_DIV2K_4") >= 0:
-        args.model      = "AETAD_LARGE"
-        args.format     = "IMAGE"
-        args.type       = "SCALING"
-        args.optimizer  = "ADAM"
-        args.data_train = "DIV2K"
-        args.data_test  = "DIV2K"
-        args.scales_train = [4]
 
     if args.template.find("ISCALE_AETAD_NTIAASPEN_4") >= 0:
-        args.model      = "AETAD"
-        args.format     = "IMAGE"
-        args.type       = "SCALING"
-        args.loss       = "HR*10*L1+LR*1*L1"
-        args.optimizer  = "ADAM"
-        args.data_train = "INTIAASPEN"
-        args.data_test  = "INTIAASPEN"
-        args.data_valid = "ICALENDAR"
-        args.scales_train = [4]
         args.scales_valid = [4]
 
     if args.template.find("VSCALE_AETAD_SOFVSR") >= 0:
-        args.model      = "AETAD"
         args.load       = "modelsxiscale4"
         args.format     = "VIDEO"
         args.type       = "SCALING"
         args.loss       = "HR*1*L1+LR*1*L1+EXT*100*L1"
-        args.optimizer  = "ADAM"
-        args.data_train = "NTIAASPEN"
-        args.data_test  = "NTIAASPEN"
-        args.data_valid = "CALENDAR"
         args.external   = "SOFVSR"
         args.scales_train = [4]
         args.scales_valid = [4]
@@ -241,6 +197,7 @@ args.scales_train = reformat_to_list(args.scales_train)
 args.scales_guidance = reformat_to_list(args.scales_guidance)
 args.scales_valid = reformat_to_list(args.scales_valid)
 args.data_valid = args.data_valid.split(":")
+args.data_valid.append(args.data_train)
 for arg in vars(args):
     if vars(args)[arg] == "True":
         vars(args)[arg] = True

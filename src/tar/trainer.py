@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : Model training and testing class.
+# Description : Model training and validation class.
 # =============================================================================
 import argparse
 import os
@@ -32,14 +32,12 @@ class _Trainer_(object):
         self.args = args
         self.ckp = ckp
         self.loader_train = loader.loader_train
-        self.loader_test  = loader.loader_test
         self.loader_valid = loader.loader_valid
         self.check_datasets()
         self.model = model
         self.loss = loss
         self.optimizer = optimization.make_optimizer(model, args)
         self.error_last = 1e8
-        self.test_iter = 1
         self.valid_iter = 1
         self.device = torch.device('cpu' if self.args.cpu else self.args.cuda_device)
         self.ckp.write_log("Building trainer module ...")
@@ -92,44 +90,7 @@ class _Trainer_(object):
         print("... epoch {} with train loss {}".format(epoch, self.error_last))
 
     # =========================================================================
-    # Testing
-    # =========================================================================
-    def test(self):
-        """ Testing function. In parallel (background) evaluate every
-        testing dataset stated in the input arguments (args). Log
-        results and save model at the end. """
-        torch.set_grad_enabled(False)
-        epoch = self.optimizer.get_last_epoch() + 1
-        finetuning = epoch >= self.args.fine_tuning
-        self.model.eval()
-        # Iterate over every testing dataset.
-        timer_test = misc._Timer_()
-        net_applying_times = []
-        save = self.args.save_results and self.test_iter%self.args.save_every==0
-        self.ckp.write_log(
-            "\nTesting {} (saving_results={}) ...".format(self.test_iter,save)
-        )
-        if save: self.ckp.begin_background()
-        # Testing for every dataset, i.e. determine output list of
-        # measures such as PSNR, runtime, etc..
-        for di, d in enumerate(self.loader_test):
-            if save: self.ckp.clear_results(d)
-            v = self.testing_core({}, d, di, save=save, finetuning=finetuning)
-            net_applying_times.append(float(v["RUNTIME"]))
-            best = self.save_psnr_checkpoint(d, di)
-        # Finalizing - Saving and logging.
-        self.ckp.write_log("Mean network applying time: {:.5f}ms".format(
-            np.mean(net_applying_times)*1000
-        ))
-        if save: self.ckp.end_background()
-        self.ckp.write_log(
-            "Testing Total: {:.2f}s".format(timer_test.toc()), refresh=True
-        )
-        self.test_iter += 1
-        torch.set_grad_enabled(True)
-
-    # =========================================================================
-    # Validation
+    # Testing and Validation
     # =========================================================================
     def validation(self):
         """ Validation function for validate model after training on several
@@ -151,15 +112,37 @@ class _Trainer_(object):
         timer_valid = misc._Timer_()
         validations = []
         for di, d in enumerate(self.loader_valid):
-            li = di + len(self.loader_test)
             name, scale = d.dataset.name, d.dataset.scale
             if save: self.ckp.clear_results(d)
             self.ckp.write_log("{}x{}".format(name,scale))
             v = {"dataset":"{}".format(name + " "*(10-len(name))),
                  "scale": "x{}".format(scale)}
-            v = self.testing_core(v, d, li, save=save, finetuning=finetuning)
-            best = self.save_psnr_checkpoint(d, li)
+            v = self.testing_core(v, d, di, save=save, finetuning=finetuning)
+            best = self.save_psnr_checkpoint(d, di)
             validations.append(v)
+        # Determine average runtime.
+        if save:
+            self.ckp.write_log(
+                "Validation {} (runtime test) ...".format(self.valid_iter)
+            )
+            runtime_al = np.mean([float(v["RUNTIME_AL"]) for v in validations])
+            runtime_up = np.mean([float(v["RUNTIME_UP"]) for v in validations])
+            runtime_dw = np.mean([float(v["RUNTIME_DW"]) for v in validations])
+            self.ckp.save_runtimes(runtime_al,runtime_up,runtime_dw)
+        # Perturbation/Noise testing i.e. perturb random SLR image in dataset
+        # in different degrees and measure drop of PSNR.
+        if save:
+            self.ckp.write_log(
+                "Validation {} (perturbation test) ...".format(self.valid_iter)
+            )
+            eps    = np.linspace(0.0, 0.3, num=10).tolist()
+            psnrs  = np.zeros((len(self.loader_valid),len(eps)))
+            labels = []
+            for di, d in enumerate(self.loader_valid):
+                name, scale = d.dataset.name, d.dataset.scale
+                psnrs[di,:] = self.perturbation_core(d, eps)
+                labels.append("{}x{}".format(name,scale))
+            self.ckp.save_pertubation(eps, psnrs, labels)
         # Finalizing.
         self.ckp.iter_is_best = best[1][0] + 1 == epoch
         if save: self.ckp.end_background()
@@ -177,22 +160,60 @@ class _Trainer_(object):
                           finetuning: bool, scale: int) -> optimization._Loss_:
         raise NotImplementedError
 
-    def test_core(self, lr: torch.Tensor, hr: torch.Tensor,
-                  finetuning: bool, scale: int) -> dict:
+    def testing_core(self, v: dict, dataset, di: int,
+                     save: bool=False, finetuning: bool=False) -> dict:
         raise NotImplementedError
 
-    def validation_core(self, v: dict, dataset, di: int,
-                        save: bool=False, finetuning: bool=False) -> dict:
-        raise NotImplementedError
+    def apply(self, lr, hr, scale, discretize=False, dec_input=None):
+        assert misc.is_power2(scale)
+        scl, hr_in, hr_out, lr_out = 1, hr.clone(), None, None
+        nmin, nmax  = self.args.norm_min, self.args.norm_max
+        # Downsample image until output (decoded image) has the
+        # the right scale, add to LR image and discretize.
+        if dec_input is None:
+            while scl < scale:
+                lr_out = self.model.model.encode(hr_in)
+                hr_in, scl = lr_out, scl*2
+            if scale in self.args.scales_guidance: lr_out=torch.add(lr_out, lr)
+            if discretize:
+                lr_out = misc.discretize(lr_out,[nmin,nmax])
+        else: lr_out, scl = dec_input, scale
+        # Upscale resulting LR_OUT image until decoding output has right scale.
+        hr_out = lr_out.clone()
+        while scl > 1:
+            hr_out = self.model.model.decode(hr_out)
+            scl    = scl//2
+        return lr_out, hr_out
+
+    def perturbation_core(self, d, eps: List[float]) -> List[float]:
+        psnrs = np.zeros((len(d),len(eps)))
+        nmin, nmax  = self.args.norm_min, self.args.norm_max
+        for id, (lr, hr, fname) in enumerate(d):
+            for ie, e in enumerate(eps):
+                lr, hr = self.prepare([lr, hr])
+                scale  = d.dataset.scale
+                lr_out, _ = self.apply(lr, hr, scale, discretize=True)
+                error = torch.normal(mean=0.0,std=torch.ones(lr_out.size())*e)
+                lr_out = lr_out + error.to(self.device)
+                _, hr_out_eps = self.apply(lr, hr, scale, dec_input=lr_out)
+                hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
+                psnrs[id,ie] = misc.calc_psnr(hr_out_eps, hr, None, nmax-nmin)
+        return psnrs.mean(axis=0)
 
     def log_description(self) -> List[str]:
         raise NotImplementedError
 
     def num_epochs(self) -> int:
-        raise NotImplementedError
+        ebase, ezoom = self.args.epochs_base, self.args.epochs_zoom
+        if len(self.args.scales_train) == 1: return ebase
+        n_zooms = len(self.args.scales_train) - 1
+        return ebase + n_zooms*ezoom
 
     def scale_current(self, epoch: int) -> int:
-        raise NotImplementedError
+        scalestrain  = self.args.scales_train
+        ebase, ezoom = self.args.epochs_base, self.args.epochs_zoom
+        if epoch < ebase: return scalestrain[0]
+        else: return scalestrain[(epoch-ebase)//ezoom+1]
 
     # =========================================================================
     # Auxialiary Functions
@@ -210,15 +231,19 @@ class _Trainer_(object):
             )
         return best
 
+    @staticmethod
+    def load_module(model_name, scale, use_gpu=True):
+        m = importlib.import_module(model_name.lower() + ".apply")
+        return getattr(m, model_name)(scale, use_gpu)
+
     def check_datasets(self):
         def _check(d, format):
             if not d.format == format:
                 raise ValueError("Dataset {} has wrong format, is {} \
                 but should be {} !".format(d.name, d.format, format))
-
         for d in self.loader_valid: _check(d.dataset, self.args.format)
         if self.args.valid_only: return True
-        for d in self.loader_test: _check(d.dataset, self.args.format)
+        for d in self.loader_train.values(): _check(d.dataset, self.args.format)
         return True
 
     def prepare(self, data):
@@ -234,3 +259,40 @@ class _Trainer_(object):
             epoch = self.optimizer.get_last_epoch() + 1
             if epoch > 1: self.ckp.save(self, epoch)
             return epoch < self.num_epochs() and self.ckp.step(nlogs=num_descs)
+
+# # =========================================================================
+# # Testing
+# # =========================================================================
+# def test(self):
+#     """ Testing function. In parallel (background) evaluate every
+#     testing dataset stated in the input arguments (args). Log
+#     results and save model at the end. """
+#     torch.set_grad_enabled(False)
+#     epoch = self.optimizer.get_last_epoch() + 1
+#     finetuning = epoch >= self.args.fine_tuning
+#     self.model.eval()
+#     # Iterate over every testing dataset.
+#     timer_test = misc._Timer_()
+#     net_applying_times = []
+#     save = self.args.save_results and self.test_iter%self.args.save_every==0
+#     self.ckp.write_log(
+#         "\nTesting {} (saving_results={}) ...".format(self.test_iter,save)
+#     )
+#     if save: self.ckp.begin_background()
+#     # Testing for every dataset, i.e. determine output list of
+#     # measures such as PSNR, runtime, etc..
+#     for di, d in enumerate(self.loader_test):
+#         if save: self.ckp.clear_results(d)
+#         v = self.testing_core({}, d, di, save=save, finetuning=finetuning)
+#         net_applying_times.append(float(v["RUNTIME"]))
+#         best = self.save_psnr_checkpoint(d, di)
+#     # Finalizing - Saving and logging.
+#     self.ckp.write_log("Mean network applying time: {:.5f}ms".format(
+#         np.mean(net_applying_times)*1000
+#     ))
+#     if save: self.ckp.end_background()
+#     self.ckp.write_log(
+#         "Testing Total: {:.2f}s".format(timer_test.toc()), refresh=True
+#     )
+#     self.test_iter += 1
+#     torch.set_grad_enabled(True)

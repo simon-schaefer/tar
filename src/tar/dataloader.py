@@ -15,7 +15,7 @@ import skimage.color as sc
 from typing import List, Tuple
 
 from torch import from_numpy, Tensor
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import ConcatDataset, Dataset, DataLoader
 from torch.utils.data.dataloader import default_collate
 from torch.utils.data.sampler import RandomSampler
 
@@ -159,7 +159,7 @@ class _IDataset_(_Dataset_):
         # Normalize patches from rgb_range to [norm_min, norm_max].
         pair = self._normalize(pair)
         # Augment patches (if flag is set).
-        if not self.args.augment and not self.args.valid_only:
+        if not self.args.no_augment and not self.args.valid_only:
             pair = self._augment(pair)
         # Set right number of channels.
         pair = self._set_channel(pair)
@@ -198,7 +198,7 @@ class _VDataset_(_Dataset_):
             # Normalize patches from rgb_range to [norm_min, norm_max].
             pair = self._normalize(pair)
             # Augment patches (if flag is set).
-            if not self.args.augment and not self.args.valid_only:
+            if not self.args.no_augment and not self.args.valid_only:
                 pair = self._augment(pair)
             # Set right number of channels.
             pair = self._set_channel(pair)
@@ -247,7 +247,6 @@ class _Data_(object):
 
     def __init__(self, args: argparse.Namespace):
         self.loader_valid = []
-        self.loader_test = []
         self.loader_train = {}
         if args.type == "SCALING": self.init_scaling(args)
         elif args.type == "COLORING": self.init_coloring(args)
@@ -263,26 +262,18 @@ class _Data_(object):
             for s in args.scales_valid:
                 vset = self.load_dataset(args, dataset, train=False, scale=s)
                 sampler = RandomSampler(vset, replacement=True,
-                                        num_samples=max_samples)
-                if max_samples > len(vset): sampler = None
+                                        num_samples=args.max_test_samples)
+                if args.max_test_samples>len(vset) or args.valid_only: sampler=None
                 self.loader_valid.append(_DataLoader_(
                     vset, 1, num_workers=args.n_threads, sampler=sampler
                 ))
         if args.valid_only: return
-        # Load testing dataset(s), if not valid only
-        for s in args.scales_train:
-            tset = self.load_dataset(args, args.data_test, train=False, scale=s)
-            sampler = RandomSampler(tset, replacement=True,
-                                    num_samples=args.max_test_samples)
-            if args.max_test_samples>len(tset) or args.valid_only: sampler=None
-            self.loader_test.append(_DataLoader_(
-                tset, 1, num_workers=args.n_threads, sampler=sampler
-            ))
         # Load training dataset, if not valid only. For training several
         # datasets are trained in one process and therefore, each given
         # training dataset is concatinated to one large dataset (for each scale).
         for s in args.scales_train:
             tset = self.load_dataset(args, args.data_train, train=True, scale=s)
+            #tset2 = self.load_dataset(args, "NTIAASPEN", train=True, scale=s)
             self.loader_train[s] = _DataLoader_(
                 tset, args.batch_size, shuffle=True, num_workers=args.n_threads
             )
@@ -299,14 +290,6 @@ class _Data_(object):
                 vset, 1, num_workers=args.n_threads, sampler=sampler
             ))
         if args.valid_only: return
-        # Load testing dataset(s), if not valid only
-        tset = self.load_dataset(args, args.data_test, train=False, scale=1)
-        sampler = RandomSampler(tset, replacement=True,
-                                num_samples=args.max_test_samples)
-        if args.max_test_samples > len(tset): sampler = None
-        self.loader_test.append(_DataLoader_(
-            tset, 1, num_workers=args.n_threads, sampler=sampler
-        ))
         # Load training dataset, if not valid only. For training several
         # datasets are trained in one process and therefore, each given
         # training dataset is concatinated to one large dataset.
@@ -322,7 +305,7 @@ class _Data_(object):
         try:
             m = importlib.import_module("tar.datasets." + name.lower())
             return getattr(m, name)(args, train=train, scale=scale)
-        except FileNotFoundError:
+        except ImportError:
             if args.format == "IMAGE":
                 return _IDataset_(args,train=train,scale=scale,name=name.upper())
             elif args.format == "VIDEO":
