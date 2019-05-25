@@ -6,7 +6,7 @@ import argparse
 
 from datasets import  Image_from_folder
 from config import config
-from tensorboardX import SummaryWriter
+#from tensorboardX import SummaryWriter
 from solver import Solver
 # np.set_printoptions(threshold=np.nan)
 
