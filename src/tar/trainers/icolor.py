@@ -73,7 +73,7 @@ class _Trainer_IColor_(_Trainer_):
                 slist = [col_out_t, col_out_y, col_out_g, gry_out, gry, col]
                 dlist = ["SCOLT", "SCOLY", "SCOLG", "SGRY", "GRY", "COL"]
                 self.ckp.save_results(slist,dlist,fname[0],d,scale)
-            if self.args.valid_only and i % self.args.n_threads == 0:
+            if save and i % self.args.n_threads == 0:
                 self.ckp.end_background()
                 self.ckp.begin_background()
             #misc.progress_bar(i+1, num_valid_samples)

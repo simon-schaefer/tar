@@ -76,7 +76,7 @@ class _Trainer_VExternal_(_Trainer_):
                 slist = [hr_out, lr_out, hrm_out, hrm_out2, lr2, hr2]
                 dlist = ["SHR", "SLR", "SHRET", "SHREB", "LR", "HR"]
                 self.ckp.save_results(slist,dlist,filename,d,scale)
-            if self.args.valid_only and i % self.args.n_threads == 0:
+            if save and i % self.args.n_threads == 0:
                 self.ckp.end_background()
                 self.ckp.begin_background()
             #misc.progress_bar(i+1, num_valid_samples)

@@ -73,7 +73,7 @@ def main(cfg):
         optimizer.step()
 
         # save checkpoint
-        if idx_iter % 5000 == 0:
+        if idx_iter % 500 == 0:
             print('Iteration---%6d,   loss---%f' % (idx_iter + 1, np.array(loss_list).mean()))
             models_dir = os.path.join(log_dir, "models")
             os.makedirs(models_dir, exist_ok=True)
