@@ -164,7 +164,7 @@ def set_template(args):
 
     # Specific types.
     if args.template.find("ICOLOR_AETAD_DIV2K") >= 0:
-        args.loss         = "COL*10*L1+GRY*1*L1"
+        args.loss         = "COL*100*L1+GRY*1*L1"
         args.scales_train = [1]
         args.scales_valid = [1]
 

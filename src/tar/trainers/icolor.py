@@ -30,8 +30,7 @@ class _Trainer_IColor_(_Trainer_):
         if dec_input is None:
             gry_out = self.model.model.encode(col.clone())
             gry_out = torch.add(gry_out, gry)
-            if discretize:
-                gry_out = misc.discretize(gry_out,[nmin,nmax])
+            if discretize: gry_out = misc.discretize(gry_out,[nmin,nmax])
         else: gry_out = dec_input
         # Decoding i.e. colorization
         col_out = self.model.model.decode(gry_out)
