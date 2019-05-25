@@ -89,5 +89,4 @@ def L1_regularization(image):
 
 if __name__ == '__main__':
     cfg = parse_args()
-    print(cfg)
     main(cfg)

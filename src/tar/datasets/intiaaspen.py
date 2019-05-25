@@ -24,7 +24,6 @@ class INTIAASPEN(_IDataset_):
         names_lr = []
         for f in names_hr:
             filename, _ = os.path.splitext(os.path.basename(f))
-            filename = filename.replace("hr", "lr")
             names_lr.append(self.dir_lr + "/{}x{}.png".format(filename,self.scale))
         return names_hr, names_lr
 

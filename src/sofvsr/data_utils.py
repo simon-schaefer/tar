@@ -23,9 +23,9 @@ class TrainsetLoader(Dataset):
         hr_dir = os.path.join(path, self.trainsets[idx_video], "HR")
         # read HR & LR frames
         sc = "x" + str(self.upscale_factor)
-        LR0 = Image.open(lr_dir + '/lr' + str(idx_frame) + sc + '.png')
-        LR1 = Image.open(lr_dir + '/lr' + str(idx_frame + 1) + sc + '.png')
-        LR2 = Image.open(lr_dir + '/lr' + str(idx_frame + 2) + sc + '.png')
+        LR0 = Image.open(lr_dir + '/hr' + str(idx_frame) + sc + '.png')
+        LR1 = Image.open(lr_dir + '/hr' + str(idx_frame + 1) + sc + '.png')
+        LR2 = Image.open(lr_dir + '/hr' + str(idx_frame + 2) + sc + '.png')
         HR0 = Image.open(hr_dir + '/hr' + str(idx_frame) + '.png')
         HR1 = Image.open(hr_dir + '/hr' + str(idx_frame + 1) + '.png')
         HR2 = Image.open(hr_dir + '/hr' + str(idx_frame + 2) + '.png')

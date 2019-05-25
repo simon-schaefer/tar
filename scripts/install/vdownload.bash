@@ -14,12 +14,12 @@ if [ ! -d "NTIAASPEN" ]; then
     mkdir LR_bicubic
     mv lr_x4_BI LR_bicubic/X4
     for filename in $LRS/X4/*.png; do
+        mv $filename ${filename/lr/hr}
+    done
+    for filename in $LRS/X4/*.png; do
         mv $filename ${filename/.png/x4.png}
     done
     python3 $DOWNSAMPLE_FILE $HRS 2 2 "LR_bicubic"
-    for filename in $LRS/X2/*.png; do
-        mv $filename ${filename/hr/lr}
-    done
     cd $SR_PROJECT_DATA_PATH
     rm -rf SOF-VSR
 fi
