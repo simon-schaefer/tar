@@ -24,7 +24,7 @@ class _Trainer_IColor_(_Trainer_):
         super(_Trainer_IColor_, self).__init__(args, loader, model, loss, ckp)
         self.ckp.write_log("... successfully built icolor trainer !")
 
-    def apply(self, gry, col, discretize=False, dec_input=None):
+    def apply(self, gry, col, scale=None, discretize=False, dec_input=None):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         # Encoding i.e. decolorization.
         if dec_input is None:
@@ -74,6 +74,9 @@ class _Trainer_IColor_(_Trainer_):
                 slist = [col_out_t, col_out_y, col_out_g, gry_out, gry, col]
                 dlist = ["SCOLT", "SCOLY", "SCOLG", "SGRY", "GRY", "COL"]
                 self.ckp.save_results(slist,dlist,fname[0],d,scale)
+            if self.args.valid_only and i % self.args.n_threads == 0:
+                self.ckp.end_background()
+                self.ckp.begin_background()
             #misc.progress_bar(i+1, num_valid_samples)
         # Logging PSNR values.
         for ip, desc in enumerate(["SGRY","SCOLT","SCOLG","SCOLY"]):
@@ -88,12 +91,11 @@ class _Trainer_IColor_(_Trainer_):
         for i, (lr, hr, fname) in enumerate(d):
             if i >= runtimes.shape[1]: break
             lr, hr = self.prepare([lr, hr])
-            scale  = d.dataset.scale
             timer_apply = misc._Timer_()
-            self.apply(lr, hr, scale, discretize=False)
+            self.apply(lr, hr, discretize=False)
             runtimes[0,i] = timer_apply.toc()
             timer_apply = misc._Timer_()
-            self.apply(lr, hr, scale, discretize=False, dec_input=lr)
+            self.apply(lr, hr, discretize=False, dec_input=lr)
             runtimes[1,i] = timer_apply.toc()
             runtimes[2,i] = max(runtimes[0,i] - runtimes[1,i], 0.0)
         v["RUNTIME_AL"] = "{:.8f}".format(np.median(runtimes[0,:], axis=0))

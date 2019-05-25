@@ -30,7 +30,7 @@ config = {
     #     'weight_decay': 0.004
     # },
 
-    'save' :'%s/work/' % path,
+    'save': os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], "cic"), 
 
     'image_folder_train' : {
         'root' : '%s/' % path,
@@ -40,7 +40,7 @@ config = {
     },
     'image_folder_val' : {
         'root' : '%s/' % path,
-        'file' : os.path.join(os.environ["SR_PROJECT_DATA_PATH"], "CUSTOM/HR/*.png"),
+        'file' : os.path.join(os.environ["SR_PROJECT_DATA_PATH"], "SET5/HR/*.png"),
         'replicates': 1,
         'train':False
     },

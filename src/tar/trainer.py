@@ -186,9 +186,11 @@ class _Trainer_(object):
         return lr_out, hr_out
 
     def perturbation_core(self, d, eps: List[float]) -> List[float]:
-        psnrs = np.zeros((len(d),len(eps)))
+        num_testing_samples = min(len(d), 50)
+        psnrs = np.zeros((num_testing_samples,len(eps)))
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         for id, (lr, hr, fname) in enumerate(d):
+            if id >= num_testing_samples: break
             for ie, e in enumerate(eps):
                 lr, hr = self.prepare([lr, hr])
                 scale  = d.dataset.scale

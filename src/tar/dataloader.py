@@ -37,6 +37,7 @@ class _Dataset_(Dataset):
         self.images_hr, self.images_lr = list_hr, list_lr
         max_samples = self.args.max_test_samples
         self.sample_size = min(self.__len__(), max_samples)
+        if not self.is_sampled(): self.sample_size = self.__len__()
 
     # =========================================================================
     # Handling the filesystem

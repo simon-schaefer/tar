@@ -76,6 +76,9 @@ class _Trainer_VExternal_(_Trainer_):
                 slist = [hr_out, lr_out, hrm_out, hrm_out2, lr2, hr2]
                 dlist = ["SHR", "SLR", "SHRET", "SHREB", "LR", "HR"]
                 self.ckp.save_results(slist,dlist,filename,d,scale)
+            if self.args.valid_only and i % self.args.n_threads == 0:
+                self.ckp.end_background()
+                self.ckp.begin_background()
             #misc.progress_bar(i+1, num_valid_samples)
         # Logging PSNR values.
         for ip, desc in enumerate(["SLR","SHR","SHRET","SHREB"]):
@@ -104,11 +107,12 @@ class _Trainer_VExternal_(_Trainer_):
         v["RUNTIME_DW"] = "{:.8f}".format(np.median(runtimes[2,:], axis=0))
         return v
 
-    def perturbation_core(self, dataset):
-        eps   = np.linspace(0.0, 0.2, num=10).tolist()
-        psnrs = np.zeros((len(d),len(eps)))
+    def perturbation_core(self, d, eps):
+        num_testing_samples = min(len(d), 50)
+        psnrs = np.zeros((num_testing_samples,len(eps)))
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         for id, data in enumerate(d):
+            if id >= num_testing_samples: break
             for ie, e in enumerate(eps):
                 lrs, hrs = self.prepare(data)
                 lr0,lr1,lr2 = lrs; hr0,hr1,hr2 = hrs
@@ -119,7 +123,7 @@ class _Trainer_VExternal_(_Trainer_):
                 _,hr_out_eps,_=self.apply(lr0,lr1,lr2,hr1,scale,dec_input=lr_out)
                 hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
                 psnrs[id,ie] = misc.calc_psnr(hr_out_eps, hr, None, nmax-nmin)
-        return eps, psnrs.mean(axis=0)
+        return psnrs.mean(axis=0)
 
     def prepare(self, data):
         lr0, hr0 = [a.to(self.device) for a in data[0][0:2]]

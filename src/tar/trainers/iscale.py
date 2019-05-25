@@ -35,6 +35,7 @@ class _Trainer_IScale_(_Trainer_):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         psnrs = np.zeros((num_valid_samples, 3))
         for i, (lr, hr, fname) in enumerate(d):
+            print(i, num_valid_samples)
             lr, hr = self.prepare([lr, hr])
             scale  = d.dataset.scale
             lr_out, hr_out_t = self.apply(lr, hr, scale, discretize=finetuning)
@@ -52,6 +53,9 @@ class _Trainer_IScale_(_Trainer_):
                 slist = [hr_out_t, hr_out_b, lr_out, lr, hr]
                 dlist = ["SHRT", "SHRB", "SLR", "LR", "HR"]
                 self.ckp.save_results(slist,dlist,fname[0],d,scale)
+            if self.args.valid_only and i % self.args.n_threads == 0:
+                self.ckp.end_background()
+                self.ckp.begin_background()
             #misc.progress_bar(i+1, num_valid_samples)
         # Logging PSNR values.
         for ip, desc in enumerate(["SLR","SHRT","SHRB"]):
