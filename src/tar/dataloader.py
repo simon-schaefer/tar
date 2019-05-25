@@ -171,7 +171,7 @@ class _IDataset_(_Dataset_):
         # Set right number of channels.
         pair = self._set_channel(pair)
         # In colorization mode convert "LR" image to YCbCr and take Y-channel.
-        if self.args.type == "COLORING": pair[0] = self._entcolorize(pair[1].copy())
+        if self.args.type=="COLORING": pair[0]=self._entcolorize(pair[1].copy())
         # Convert to torch tensor and return.
         pair_t = self._np2Tensor(pair)
         return pair_t[0], pair_t[1], filename

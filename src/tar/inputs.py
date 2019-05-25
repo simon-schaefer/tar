@@ -83,7 +83,7 @@ parser.add_argument("--valid_only", action="store_true",
 # =============================================================================
 # Optimization specifications.
 # =============================================================================
-parser.add_argument("--lr", type=float, default=1e-3,
+parser.add_argument("--lr", type=float, default=4e-4,
                     help="learning rate")
 parser.add_argument("--decay", type=str, default="20-100-200",
                     help="learning rate decay interval (epochs)")
