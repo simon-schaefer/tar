@@ -47,6 +47,7 @@ class _Trainer_IColor_(_Trainer_):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         psnrs = np.zeros((num_valid_samples, 4))
         for i, (gry, col, fname) in enumerate(d):
+            print(i, num_valid_samples, self.args.n_threads)
             gry, col = self.prepare([gry, col])
             scale  = d.dataset.scale
             gry_out, col_out_t = self.apply(gry, col, discretize=finetuning)

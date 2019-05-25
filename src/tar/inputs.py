@@ -22,7 +22,7 @@ parser.add_argument("--verbose", action="store_false",
 # =============================================================================
 # Hardware specifications.
 # =============================================================================
-parser.add_argument("--n_threads", type=int, default=10,
+parser.add_argument("--n_threads", type=int, default=5,
                     help="number of threads for data loading")
 parser.add_argument("--cpu", action="store_true",
                     help="use cpu only (default=False)")
