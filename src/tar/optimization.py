@@ -88,7 +88,7 @@ class _Loss_(nn.modules.loss._Loss):
         self.loss = []
         self.loss_module = nn.ModuleList()
         for loss in args.loss.split('+'):
-            input_type, weight, loss_type = loss.split('*')
+            input_type, weight, loss_type, cut = loss.split('*')
             loss_function = None
             if loss_type == "L1":
                 loss_function = nn.L1Loss()
@@ -100,13 +100,14 @@ class _Loss_(nn.modules.loss._Loss):
             self.loss.append({
                 "weight"    : float(weight),
                 "desc"      : "{}-{}".format(input_type, loss_type),
+                "cut"       : int(cut),
                 "function"  : loss_function})
             self.loss_module.append(loss_function)
             ckp.write_log("... adding %s loss with weight=%f and input type=%s" \
                     % (loss_type, float(weight), input_type))
         # For logging purposes add additional element to loss
         # containing the sum of all "sub-losses".
-        self.loss.append({"desc": "TOTAL", "weight": 0.0, "function": None})
+        self.loss.append({"desc":"TOTAL", "weight":0.0, cut:0, "function":None})
         # Load loss function to given device.
         self.n_gpus = args.n_gpus
         device = torch.device("cpu" if args.cpu else args.cuda_device)
@@ -115,27 +116,15 @@ class _Loss_(nn.modules.loss._Loss):
             self.loss_module = nn.DataParallel(
                 self.loss_module, range(self.n_GPUs)
             )
+        # Auxialiary variables.
+        self.pixel_range = args.norm_max - args.norm_min
         # Build logging and load previous log (if required).
         self.log = torch.Tensor()
         ckp.write_log("... successfully built loss module !")
 
     def forward(self, kwargs):
         """ Given the required input arguments determine every single
-        loss as well as the total loss, return and add to logging.
-        Expected inputs: {"LR_GT": low resolution ground truth,
-                          "LR_OUT": low resolution output
-                          "HR_GT": high resolution ground truth,
-                          "HR_OUT": high resolution }
-        """
-        # Search for required inputs for specific loss type.
-        for l  in self.loss:
-            input_type = l["desc"].split("-")[0]
-            if input_type == "HR" and \
-            (not "HR_GT" in kwargs.keys() or not "HR_OUT" in kwargs.keys()):
-                raise ValueError("Loss missing HR arguments !")
-            if input_type == "LR" and \
-            (not "LR_GT" in kwargs.keys() or not "LR_OUT" in kwargs.keys()):
-                raise ValueError("Loss missing LR arguments !")
+        loss as well as the total loss, return and add to logging. """
         # Determine loss given loss function.
         losses = []
         for i, l in enumerate(self.loss):
@@ -143,6 +132,10 @@ class _Loss_(nn.modules.loss._Loss):
             if l["function"] is not None:
                 x, y = kwargs[input_type+"_OUT"], kwargs[input_type+"_GT"]
                 loss = l["function"](x, y)
+                loss_norm = loss/(self.pixel_range*x.numel())*100
+                if loss_norm < l["cut"]: loss = 0.0
+                print("loss", loss, type(loss))
+                print("loss_norm", loss_norm)
                 effective_loss = l["weight"] * loss
                 losses.append(effective_loss)
                 self.log[-1, i] += effective_loss.item()

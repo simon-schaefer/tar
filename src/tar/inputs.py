@@ -109,7 +109,7 @@ parser.add_argument("--gclip", type=float, default=0,
 # =============================================================================
 # Loss specifications.
 # =============================================================================
-parser.add_argument("--loss", type=str, default="HR*10*L1+LR*1*L1",
+parser.add_argument("--loss", type=str, default="HR*10*L1*0+LR*1*L1*1",
                     help="loss function configuration")
 
 # =============================================================================
@@ -171,7 +171,7 @@ def set_template(args):
 
     # Specific types.
     if args.template.find("ICOLOR_AETAD_DIV2K") >= 0:
-        args.loss         = "COL*100*L1+GRY*1*L1"
+        args.loss         = "COL*100*L1*0+GRY*1*L1*1"
         args.scales_train = [1]
         args.scales_valid = [1]
 
@@ -181,7 +181,7 @@ def set_template(args):
     # if args.template.find("VSCALE_AETAD_SOFVSR_4") >= 0:
     #     args.format     = "VIDEO"
     #     args.type       = "SCALING"
-    #     args.loss       = "LR*1*L1+EXT*100*L1"
+    #     args.loss       = "LR*1*L1*1+EXT*100*L1*0"
     #     args.external   = "SOFVSR-iter18500x4"
     #     args.scales_valid = [4]
     #     args.batch_size = 6
