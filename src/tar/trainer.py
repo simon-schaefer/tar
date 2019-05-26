@@ -188,8 +188,18 @@ class _Trainer_(object):
             scl    = scl//2
         return lr_out, hr_out
 
+    def logging_core(self, psnrs, di:int, v: dict) -> dict:
+        for ip, desc in enumerate(self.psnr_description()):
+            psnrs_i = psnrs[:,ip]
+            psnrs_i.sort()
+            v["PSNR_{}_best".format(desc)]="{:.3f}".format(psnrs_i[-1])
+            v["PSNR_{}_mean".format(desc)]="{:.3f}".format(np.mean(psnrs_i))
+        log = [float(v["PSNR_{}".format(x)]) for x in self.log_description()]
+        self.ckp.log[-1, di, :] += torch.Tensor(log)
+        return v
+
     def perturbation_core(self, d, eps: List[float]):
-        num_testing_samples = min(len(d), 50)
+        num_testing_samples = min(len(d), 10)
         psnrs_t = np.zeros((num_testing_samples,len(eps)))
         psnrs_b = np.zeros((num_testing_samples,len(eps)))
         nmin, nmax  = self.args.norm_min, self.args.norm_max
@@ -209,6 +219,29 @@ class _Trainer_(object):
                 hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
                 psnrs_b[id,ie] = misc.calc_psnr(hr_out_eps, hr, None, nmax-nmin)
         return psnrs_t.mean(axis=0), psnrs_b.mean(axis=0)
+
+    def runtime_core(self, d, v: dict) -> dict:
+        runtimes = np.zeros((3, min(len(d),10)))
+        for i, (lr, hr, fname) in enumerate(d):
+            if i >= runtimes.shape[1]: break
+            lr, hr = self.prepare([lr, hr])
+            scale  = d.dataset.scale
+            timer_apply = misc._Timer_()
+            self.apply(lr, hr, scale, discretize=False)
+            runtimes[0,i] = timer_apply.toc()
+            timer_apply = misc._Timer_()
+            if type(lr) == tuple: dec_inp = lr[0]
+            else:                 dec_inp = lr
+            self.apply(lr, hr, scale, discretize=False, dec_input=dec_inp)
+            runtimes[1,i] = timer_apply.toc()
+            runtimes[2,i] = max(runtimes[0,i] - runtimes[1,i], 0.0)
+        v["RUNTIME_AL"] = "{:.8f}".format(np.median(runtimes[0,:], axis=0))
+        v["RUNTIME_UP"] = "{:.8f}".format(np.median(runtimes[1,:], axis=0))
+        v["RUNTIME_DW"] = "{:.8f}".format(np.median(runtimes[2,:], axis=0))
+        return v
+
+    def psnr_description(self) -> List[str]:
+        raise NotImplementedError
 
     def log_description(self) -> List[str]:
         raise NotImplementedError

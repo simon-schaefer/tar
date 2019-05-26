@@ -193,7 +193,7 @@ class _VDataset_(_Dataset_):
         lr1, hr1, fname1 = self._load_file(idx + 1)
         lr2, hr2, fname2 = self._load_file(idx + 2)
         # Iterate over and process all files in returned array.
-        returns = []
+        lrs, hrs, fnames = [], [], []
         for lr,hr,filename in zip([lr0,lr1,lr2],[hr0,hr1,hr2],[fname0,fname1,fname2]):
             # Cut patches from file.
             patch_size = self.args.patch_size
@@ -210,8 +210,10 @@ class _VDataset_(_Dataset_):
             if self.args.type == "COLORING": pair[0] = self._entcolorize(pair[1].copy())
             # Convert to torch tensor and return.
             pair_t = self._np2Tensor(pair)
-            returns.append((pair_t[0], pair_t[1], filename))
-        return tuple(returns)
+            lrs.append(pair_t[0])
+            hrs.append(pair_t[1])
+            fnames.append(filename)
+        return tuple(lrs), tuple(hrs), tuple(fnames)
 
 # =============================================================================
 # DATA LOADING CLASS.

@@ -78,29 +78,13 @@ class _Trainer_IColor_(_Trainer_):
                 self.ckp.begin_background()
             #misc.progress_bar(i+1, num_valid_samples)
         # Logging PSNR values.
-        for ip, desc in enumerate(["SGRY","SCOLT","SCOLG","SCOLY"]):
-            psnrs_i = psnrs[:,ip]
-            psnrs_i.sort()
-            v["PSNR_{}_best".format(desc)]="{:.3f}".format(psnrs_i[-1])
-            v["PSNR_{}_mean".format(desc)]="{:.3f}".format(np.mean(psnrs_i))
-        log = [float(v["PSNR_{}".format(x)]) for x in self.log_description()]
-        self.ckp.log[-1, di, :] += torch.Tensor(log)
+        v = self.logging_core(psnrs=psnrs, di=di, v=v)
         # Determine runtimes for up and downscaling and overall.
-        runtimes = np.zeros((3, min(len(d),10)))
-        for i, (lr, hr, fname) in enumerate(d):
-            if i >= runtimes.shape[1]: break
-            lr, hr = self.prepare([lr, hr])
-            timer_apply = misc._Timer_()
-            self.apply(lr, hr, discretize=False)
-            runtimes[0,i] = timer_apply.toc()
-            timer_apply = misc._Timer_()
-            self.apply(lr, hr, discretize=False, dec_input=lr)
-            runtimes[1,i] = timer_apply.toc()
-            runtimes[2,i] = max(runtimes[0,i] - runtimes[1,i], 0.0)
-        v["RUNTIME_AL"] = "{:.8f}".format(np.median(runtimes[0,:], axis=0))
-        v["RUNTIME_UP"] = "{:.8f}".format(np.median(runtimes[1,:], axis=0))
-        v["RUNTIME_DW"] = "{:.8f}".format(np.median(runtimes[2,:], axis=0))
+        v = self.runtime_core(d, v)
         return v
+
+    def psnr_description(self):
+        return ["SGRY","SCOLT","SCOLG","SCOLY"]
 
     def log_description(self):
         return ["SCOLT_best", "SCOLT_mean", "SGRY_best", "SGRY_mean"]

@@ -22,7 +22,7 @@ parser.add_argument("--verbose", action="store_false",
 # =============================================================================
 # Hardware specifications.
 # =============================================================================
-parser.add_argument("--n_threads", type=int, default=5,
+parser.add_argument("--n_threads", type=int, default=10,
                     help="number of threads for data loading")
 parser.add_argument("--cpu", action="store_true",
                     help="use cpu only (default=False)")
@@ -171,13 +171,13 @@ def set_template(args):
     if args.template.find("ISCALE_AETAD_NTIAASPEN_4") >= 0:
         args.scales_valid = [4]
 
-    if args.template.find("VSCALE_AETAD_SOFVSR_4") >= 0:
-        args.format     = "VIDEO"
-        args.type       = "SCALING"
-        args.loss       = "HR*1*L1+LR*1*L1+EXT*100*L1"
-        args.external   = "SOFVSR-iter18500x4"
-        args.scales_valid = [4]
-        args.batch_size = 6
+    # if args.template.find("VSCALE_AETAD_SOFVSR_4") >= 0:
+    #     args.format     = "VIDEO"
+    #     args.type       = "SCALING"
+    #     args.loss       = "LR*1*L1+EXT*100*L1"
+    #     args.external   = "SOFVSR-iter18500x4"
+    #     args.scales_valid = [4]
+    #     args.batch_size = 6
 
 # =============================================================================
 # MAIN.
