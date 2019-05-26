@@ -24,16 +24,26 @@ class _Trainer_IColor_(_Trainer_):
         super(_Trainer_IColor_, self).__init__(args, loader, model, loss, ckp)
         self.ckp.write_log("... successfully built icolor trainer !")
 
-    def apply(self, gry, col, scale=None, discretize=False, dec_input=None):
+    def apply(self, gry, col, scale=None, discretize=False, dec_input=None, mode="all"):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
-        # Encoding i.e. decolorization.
-        if dec_input is None:
+        assert mode in ["all", "up", "down"]
+        if mode == "up": assert not dec_input is None
+        # Encoding i.e. decolorization and decoding i.e. colorization
+        def _decolorization(col):
             gry_out = self.model.model.encode(col.clone())
             gry_out = torch.add(gry_out, gry)
             if discretize: gry_out = misc.discretize(gry_out,[nmin,nmax])
-        else: gry_out = dec_input
-        # Decoding i.e. colorization
-        col_out = self.model.model.decode(gry_out)
+            return gry_out
+        def _colorization(gry):
+            return self.model.model.decode(gry.clone())
+        # In case of down- or upscaling only perform only part scalings.
+        if mode == "down":
+            if dec_input is not None: return gry.clone()
+            else:                     return _decolorization(col)
+        elif mode == "up":            return _colorization(gry)
+        # Otherwise perform down- and upscaling and return both tensors.
+        gry_out = _downsample(col)
+        col_out = _upsample(gry_out)
         return gry_out, col_out
 
     def optimization_core(self, gry, col, finetuning, *args):
@@ -54,9 +64,9 @@ class _Trainer_IColor_(_Trainer_):
             col_gry = (col_cpy[:,0,:,:]+col_cpy[:,1,:,:]+col_cpy[:,2,:,:])/3.0
             _,w,h = col_gry.size()
             col_gry = col_gry.view(1,1,w,h)
-            _, col_out_g = self.apply(gry, col, dec_input=col_gry)
+            col_out_g = self.apply(gry, col, dec_input=col_gry, mode="up")
             timer_apply = misc._Timer_()
-            _, col_out_y = self.apply(gry, col, dec_input=gry)
+            col_out_y = self.apply(gry, col, dec_input=gry, mode="up")
             # PSNR - Grey image.
             gry_out = misc.discretize(gry_out, [nmin, nmax])
             psnrs[i,0] = misc.calc_psnr(gry_out, gry, None, nmax-nmin)

@@ -39,7 +39,6 @@ class _Checkpoint_(object):
         now = time.strftime("%H_%M_%S_%d_%b", time.gmtime())
         tag = args.template + "_" + now
         self.dir = os.path.join(os.environ['SR_PROJECT_OUTS_PATH'], tag)
-        if args.valid_only: self.dir = self.dir + "_valid"
         self.dir_load = None
         # If previous training/model should be loaded, build loading path
         # from input arguments and read loaded config file.

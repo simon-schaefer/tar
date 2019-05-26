@@ -136,7 +136,7 @@ class _Trainer_(object):
             self.ckp.write_log(
                 "Validation {} (perturbation test) ...".format(self.valid_iter)
             )
-            eps     = np.linspace(0.0, 0.3, num=10).tolist()
+            eps     = np.linspace(0.0,self.args.max_eps,num=10).tolist()
             psnrs_t = np.zeros((len(self.loader_valid),len(eps)))
             psnrs_b = np.zeros((len(self.loader_valid),len(eps)))
             labels  = []
@@ -167,25 +167,36 @@ class _Trainer_(object):
                      save: bool=False, finetuning: bool=False) -> dict:
         raise NotImplementedError
 
-    def apply(self, lr, hr, scale, discretize=False, dec_input=None):
+    def apply(self, lr, hr, scale, discretize=False, dec_input=None, mode="all"):
         assert misc.is_power2(scale)
-        scl, hr_in, hr_out, lr_out = 1, hr.clone(), None, None
+        assert mode in ["all", "up", "down"]
+        if mode == "up": assert not dec_input is None
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         # Downsample image until output (decoded image) has the
         # the right scale, add to LR image and discretize.
-        if dec_input is None:
+        def _downsample(hr, scale):
+            hr_in = hr.clone()
+            scl   = 1
             while scl < scale:
                 lr_out = self.model.model.encode(hr_in)
                 hr_in, scl = lr_out, scl*2
-            if scale in self.args.scales_guidance: lr_out=torch.add(lr_out, lr)
-            if discretize:
-                lr_out = misc.discretize(lr_out,[nmin,nmax])
-        else: lr_out, scl = dec_input, scale
-        # Upscale resulting LR_OUT image until decoding output has right scale.
-        hr_out = lr_out.clone()
-        while scl > 1:
-            hr_out = self.model.model.decode(hr_out)
-            scl    = scl//2
+            if scale in self.args.scales_guidance: lr_out=torch.add(lr_out, lr.clone())
+            if discretize: lr_out = misc.discretize(lr_out,[nmin,nmax])
+            return lr_out
+        def _upsample(lr, scl):
+            hr_out = lr.clone()
+            while scl > 1:
+                hr_out = self.model.model.decode(hr_out)
+                scl    = scl//2
+            return hr_out
+        # In case of down- or upscaling only perform only part scalings.
+        if mode == "down":
+            if dec_input is not None: return lr.clone()
+            else:                     return _downsample(hr, scale)
+        elif mode == "up":            return _upsample(dec_input, scale)
+        # Otherwise perform down- and upscaling and return both tensors.
+        lr_out = _downsample(hr, scale)
+        hr_out = _upsample(lr_out, scale)
         return lr_out, hr_out
 
     def logging_core(self, psnrs, di:int, v: dict) -> dict:
@@ -205,17 +216,17 @@ class _Trainer_(object):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         for id, (lr, hr, fname) in enumerate(d):
             if id >= num_testing_samples: break
+            lr, hr = self.prepare([lr, hr])
+            scale  = d.dataset.scale
+            lr_out = self.apply(lr, hr, scale, discretize=True, mode="down")
             for ie, e in enumerate(eps):
-                lr, hr = self.prepare([lr, hr])
-                scale  = d.dataset.scale
-                lr_out, _ = self.apply(lr, hr, scale, discretize=True)
                 error = torch.normal(mean=0.0,std=torch.ones(lr_out.size())*e)
-                lr_out = lr_out + error.to(self.device)
-                _, hr_out_eps = self.apply(lr, hr, scale, dec_input=lr_out)
+                lr_out = lr_out.clone() + error.to(self.device)
+                hr_out_eps = self.apply(lr,hr,scale,dec_input=lr_out,mode="up")
                 hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
                 psnrs_t[id,ie] = misc.calc_psnr(hr_out_eps, hr, None, nmax-nmin)
-                lr_error = lr + error.to(self.device)
-                _, hr_out_eps = self.apply(lr, hr, scale, dec_input=lr_error)
+                lr_error = lr.clone() + error.to(self.device)
+                hr_out_eps = self.apply(lr,hr,scale,dec_input=lr_error,mode="up")
                 hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
                 psnrs_b[id,ie] = misc.calc_psnr(hr_out_eps, hr, None, nmax-nmin)
         return psnrs_t.mean(axis=0), psnrs_b.mean(axis=0)
@@ -227,12 +238,10 @@ class _Trainer_(object):
             lr, hr = self.prepare([lr, hr])
             scale  = d.dataset.scale
             timer_apply = misc._Timer_()
-            self.apply(lr, hr, scale, discretize=False)
+            self.apply(lr, hr, scale, discretize=False, mode="all")
             runtimes[0,i] = timer_apply.toc()
             timer_apply = misc._Timer_()
-            if type(lr) == tuple: dec_inp = lr[0]
-            else:                 dec_inp = lr
-            self.apply(lr, hr, scale, discretize=False, dec_input=dec_inp)
+            self.apply(lr, hr, scale, discretize=False, dec_input=lr, mode="up")
             runtimes[1,i] = timer_apply.toc()
             runtimes[2,i] = max(runtimes[0,i] - runtimes[1,i], 0.0)
         v["RUNTIME_AL"] = "{:.8f}".format(np.median(runtimes[0,:], axis=0))

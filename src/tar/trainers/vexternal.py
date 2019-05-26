@@ -28,21 +28,37 @@ class _Trainer_VExternal_(_Trainer_):
         self._external = self.load_module(external,self.scale_current(0),use_gpu)
         self.ckp.write_log("... successfully built vscale trainer !")
 
-    def apply(self,lrs,hrs,scale,discretize=False,dec_input=None):
-        lr0,lr1,lr2 = lrs; _,hr1,_ = hrs
-        lr_out, _ = super(_Trainer_VExternal_, self).apply(
-            lr1, hr1, scale, discretize, dec_input
-        )
-        # Apply input images to model and determine output.
+    def apply(self,lrs,hrs,scale,discretize=False,dec_input=[None,None,None],mode="all"):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
-        lr_ext = misc.discretize(lr_out.clone(),[nmin,nmax])
-        hre_out = self._external.apply(lr0, lr_ext, lr2)
-        return lr_out, hre_out
+        assert mode in ["all", "up", "down"]
+        if mode == "up": assert not all([x is None for x in dec_input])
+        # Downscaling.
+        lr0,lr1,lr2 = lrs; hr0,hr1,hr2 = hrs
+        if mode == "down":
+            return super(_Trainer_VExternal_, self).apply(
+                lr1, hr1, scale, discretize, dec_input[1], mode="down"
+            )
+        # Apply input images to model and determine output.
+        lr0_out = super(_Trainer_VExternal_, self).apply(
+            lr0, hr0, scale, discretize, dec_input[0], mode="down"
+        )
+        lr1_out = super(_Trainer_VExternal_, self).apply(
+            lr1, hr1, scale, discretize, dec_input[1], mode="down"
+        )
+        lr2_out = super(_Trainer_VExternal_, self).apply(
+            lr2, hr2, scale, discretize, dec_input[2], mode="down"
+        )
+        lr0e = misc.discretize(lr0_out.clone(),[nmin,nmax])
+        lr1e = misc.discretize(lr1_out.clone(),[nmin,nmax])
+        lr2e = misc.discretize(lr2_out.clone(),[nmin,nmax])
+        hre_out = self._external.apply(lr0e.clone(),lr1e.clone(),lr2e.clone())
+        if mode == "up": return hre_out
+        return lr1_out, hre_out
 
     def optimization_core(self, lrs, hrs, finetuning, scale):
         lr_out,hrm_out = self.apply(lrs,hrs,scale,discretize=finetuning)
         # Pass loss variables to optimizer and optimize.
-        loss_kwargs = {'LR_GT': lr1,  'LR_OUT': lr_out,
+        loss_kwargs = { 'LR_GT': lr1,  'LR_OUT': lr_out,
                        'EXT_GT': hr1, 'EXT_OUT': hrm_out}
         loss = self.loss(loss_kwargs)
         return loss
@@ -57,8 +73,8 @@ class _Trainer_VExternal_(_Trainer_):
             lr0,lr1,lr2 = lrs; hr0,hr1,hr2 = hrs
             scale  = d.dataset.scale
             lr_out,hrm_out = self.apply(lrs,hrs,scale,discretize=finetuning)
-            _,hrm_out2 = self.apply(lrs,hrs,scale,discretize=finetuning,
-                                     dec_input=lr1)
+            hrm_out2 = self.apply(lrs,hrs,scale,discretize=finetuning,
+                                  dec_input=[lr0,lr1,lr2], mode="up")
             # PSNR - Low resolution image.
             lr_out = misc.discretize(lr_out, [nmin, nmax])
             psnrs[i,0] = misc.calc_psnr(lr_out, lr1, None, nmax-nmin)
@@ -68,7 +84,7 @@ class _Trainer_VExternal_(_Trainer_):
             if save:
                 slist = [lr_out, hrm_out, hrm_out2, lr1, hr1]
                 dlist = ["SLR", "SHRET", "SHREB", "LR", "HR"]
-                self.ckp.save_results(slist,dlist,fnames[0],d,scale)
+                self.ckp.save_results(slist,dlist,fnames[1],d,scale)
             if save and i % self.args.n_threads == 0:
                 self.ckp.end_background()
                 self.ckp.begin_background()
@@ -86,18 +102,22 @@ class _Trainer_VExternal_(_Trainer_):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         for id, (lrs, hrs, fname) in enumerate(d):
             if id >= num_testing_samples: break
+            lrs, hrs = self.prepare([lrs, hrs])
+            lr0,lr1,lr2 = lrs; hr0,hr1,hr2 = hrs
+            scale  = d.dataset.scale
+            lr_out = self.apply(lrs,hrs,scale,discretize=True,mode="down")
             for ie, e in enumerate(eps):
-                lrs, hrs = self.prepare([lrs, hrs])
-                lr0,lr1,lr2 = lrs; hr0,hr1,hr2 = hrs
-                scale  = d.dataset.scale
-                lr_out, _ = self.apply(lrs, hrs, scale, discretize=True)
                 error = torch.normal(mean=0.0,std=torch.ones(lr_out.size())*e)
-                lr_out = lr_out + error.to(self.device)
-                _, hr_out_eps = self.apply(lrs, hrs, scale, dec_input=lr_out)
+                lr_out = lr_out.clone() + error.to(self.device)
+                hr_out_eps = self.apply(lrs, hrs, scale,
+                                        dec_input=[None,lr_out,None], mode="up")
                 hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
                 psnrs_t[id,ie] = misc.calc_psnr(hr_out_eps, hr1, None, nmax-nmin)
-                lr_error = lr1 + error.to(self.device)
-                _, hr_out_eps = self.apply(lrs, hrs, scale, dec_input=lr_error)
+                lr0e = lr0.clone() + error.to(self.device)
+                lr1e = lr1.clone() + error.to(self.device)
+                lr2e = lr2.clone() + error.to(self.device)
+                hr_out_eps = self.apply(lrs, hrs, scale,
+                                        dec_input=[lr0e, lr1e, lr2e], mode="up")
                 hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
                 psnrs_b[id,ie] = misc.calc_psnr(hr_out_eps, hr1, None, nmax-nmin)
         return psnrs_t.mean(axis=0), psnrs_b.mean(axis=0)

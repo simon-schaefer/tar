@@ -14,6 +14,9 @@ parser.add_argument("--format", type=str, default="IMAGE",
                     choices=("IMAGE", "VIDEO"))
 parser.add_argument("--external", type=str, default="",
                     help="external model, format (program-model)")
+parser.add_argument("--load", type=str, default="",
+                    help="directory to load model from, training is not \
+                    continued to not overwrite, format [outs,models]xdir_name")
 parser.add_argument("--template", default="valid",
                     help="set various templates in option.py")
 parser.add_argument("--verbose", action="store_false",
@@ -112,9 +115,8 @@ parser.add_argument("--loss", type=str, default="HR*10*L1+LR*1*L1",
 # =============================================================================
 # Log specifications.
 # =============================================================================
-parser.add_argument("--load", type=str, default="",
-                    help="directory to load model from, training is not \
-                    continued to not overwrite, format [outs,models]xdir_name")
+parser.add_argument("--max_eps", type=float, default=0.5,
+                    help="maximal noise for perturbation test with [0,1] image")
 parser.add_argument("--resume", type=int, default=-2,
                     help="resume from specific checkpoint (-1=latest, -2=best)")
 parser.add_argument("--save_models", action="store_true",
