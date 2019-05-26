@@ -22,6 +22,7 @@
 \usepackage{colortbl}
 \usepackage{nomencl}
 \usepackage{multicol} % multiple columns
+\input{acronyms}
 
 \renewcommand{\vec}[1]{\mathbf{#1}}
 \newcommand{\mat}[1]{\mathtt{#1}}
@@ -56,21 +57,18 @@
 % Title page, modify accordingly
 \input{title.tex}
 \input{abstract.tex}
-\input{ack.tex}
 
 \pagestyle{fancy}
 \pagenumbering{Roman}
 
+% Insert list of acronyms
+\newpage
+\addcontentsline{toc}{section}{Abbreviations}
+\printacronyms[include-classes=abbrev,name=Abbreviations]
 % Insert table of contents
 \newpage
 \tableofcontents
-% Insert list of figures.
-\newpage
-\listoffigures
-% Insert list of tables
-%\newpage
-%\listoftables
-
+\thispagestyle{empty}
 \pagenumbering{arabic}
 
 %% ----------------------------------------------------------------------------
@@ -81,7 +79,6 @@
 \input{approach.tex}
 \input{experimentsandresults.tex}
 \input{discussion.tex}
-\input{conclusion.tex}
 
 %% ----------------------------------------------------------------------------
 % Bibliography
@@ -96,5 +93,7 @@
 \newpage
 \appendix
 \input{appendix.tex}
+\newpage
+\listoffigures
 
 \end{document}

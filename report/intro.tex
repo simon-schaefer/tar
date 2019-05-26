@@ -1,12 +1,11 @@
 \newpage
 \section{Introduction}
 \label{sec:Introduction}
-With the rise of deep learning in image processing super-resolution (SR) and image
-colorization (IC) in both the image and the video domain have received significant
-attention \cite{DLFISRAS}. While SR aims to reconstruct a high-resolution (HR)
-image from a low-resolution (LR) image, image colorization deals with the
-transformation from an uncolored, grayscale (GR) image to a RGB colored
-(COL) image.
+With the rise of deep learning in image processing \ac{SR} and \ac{IC}
+in both the image and the video domain have received significant
+attention \cite{DLFISRAS}. While SR aims to reconstruct a \ac{HR} from a
+\ac{LR}, image colorization deals with the transformation from an uncolored,
+\ac{GRY} to a RGB \ac{COL}.
 However, in most of the recent works (e.g. \cite{AFPATSISR}, \cite{ESRGAN},
 \cite{RBPNFVSR}, \cite{LFVSRTHROFE}) the problem of downscaling and upscaling
 or decolorization and colorization are regarded as seperate problems although
@@ -19,36 +18,35 @@ when interpolation is used for downsampling. However, as shown in
 the performance of the subsequent upscaling task.
 
 \begin{figure}[!htbp]
-	\centering
-	\includegraphics[width=6cm]{figures/shrb_vs_shrt_x4}
-  \includegraphics[width=6cm]{figures/cvl}
-	\caption{Comparison between an upscaled image based on bicubic downsampled
-  (left) and task-aware downsampled (right) LR image applied on the same model
-  with upscaling factor 4, for the image-domain, SET 14 dataset, and video
-  domain, CALENDAR dataset. }
-  \label{fig:shrb_vs_shrt_x4}
+\centering
+\includegraphics[width=5cm]{figures/shrb_vs_shrt_x4}
+\includegraphics[width=5cm]{figures/cvl}
+\caption{Comparison between an upscaled image based on bicubic downsampled
+(left) and task-aware downsampled (right) LR image applied on the same model
+with upscaling factor 4, for the image-domain, SET 14 dataset, and video
+domain, CALENDAR dataset.}
+\label{fig:shrb_vs_shrt_x4}
 \end{figure}
 
 As can be seen above a task-aware approach can dramatically improve the
 performance of existing super-resolution models. However, the research on task-
 aware downscaling methods is a very new field and therefore there still are
 a lot of unresolved issues such as the effect of noise or the feasibility of
-applying it in other domains.
+applying it to tasks other than \ac{SISR}.
 
-\newpage
 \subsection{Focus of this Work}
-For this reason this work focuses on Task-Aware-Downscaling (TAD) for several standard
+For this reason this work focuses on \ac{TAD} for several standard
 computer vision problems such as super-resolution or colorization in both the
 image and video domain, as recently purposed by Heewon Kim et. alt. (\cite{TAID})
 for the image domain only. Therefore the goals of this work are the following
 
 \begin{itemize}
-  \item reimplement and evaluate the TAD framework purposed in (\cite{TAID})
-  \item improve the TAD framework especially with regards on accuracy
-  (PSNR) and speed in the image domain
-  \item evaluate the effect of external effects such as noise on the TAD
-  framework
-  \item extend the TAD framework to the video domain
+\item reimplement and evaluate the TAD framework purposed in (\cite{TAID})
+\item improve the TAD framework especially with regards on accuracy
+(PSNR) and speed in the image domain
+\item evaluate the effect of external effects such as noise on the TAD
+framework
+\item extend the TAD framework to the video domain
 \end{itemize}
 
 By that to the best of our knowledge this work is the first one using deep
@@ -61,8 +59,8 @@ introduced for both the image and video domain \mychapterref{sec:RelatedWork}.
 achieve the goals described above and which are evaluated in
 \mychapterref{sec:ExperimentsandResults}. A final discussion of the results
 as well as an outlook on further work can be found in
-\mychapterref{sec:Discussion} and \mychapterref{sec:Conclusion}.
-Further visualization and experiments are shown in the abstract.
+\mychapterref{sec:Discussion}. Further visualization and experiments are
+shown in the abstract.
 
 % Give an introduction to the topic you have worked on:
 %

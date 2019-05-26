@@ -9,9 +9,9 @@ performance compared to the state-of-the-art, the use as benchmark in related
 papers and availability of (pretrained) models.
 
 \subsection{Super-Resolution in Image Domain}
-The problem of SR in the image domain is called Single-Image-Super-Resolution
-(SISR) and is shown in \myfigref{fig:sisr_problem}. A lot of approaches have been
-tried in order to cope with the SISR problem. While early approaches such as
+The problem of SR in the image domain is called \ac{SISR} and is shown in
+\myfigref{fig:sisr_problem}. A lot of approaches have been
+tried in order to cope with the \ac{SISR} problem. While early approaches such as
 bicubic and Lanczos \cite{LFIOATD} tackle the problem using simple deterministic
 filters which are computational cheap but produce blurry results and lack in
 high frequency details, more recent approaches approach the problem using
@@ -19,14 +19,14 @@ example-based methods such as sparse encoding or deep learning methods.
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=8cm]{figures/sisr_problem}
+	\includegraphics[width=10cm]{figures/sisr_problem}
 	\caption{General SISR problem  according to \cite{DLFSISRABR}.}
   \label{fig:sisr_problem}
 \end{figure}
 
-Sparsity-based techniques assumes the LR image to be transformable in another
+Sparsity-based techniques assumes the \ac{LR} image to be transformable in another
 domain (usually a dictionary of image atoms \cite{SARPFTTAISAIP}) and tries to
-find correspondences between the LR and HR patches in the transformed space, as
+find correspondences between the \ac{LR} and \ac{HR} patches in the transformed space, as
 implemented in \cite{IDASRBASDSAAR}. However, these techniques usually are
 very computationally expensive. Among other learning based approaches such as
 the use of random forests \cite{FAAIUWSRF}, in-place example regression models
@@ -44,25 +44,25 @@ got the best results in the NTIRE2017 Super-Resolution Challenge \cite{NTIRE2017
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=8cm]{figures/vdsr}
+	\includegraphics[width=10cm]{figures/vdsr}
 	\caption{Overview of VDSR network design \cite{AISRUVDCN}.}
   \label{fig:vdsr}
 \end{figure}
 
 \subsection{Super-Resolution in Video Domain}
-Video Super-Resolution combines information from multiple adjacent LR frames
+\ac{VSR} combines information from multiple adjacent LR frames
 to take temporal information into account, leading to higher quality results.
 Takeda et al. \cite{SRWESME} apply a 3D kernel regression on a patch of adjacent
-LR frames to implicitly encounter temporal information. Since purposed by
+\ac{LR} frames to implicitly encounter temporal information. Since purposed by
 Caballero et al. \cite{RTVSRWSTNAMC} end-to-end approaches including motion
 compensation such as the CNN framework from \cite{RTVSRWSTNAMC} have large success
 in the VSR area. Liu et al. \cite{RVSRWLTD} added temporal addaptivity to the
-framework to be able to aggregate the resulting HR frame based on a weighted
+framework to be able to aggregate the resulting \ac{HR} frame based on a weighted
 sum of several estimates as well as a varying number of input LR frames. Sajjadi
 et al. \cite{FRVSR} purposed a frame-recurrent architecture iteratively using
-the previously inferred HR frames for the subsequent prediction. Wang et al.
+the previously inferred \ac{HR} frames for the subsequent prediction. Wang et al.
 \cite{LFVSRTHROFE} (SOFVSR) implemented an end-to-end trainable approach to predict
-both, the HR frame as well as the HR optical flow. Therefore, first the HR
+both, the \ac{HR} frame as well as the HR optical flow. Therefore, first the HR
 optical flow is inferred in a coarse-to-fine manner, then motion compensation is
 performed according to the HR optical flows and finally, the compensated LR
 inputs are fed to a super-resolution network to generate the HR frame estimate
