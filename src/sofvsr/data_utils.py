@@ -1,5 +1,6 @@
 import numpy as np
 from PIL import Image
+import glob
 import os
 import torch
 from torch.utils.data.dataset import Dataset
@@ -68,13 +69,15 @@ class TestsetLoader(Dataset):
         super(TestsetLoader).__init__()
         self.dataset_dir = dataset_dir
         self.upscale_factor = upscale_factor
-        self.frame_list = os.listdir(self.dataset_dir + '/lr_x' + str(self.upscale_factor))
+        path = os.environ["SR_PROJECT_DATA_PATH"]
+        lr_dir = os.path.join(path, self.dataset_dir, "LR_bicubic")
+        lr_dir = lr_dir + '/X' + str(self.upscale_factor)
+        self.frame_list = sorted(glob.glob(lr_dir + "/*" + ".png"))
 
     def __getitem__(self, idx):
-        dir = self.dataset_dir + '/lr_x' + str(self.upscale_factor)
-        LR0 = Image.open(dir + '/' + 'lr_' + str(idx+1).rjust(2, '0') + '.png')
-        LR1 = Image.open(dir + '/' + 'lr_' + str(idx+2).rjust(2, '0') + '.png')
-        LR2 = Image.open(dir + '/' + 'lr_' + str(idx+3).rjust(2, '0') + '.png')
+        LR0 = Image.open(self.frame_list[idx])
+        LR1 = Image.open(self.frame_list[idx+1])
+        LR2 = Image.open(self.frame_list[idx+2])
         W, H = LR1.size
         # H and W should be divisible by 2
         W = int(W // 2) * 2

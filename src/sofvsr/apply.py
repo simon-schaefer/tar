@@ -21,11 +21,11 @@ from sofvsr.data_utils import ycbcr2rgb, rgb2ycbcr
 
 class SOFVSR(object):
 
-    def __init__(self, scale, use_gpu=True):
+    def __init__(self, model, scale, use_gpu=True):
         # Load SOFVSR model from model path.
         self._net = SOFVSR_NET(upscale_factor=scale)
         model_path = os.path.join(os.environ["SR_PROJECT_MODELS_PATH"], "sofvsr")
-        model_path = os.path.join(model_path, "SOFVSR_x"+ str(scale)+'.pth')
+        model_path = os.path.join(model_path, model + '.pth')
         ckpt = torch.load(model_path)
         self._net.load_state_dict(ckpt)
         if use_gpu: self._net.cuda()

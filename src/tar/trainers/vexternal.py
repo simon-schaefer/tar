@@ -5,7 +5,6 @@
 # Description : Task-aware super resolution trainer for videos.
 # =============================================================================
 import argparse
-import importlib
 import numpy as np
 import random
 
@@ -29,13 +28,14 @@ class _Trainer_VExternal_(_Trainer_):
         self._external = self.load_module(external,self.scale_current(0),use_gpu)
         self.ckp.write_log("... successfully built vscale trainer !")
 
-    def apply(self,lr_prev,lr,lr_next,hr,scale,discretize=False,dec_input=None):
+    def apply(self,lr0,lr1,lr2,hr0,scale,discretize=False,dec_input=None):
         lr_out, hr_out = super(_Trainer_VExternal_, self).apply(
-            lr,hr,scale,discretize,dec_input
+            lr1, hr1, scale, discretize, dec_input
         )
         # Apply input images to model and determine output.
+        nmin, nmax  = self.args.norm_min, self.args.norm_max
         lr_ext = misc.discretize(lr_out.clone(),[nmin,nmax])
-        hre_out = self._external.apply(lr_prev, lr_ext, lr_next)
+        hre_out = self._external.apply(lr0, lr1, lr2)
         return lr_out, hr_out, hre_out
 
     def optimization_core(self, lrs, hrs, finetuning, scale):
@@ -43,9 +43,9 @@ class _Trainer_VExternal_(_Trainer_):
         lr_out,hr_out,hrm_out = self.apply(lr0,lr1,lr2,hr1,
                                            scale,discretize=finetuning)
         # Pass loss variables to optimizer and optimize.
-        loss_kwargs = {'HR_GT': hr2,  'HR_OUT': hr_out,
-                       'LR_GT': lr2,  'LR_OUT': lr_out,
-                       'EXT_GT': hr2, 'EXT_OUT': hrm_out}
+        loss_kwargs = {'HR_GT': hr1,  'HR_OUT': hr_out,
+                       'LR_GT': lr1,  'LR_OUT': lr_out,
+                       'EXT_GT': hr1, 'EXT_OUT': hrm_out}
         loss = self.loss(loss_kwargs)
         return loss
 
@@ -64,16 +64,16 @@ class _Trainer_VExternal_(_Trainer_):
                                      dec_input=lr1)
             # PSNR - Low resolution image.
             lr_out = misc.discretize(lr_out, [nmin, nmax])
-            psnrs[i,0] = misc.calc_psnr(lr_out, lr2, None, nmax-nmin)
+            psnrs[i,0] = misc.calc_psnr(lr_out, lr1, None, nmax-nmin)
             # PSNR - High resolution image (base: lr_out).
             hr_out = misc.discretize(hr_out, [nmin, nmax])
-            psnrs[i,1] = misc.calc_psnr(hr_out, hr2, None, nmax-nmin)
+            psnrs[i,1] = misc.calc_psnr(hr_out, hr1, None, nmax-nmin)
             # PSNR - Model image.
-            psnrs[i,2] = misc.calc_psnr(hrm_out, hr2, None, nmax-nmin)
-            psnrs[i,3] = misc.calc_psnr(hrm_out2, hr2, None, nmax-nmin)
+            psnrs[i,2] = misc.calc_psnr(hrm_out, hr1, None, nmax-nmin)
+            psnrs[i,3] = misc.calc_psnr(hrm_out2, hr1, None, nmax-nmin)
             if save:
                 filename = str(data[0][2][0]).split("_")[0]
-                slist = [hr_out, lr_out, hrm_out, hrm_out2, lr2, hr2]
+                slist = [hr_out, lr_out, hrm_out, hrm_out2, lr1, hr1]
                 dlist = ["SHR", "SLR", "SHRET", "SHREB", "LR", "HR"]
                 self.ckp.save_results(slist,dlist,filename,d,scale)
             if save and i % self.args.n_threads == 0:
@@ -120,9 +120,9 @@ class _Trainer_VExternal_(_Trainer_):
                 lr_out,_,_=self.apply(lr0,lr1,lr2,hr1, scale, discretize=True)
                 error = torch.normal(mean=0.0,std=torch.ones(lr_out.size())*e)
                 lr_out = lr_out + error.to(self.device)
-                _,hr_out_eps,_=self.apply(lr0,lr1,lr2,hr1,scale,dec_input=lr_out)
+                _,_,hr_out_eps=self.apply(lr0,lr1,lr2,hr1,scale,dec_input=lr_out)
                 hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
-                psnrs[id,ie] = misc.calc_psnr(hr_out_eps, hr, None, nmax-nmin)
+                psnrs[id,ie] = misc.calc_psnr(hr_out_eps, hr1, None, nmax-nmin)
         return psnrs.mean(axis=0)
 
     def prepare(self, data):

@@ -13,7 +13,7 @@ parser.add_argument("--type", type=str, default="SCALING",
 parser.add_argument("--format", type=str, default="IMAGE",
                     choices=("IMAGE", "VIDEO"))
 parser.add_argument("--external", type=str, default="",
-                    choices=("SOFVSR"))
+                    help="external model, format (program-model)")
 parser.add_argument("--template", default="valid",
                     help="set various templates in option.py")
 parser.add_argument("--verbose", action="store_false",
@@ -171,13 +171,11 @@ def set_template(args):
     if args.template.find("ISCALE_AETAD_NTIAASPEN_4") >= 0:
         args.scales_valid = [4]
 
-    if args.template.find("VSCALE_AETAD_SOFVSR") >= 0:
-        args.load       = "modelsxiscale4"
+    if args.template.find("VSCALE_AETAD_SOFVSR_4") >= 0:
         args.format     = "VIDEO"
         args.type       = "SCALING"
         args.loss       = "HR*1*L1+LR*1*L1+EXT*100*L1"
-        args.external   = "SOFVSR"
-        args.scales_train = [4]
+        args.external   = "SOFVSR-iter18500x4"
         args.scales_valid = [4]
         args.batch_size = 6
 

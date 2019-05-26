@@ -188,10 +188,10 @@ class _VDataset_(_Dataset_):
 
     def __getitem__(self, idx: int):
         # Load image file.
-        idx = max(min(idx, self.__len__() - 2), 1)
-        lr0, hr0, fname0 = self._load_file(idx - 1)
-        lr1, hr1, fname1 = self._load_file(idx)
-        lr2, hr2, fname2 = self._load_file(idx + 1)
+        idx = max(min(idx, self.__len__() - 3), 0)
+        lr0, hr0, fname0 = self._load_file(idx)
+        lr1, hr1, fname1 = self._load_file(idx + 1)
+        lr2, hr2, fname2 = self._load_file(idx + 2)
         # Iterate over and process all files in returned array.
         returns = []
         for lr,hr,filename in zip([lr0,lr1,lr2],[hr0,hr1,hr2],[fname0,fname1,fname2]):

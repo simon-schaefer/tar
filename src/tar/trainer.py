@@ -6,6 +6,7 @@
 # =============================================================================
 import argparse
 import os
+import importlib
 import math
 import numpy as np
 import random
@@ -235,8 +236,10 @@ class _Trainer_(object):
 
     @staticmethod
     def load_module(model_name, scale, use_gpu=True):
-        m = importlib.import_module(model_name.lower() + ".apply")
-        return getattr(m, model_name)(scale, use_gpu)
+        assert len(model_name.split("-")) == 2
+        program, model = model_name.split("-")
+        m = importlib.import_module(program.lower() + ".apply")
+        return getattr(m, program)(model, scale, use_gpu)
 
     def check_datasets(self):
         def _check(d, format):
