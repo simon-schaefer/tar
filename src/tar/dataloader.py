@@ -30,7 +30,6 @@ class _Dataset_(Dataset):
         self.args = args
         self.name = name
         self.train = train
-        self.split = 'train' if train else 'test'
         self.scale = scale
         self._set_filesystem(args.dir_data)
         list_hr, list_lr = self._scan()
@@ -166,7 +165,7 @@ class _IDataset_(_Dataset_):
         # Normalize patches from rgb_range to [norm_min, norm_max].
         pair = self._normalize(pair)
         # Augment patches (if flag is set).
-        if not self.args.no_augment and not self.args.valid_only:
+        if not self.args.no_augment and not self.args.valid_only and self.train:
             pair = self._augment(pair)
         # Set right number of channels.
         pair = self._set_channel(pair)
