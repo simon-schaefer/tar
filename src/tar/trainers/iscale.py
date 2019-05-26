@@ -38,7 +38,7 @@ class _Trainer_IScale_(_Trainer_):
             lr, hr = self.prepare([lr, hr])
             scale  = d.dataset.scale
             lr_out, hr_out_t = self.apply(lr, hr, scale, discretize=finetuning)
-            _, hr_out_b = self.apply(lr, hr, scale, dec_input=lr, mode="up")
+            hr_out_b = self.apply(lr, hr, scale, dec_input=lr, mode="up")
             # PSNR - Low resolution image.
             lr_out = misc.discretize(lr_out, [nmin, nmax])
             psnrs[i,0] = misc.calc_psnr(lr_out, lr, None, nmax-nmin)

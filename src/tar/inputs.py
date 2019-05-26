@@ -163,6 +163,11 @@ def set_template(args):
     # Scales.
     if args.template.count("_4") > 0:
         args.scales_train = [4]
+    elif args.template.count("_2") > 0:
+        args.scales_train = [2]
+    elif args.template.count("_16") > 0:
+        args.scales_train = [16]
+        args.scales_valid = [16]
 
     # Specific types.
     if args.template.find("ICOLOR_AETAD_DIV2K") >= 0:
