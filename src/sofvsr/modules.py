@@ -133,7 +133,8 @@ class OFRnet(nn.Module):
 class SRnet(nn.Module):
     def __init__(self, upscale_factor, is_training):
         super(SRnet, self).__init__()
-        self.conv = nn.Conv2d(35, 64, 3, 1, 1, bias=False)
+        if upscale_factor == 2: self.conv = nn.Conv2d(11, 64, 3, 1, 1, bias=False)
+        else:                   self.conv = nn.Conv2d(35, 64, 3, 1, 1, bias=False)
         self.RDB_1 = RDB(5, 64, 32)
         self.RDB_2 = RDB(5, 64, 32)
         self.RDB_3 = RDB(5, 64, 32)

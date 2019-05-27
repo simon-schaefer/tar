@@ -15,6 +15,8 @@
 # logging directory. preferrably on your scratch
 #$ -o /scratch_net/biwidl215/sischaef/outs/
 #
-# calling exectuable.
+# calling exectuable. args:
+# --trainsets (e.g. NTIAASPEN:)
+# --upscale_factor (e.g. 4)
 source /scratch_net/biwidl215/sischaef/tar/scripts/setup.bash --build
-python3 /scratch_net/biwidl215/sischaef/tar/src/sofvsr/train.py --upscale_factor 4 --gpu_mode True "$@"
+python3 /scratch_net/biwidl215/sischaef/tar/src/sofvsr/train.py --gpu_mode True "$@"
