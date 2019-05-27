@@ -175,6 +175,12 @@ def set_template(args):
         args.scales_train = [1]
         args.scales_valid = [1]
 
+    if args.template.find("ICOLOR_AETAD_LARGE_DIV2K") >= 0:
+        args.loss         = "COL*100*L1*0+GRY*1*L1*1"
+        args.model        = "AETAD_COLOR_LARGE"
+        args.scales_train = [1]
+        args.scales_valid = [1]
+
     if args.template.find("ISCALE_AETAD_NTIAASPEN_4") >= 0:
         args.scales_valid = [4]
 
