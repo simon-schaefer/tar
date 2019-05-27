@@ -19,7 +19,9 @@ if [ ! -d "NTIAASPEN" ]; then
     for filename in $LRS/X4/*.png; do
         mv $filename ${filename/.png/x4.png}
     done
-    python3 $DOWNSAMPLE_FILE $HRS 2 2 "LR_bicubic"
+    for (( s = 2; s <= 16; s=s*2 )); do
+        python3 $DOWNSAMPLE_FILE $HRS $s 16
+    done
     cd $SR_PROJECT_DATA_PATH
     rm -rf SOF-VSR
 fi
@@ -44,8 +46,8 @@ then
     cp FRVSR_VID4/HR/foliage/*.png $SR_PROJECT_DATA_PATH/FOLIAGE/HR/.
     cp FRVSR_VID4/HR/walk/*.png $SR_PROJECT_DATA_PATH/WALK/HR/.
     for dir in "CALENDAR" "CITY" "FOLIAGE" "WALK"; do
-        for (( s = 2; s <= 4; s=s*2 )); do
-            python3 $DOWNSAMPLE_FILE $SR_PROJECT_DATA_PATH/$dir/HR $s 4
+        for (( s = 2; s <= 16; s=s*2 )); do
+            python3 $DOWNSAMPLE_FILE $SR_PROJECT_DATA_PATH/$dir/HR $s 16
         done
     done
 fi

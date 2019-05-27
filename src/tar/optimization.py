@@ -97,14 +97,15 @@ class _Loss_(nn.modules.loss._Loss):
             else:
                 raise ValueError("Invalid loss type %s !" % loss_type)
             # Append to overall loss array.
+            cut = float(int(cut)/100000.0)
             self.loss.append({
                 "weight"    : float(weight),
                 "desc"      : "{}-{}".format(input_type, loss_type),
-                "cut"       : float(int(cut)/100000.0),
+                "cut"       : cut,
                 "function"  : loss_function})
             self.loss_module.append(loss_function)
             ckp.write_log("... adding %s loss with weight=%f, cut=%f and input type=%s" \
-                    % (loss_type, float(weight), float(cut), input_type))
+                                % (loss_type, float(weight), cut, input_type))
         # For logging purposes add additional element to loss
         # containing the sum of all "sub-losses".
         self.loss.append({"desc":"TOTAL", "weight":0.0, cut:0, "function":None})
@@ -134,9 +135,6 @@ class _Loss_(nn.modules.loss._Loss):
                 loss = l["function"](x, y)
                 loss_norm = torch.div(loss,self.pixel_range*x.numel())*100
                 if loss_norm < l["cut"]: loss = torch.mul(loss,0.0)
-                print("loss", loss, type(loss))
-                print("loss_norm", loss_norm)
-                print("cut", l["cut"])
                 effective_loss = l["weight"] * loss
                 losses.append(effective_loss)
                 self.log[-1, i] += effective_loss.item()

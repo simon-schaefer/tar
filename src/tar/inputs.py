@@ -40,7 +40,7 @@ parser.add_argument("--n_gpus", type=int, default=1,
 parser.add_argument("--dir_data", type=str, default=os.environ["SR_PROJECT_DATA_PATH"],
                     help="dataset directory")
 parser.add_argument("--data_train", type=str, default="DIV2K",
-                    choices=("DIV2K", "NTIAASPEN"),
+                    choices=("DIV2K", "NTIAASPEN", "INTIAASPEN"),
                     help="training dataset name (= 1 dataset!)")
 parser.add_argument("--data_valid", default="SET5:SET14",
                     help="validation datasets names (>= 1 dataset!), \
@@ -141,7 +141,7 @@ def set_template(args):
         args.data_valid = "CALENDAR"
     if args.template.count("INTIAASPEN") > 0:
         args.data_train = "INTIAASPEN"
-        args.data_valid = "CALENDAR"
+        args.data_valid = "CALENDAR:INTIAASPEN:WALK"
     # Model.
     if args.template.count("AETAD") > 0:
         args.model      = "AETAD"
