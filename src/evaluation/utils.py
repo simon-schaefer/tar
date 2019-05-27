@@ -37,13 +37,16 @@ def scrap_outputs():
     for dir in out_dirs:
         if not os.path.isfile(os.path.join(dir, "config.txt")): continue
         config  = read_config_file(os.path.join(dir, "config.txt"))
-        if not all([x in config.keys() for x in config_keys]): continue
+        #if not all([x in config.keys() for x in config_keys]): continue
         if not os.path.isfile(os.path.join(dir, "validations.csv")): continue
         results_df = pd.read_csv(os.path.join(dir, "validations.csv"))
         for index, row in results_df.iterrows():
             for x in scrapped.keys(): scrapped[x].append(None)
-            for x in config_keys: scrapped[x][-1] = config[x]
+            for x in config_keys:
+                if x in config: scrapped[x][-1] = config[x]
             for x in results_keys:
-                if x not in row.keys(): continue
+                if x == "RUNTIME_AL" and "RUNTIME" in row.keys():
+                    scrapped[x][-1] = row["RUNTIME"]
+                elif x not in row.keys(): continue
                 else: scrapped[x][-1] = row[x]
     return pd.DataFrame.from_dict(scrapped)

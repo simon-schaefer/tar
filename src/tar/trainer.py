@@ -237,16 +237,16 @@ class _Trainer_(object):
             if i >= runtimes.shape[1]: break
             lr, hr = self.prepare([lr, hr])
             scale  = d.dataset.scale
-            timer_apply = misc._Timer_()
+            timer_all = misc._Timer_()
             self.apply(lr, hr, scale, discretize=False, mode="all")
-            runtimes[0,i] = timer_apply.toc()
-            timer_apply = misc._Timer_()
+            runtimes[0,i] = timer_all.toc()
+            timer_up = misc._Timer_()
             self.apply(lr, hr, scale, discretize=False, dec_input=lr, mode="up")
-            runtimes[1,i] = timer_apply.toc()
+            runtimes[1,i] = timer_up.toc()
             runtimes[2,i] = max(runtimes[0,i] - runtimes[1,i], 0.0)
-        v["RUNTIME_AL"] = "{:.8f}".format(np.median(runtimes[0,:], axis=0))
-        v["RUNTIME_UP"] = "{:.8f}".format(np.median(runtimes[1,:], axis=0))
-        v["RUNTIME_DW"] = "{:.8f}".format(np.median(runtimes[2,:], axis=0))
+        v["RUNTIME_AL"] = "{:.8f}".format(np.median(runtimes[0,:]))
+        v["RUNTIME_UP"] = "{:.8f}".format(np.median(runtimes[1,:]))
+        v["RUNTIME_DW"] = "{:.8f}".format(np.median(runtimes[2,:]))
         return v
 
     def psnr_description(self) -> List[str]:

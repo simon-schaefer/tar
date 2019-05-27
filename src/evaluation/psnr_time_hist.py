@@ -3,7 +3,7 @@
 # =============================================================================
 # Created By  : Simon Schaefer
 # =============================================================================
-import pandas as pd
+from utils import scrap_outputs
 
 import matplotlib
 matplotlib.use('Agg')
@@ -11,13 +11,14 @@ import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-fdata = "psnr_time_network.csv"
-data = pd.read_csv(fdata)
-data = data[data.Type != "Runtime"]
-print(data.head())
-fig = plt.figure()
-sns.catplot(x="Type", y="Value", hue="Network",
-            data=data, kind="bar", height=6, aspect=1.5)
-plt.ylabel("PSNR")
-plt.ylim([25,35])
-plt.savefig(fdata.replace(".csv", ".png"))
+data = scrap_outputs()
+data["RUNTIME_AL"] = round(data["RUNTIME_AL"]*1000, 2)
+data = data[data.type == "SCALING"]
+data = data[(data.model == "AETAD_SMALL") | (data.model == "AETAD_LARGE")]
+
+f, axes = plt.subplots(1, 2, figsize=(10,5))
+sns.boxplot(x="model",y="PSNR_SHRT_best",data=data, orient='v', ax=axes[0])
+axes[0].set_ylabel("PSNR [dB]")
+sns.boxplot(x="model",y="RUNTIME_AL", data=data, orient='v', ax=axes[1])
+axes[1].set_ylabel("RUNTIME OVERALL [ms]")
+plt.savefig("psnr_time_hist.png")

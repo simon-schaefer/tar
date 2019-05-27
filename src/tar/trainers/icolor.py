@@ -42,8 +42,8 @@ class _Trainer_IColor_(_Trainer_):
             else:                     return _decolorization(col)
         elif mode == "up":            return _colorization(gry)
         # Otherwise perform down- and upscaling and return both tensors.
-        gry_out = _downsample(col)
-        col_out = _upsample(gry_out)
+        gry_out = _decolorization(col)
+        col_out = _colorization(gry_out)
         return gry_out, col_out
 
     def optimization_core(self, gry, col, finetuning, *args):
