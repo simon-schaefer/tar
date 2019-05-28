@@ -20,13 +20,13 @@ if not len(sys.argv) >= 2:
 path_img_dir = sys.argv[1]
 assert os.path.isdir(path_img_dir)
 video_name = sys.argv[2]
-tag = sys.argv[3] if len(sys.argv) > 3 else None
+tag = "_" + sys.argv[3] if len(sys.argv) > 3 else None
 
 # Make list of images in img_dir having the tag.
 images = glob.glob(path_img_dir + "/*" + ".png")
-for x in range(0, len(images)): images[x] = path_img_dir+"/hr"+str(x)+"x4.png"
+#for x in range(0, len(images)): images[x] = path_img_dir+"/hr"+str(x)+"x4.png"
+images = sorted(images)
 if tag is not None: images = [x for x in images if x.count(tag) > 0]
-print(images)
 
 # Create video using OpenCV functionalities.
 fps = 10

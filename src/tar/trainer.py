@@ -232,7 +232,7 @@ class _Trainer_(object):
         return psnrs_t.mean(axis=0), psnrs_b.mean(axis=0)
 
     def runtime_core(self, d, v: dict) -> dict:
-        runtimes = np.zeros((3, min(len(d),10)))
+        runtimes = np.zeros((2, min(len(d),10)))
         for i, (lr, hr, fname) in enumerate(d):
             if i >= runtimes.shape[1]: break
             lr, hr = self.prepare([lr, hr])
@@ -243,10 +243,9 @@ class _Trainer_(object):
             timer_up = misc._Timer_()
             self.apply(lr, hr, scale, discretize=False, dec_input=lr, mode="up")
             runtimes[1,i] = timer_up.toc()
-            runtimes[2,i] = max(runtimes[0,i] - runtimes[1,i], 0.0)
         v["RUNTIME_AL"] = "{:.8f}".format(np.median(runtimes[0,:]))
         v["RUNTIME_UP"] = "{:.8f}".format(np.median(runtimes[1,:]))
-        v["RUNTIME_DW"] = "{:.8f}".format(np.median(runtimes[2,:]))
+        v["RUNTIME_DW"] = str(max(float(v["RUNTIME_AL"])-float(v["RUNTIME_UP"]), 0.0))
         return v
 
     def psnr_description(self) -> List[str]:
