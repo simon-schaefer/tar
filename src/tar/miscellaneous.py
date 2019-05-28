@@ -297,7 +297,7 @@ def calc_psnr(x: torch.Tensor, y: torch.Tensor,
     #     px = x[:, :, ly:ly + lp, lx:lx + lp]
     #     py = y[:, :, ly:ly + lp, lx:lx + lp]
     if mse == 0: return 100.0
-    print(torch.pow(x - y, 2), x, y)
+    if math.isinf(mse): return 0.0
     return 20 * math.log10(rgb_range/np.sqrt(mse))
 
 def discretize(img: torch.Tensor, norm_range: List[float]) -> torch.Tensor:
