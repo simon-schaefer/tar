@@ -288,7 +288,7 @@ class _Trainer_(object):
         assert len(model_name.split("-")) == 2
         program, model = model_name.split("-")
         m = importlib.import_module(program.lower() + ".apply")
-        return getattr(m, program)(model, scale, use_gpu)
+        return getattr(m, program.upper())(model, scale, use_gpu)
 
     def check_datasets(self):
         def _check(d, format):
