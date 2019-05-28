@@ -147,8 +147,12 @@ def set_template(args):
         args.model      = "AETAD"
     if args.template.count("AETAD_SMALL") > 0:
         args.model      = "AETAD_SMALL"
+    if args.template.count("AETAD_VERY_SMALL") > 0:
+        args.model      = "AETAD_VERY_SMALL"
     if args.template.count("AETAD_LARGE") > 0:
         args.model      = "AETAD_LARGE"
+    if args.template.count("AETAD_VERY_LARGE") > 0:
+        args.model      = "AETAD_VERY_LARGE"
     # Type.
     if args.template.count("ISCALE") > 0:
         args.type       = "SCALING"

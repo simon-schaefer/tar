@@ -135,7 +135,8 @@ class _Trainer_VExternal_(_Trainer_):
                 "SHRET_best", "SHRET_mean", "SHREB_best", "SHREB_mean"]
 
     def scale_current(self, epoch):
-        assert self.args.scales_train == self.args.scales_valid
+        if not self.args.valid_only:
+            assert self.args.scales_train == self.args.scales_valid
         return self.args.scales_train[0]
 
     def num_epochs(self):

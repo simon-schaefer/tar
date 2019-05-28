@@ -3,7 +3,7 @@
 # =============================================================================
 # Created By  : Simon Schaefer
 # Description : Task-aware image downscaling autoencoder model - SCALING.
-#               Variation with one less resblock than standard aetad network.
+#               Variation with two less resblock than standard aetad network.
 # =============================================================================
 import torch
 from torch import nn
@@ -11,12 +11,12 @@ from torch import nn
 from tar.modules import _Resblock_, _ReversePixelShuffle_
 
 def build_net():
-    return AETAD_SMALL()
+    return AETAD_VERY_SMALL()
 
-class AETAD_SMALL(nn.Module):
+class AETAD_VERY_SMALL(nn.Module):
 
     def __init__(self):
-        super(AETAD_SMALL, self).__init__()
+        super(AETAD_VERY_SMALL, self).__init__()
         # Build encoding part.
         self._downscaling = nn.Sequential(
             nn.Conv2d(3, 8, 3, stride=1, padding=1),
@@ -24,13 +24,11 @@ class AETAD_SMALL(nn.Module):
             _ReversePixelShuffle_(downscale_factor=2),
         )
         self._res_en1 = _Resblock_(64)
-        self._res_en2 = _Resblock_(64)
         self._conv_en1 = nn.Conv2d(64, 64, 3, stride=1, padding=1)
         self._conv_en2 = nn.Conv2d(64, 3, 3, stride=1, padding=1)
         # Build decoding part.
         self._conv_de1 = nn.Conv2d(3, 64, 3, stride=1, padding=1)
         self._res_de1 = _Resblock_(64)
-        self._res_de2 = _Resblock_(64)
         self._conv_de2 = nn.Conv2d(64, 64, 3, stride=1, padding=1)
         self._upscaling = nn.Sequential(
             nn.Conv2d(64, 256, 3, stride=1, padding=1),
@@ -42,7 +40,6 @@ class AETAD_SMALL(nn.Module):
         x = self._downscaling(x)                                    # b, 64, p/2, p/2
         residual = x
         x = self._res_en1.forward(x)                                # b, 64, p/2, p/2
-        x = self._res_en2.forward(x)                                # b, 64, p/2, p/2
         x = self._conv_en1(x)                                       # b, 64, p/2, p/2
         x = torch.add(residual, x)                                  # b, 64, p/2, p/2
         x = self._conv_en2(x)                                       # b, 3, p/2, p/2
@@ -52,7 +49,6 @@ class AETAD_SMALL(nn.Module):
         x = self._conv_de1(x)                                       # b, 64, p/2, p/2
         residual = x
         x = self._res_de1.forward(x)                                # b, 64, p/2, p/2
-        x = self._res_de2.forward(x)                                # b, 64, p/2, p/2
         x = self._conv_de2(x)                                       # b, 64, p/2, p/2
         x = torch.add(residual, x)                                  # b, 64, p/2, p/2
         x = self._upscaling(x)                                      # b, 3, p, p
