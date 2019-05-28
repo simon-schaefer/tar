@@ -1,0 +1,42 @@
+external: 
+momentum: 0.9
+lr: 0.001
+template: ISCALE_AETAD_DIV2K_4
+cpu: False
+batch_size: 16
+betas: (0.9, 0.999)
+gamma: 0.25
+dir_data: /scratch_net/biwidl215/sischaef/data
+loss: HR*10*L1+LR*1*L1
+verbose: True
+scales_guidance: [1, 2, 4, 8, 16]
+cuda_device: cuda:0
+model: AETAD
+scales_valid: [2, 4]
+save_models: False
+weight_decay: 0
+data_valid: ['SET5', 'SET14', 'CUSTOM', 'WALK', 'INTIAASPEN']
+fine_tuning: 400
+epochs_zoom: 0
+save_results: True
+no_augment: False
+save_every: 20
+epsilon: 1e-08
+norm_min: 0.0
+format: IMAGE
+n_gpus: 1
+optimizer: ADAM
+epochs_base: 500
+valid_only: False
+print_every: 20
+scales_train: [4]
+decay: 20-100-200
+norm_max: 1.0
+patch_size: 96
+type: SCALING
+n_threads: 10
+gclip: 0
+resume: -2
+load: 
+data_train: DIV2K
+max_test_samples: 20
