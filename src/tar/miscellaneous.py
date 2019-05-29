@@ -138,16 +138,20 @@ class _Checkpoint_(object):
             tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
             self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
 
-    def save_pertubation(self, eps, psnrs, labels, name="task"):
-        fig = plt.figure()
+    def save_pertubation(self, eps, psnrs, labels, names):
+        assert len(names) == len(psnrs)
+        assert all([len(labels) == len(x) for x in psnrs])
+        num_datasets = len(labels)
+        fig, ax = plt.subplots(1, num_datasets)
         plt.title("Perturbation")
-        for i in range(len(labels)):
-            plt.plot(eps, psnrs[i,:], label="{}".format(labels[i]))
-        plt.legend()
-        plt.xlabel('Perturbation (white Gaussian noise)')
-        plt.ylabel('PSNR')
-        plt.grid(True)
-        plt.savefig(self.get_path("perturbation_{}.pdf".format(name)))
+        for li, label in enumerate(labels):
+            for name in names:
+                ax[li].plot(eps, psnrs[i,:], label="{}_{}".format(label,name))
+            plt.legend()
+            plt.xlabel('Perturbation (white Gaussian noise)')
+            plt.ylabel('PSNR')
+            plt.grid(True)
+        plt.savefig(self.get_path("perturbation.pdf"))
         plt.close(fig)
 
     def save_runtimes(self, all, up, down):

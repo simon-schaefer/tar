@@ -144,8 +144,8 @@ class _Trainer_(object):
                 name, scale = d.dataset.name, d.dataset.scale
                 psnrs_t[di,:], psnrs_b[di,:] = self.perturbation_core(d, eps)
                 labels.append("{}x{}".format(name,scale))
-            self.ckp.save_pertubation(eps, psnrs_t, labels, name="task_aware")
-            self.ckp.save_pertubation(eps, psnrs_b, labels, name="bilinear")
+            self.ckp.save_pertubation(eps, [psnrs_t, psnrs_b], labels,
+                                      ["task_aware", "bilinear"])
         # Finalizing.
         self.ckp.iter_is_best = best[1][0] + 1 == epoch
         if save: self.ckp.end_background()

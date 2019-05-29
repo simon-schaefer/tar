@@ -42,7 +42,7 @@ parser.add_argument("--dir_data", type=str, default=os.environ["SR_PROJECT_DATA_
 parser.add_argument("--data_train", type=str, default="DIV2K",
                     choices=("DIV2K", "NTIAASPEN", "INTIAASPEN"),
                     help="training dataset name (= 1 dataset!)")
-parser.add_argument("--data_valid", default="SET5:SET14",
+parser.add_argument("--data_valid", default="SET5:SET14:VDIV2K",
                     help="validation datasets names (>= 1 dataset!), \
                     choices=URBAN100,SET5,SET14,BSDS100,VDIV2K,CUSTOM, \
                     CALENDAR,NTIAASPEN,WALK,CITY,FOLIAGE")
@@ -72,7 +72,7 @@ parser.add_argument("--model", default="AETAD",
 # =============================================================================
 # Training specifications.
 # =============================================================================
-parser.add_argument("--epochs_base", type=int, default=500,
+parser.add_argument("--epochs_base", type=int, default=200,
                     help="number of epochs to train on base scale")
 parser.add_argument("--epochs_zoom", type=int, default=0,
                     help="number of epochs to train on further scale")
@@ -153,6 +153,8 @@ def set_template(args):
         args.model      = "AETAD_LARGE"
     if args.template.count("AETAD_VERY_LARGE") > 0:
         args.model      = "AETAD_VERY_LARGE"
+    if args.template.count("CONV_ONLY") > 0:
+        args.model      = "CONV_ONLY"
     # Type.
     if args.template.count("ISCALE") > 0:
         args.type       = "SCALING"
