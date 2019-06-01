@@ -1,13 +1,6 @@
 \newpage
 \section{Related Work}
 \label{sec:RelatedWork}
-In the following previous work in super-resolution, colorization and
-task aware-downscaling are presented. At the end of each section the models
-used for comparison and evaluation of the the underlying approach are further
-explained in detail. Thereby the models were selected based on several criterias
-performance compared to the state-of-the-art, the use as benchmark in related
-papers and availability of (pretrained) models.
-
 \subsection{Super-Resolution in Image Domain}
 The problem of SR in the image domain is called \ac{SISR} and is shown in
 \myfigref{fig:sisr_problem}. A lot of approaches have been
@@ -19,7 +12,7 @@ example-based methods such as sparse encoding or deep learning methods.
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=14cm]{figures/sisr_problem}
+	\includegraphics[width=10cm]{figures/sisr_problem}
 	\caption{General SISR problem  according to \cite{DLFSISRABR}.}
   \label{fig:sisr_problem}
 \end{figure}
@@ -39,12 +32,11 @@ image based on a bicubicly upscaled LR image. This approach was improved by Kim
 et al. \cite{AISRUVDCN} (VDSR) using a deeper network (20 layers) and cascading
 small filters many times in a deep network structure to exploit contextual
 information over large image regions in an efficient way. By advancing the
-network model VDSR was further improved by Lim et al. \cite{EDRNFSISR} which
-got the best results in the NTIRE2017 Super-Resolution Challenge \cite{NTIRE2017}.
+network model VDSR was further improved by Lim et al. \cite{EDRNFSISR}.
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=14cm]{figures/vdsr}
+	\includegraphics[width=10cm]{figures/vdsr}
 	\caption{Overview of VDSR network design \cite{AISRUVDCN}.}
   \label{fig:vdsr}
 \end{figure}
@@ -66,14 +58,8 @@ both, the \ac{HR} frame as well as the HR optical flow. Therefore, first the HR
 optical flow is inferred in a coarse-to-fine manner, then motion compensation is
 performed according to the HR optical flows and finally, the compensated LR
 inputs are fed to a super-resolution network to generate the HR frame estimate
-(comp. \myfigref{fig:sofvsr}).
-
-\begin{figure}[!htbp]
-	\centering
-	\includegraphics[width=14cm]{figures/sofvsr}
-	\caption{Overview of SOFVSR pipeline \cite{LFVSRTHROFE}.}
-  \label{fig:sofvsr}
-\end{figure}
+(comp. \myfigref{fig:sofvsr}).\footnote{Since SOFVSR was used in the project
+an overview of SOFVSR baselines can be found in the appendix.}
 
 \subsection{Colorization}
 Image colorization methods can be categorized in two categories: Non-parametric
@@ -83,12 +69,11 @@ while parameteric models learns this correspondence from large datasets,
 transforming the colorization problem into a regression problem. Zhang et al.
 \cite{CIC} (CIC) purpose posing colorization as a classification task and use
 class-rebalancing at training time to increase the diversity of colors in the
-result, using the CNN shown in \myfigref{fig:cic} and not requiring any
-user-interaction.
+result, not requiring any user-interaction.
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=14cm]{figures/cic}
+	\includegraphics[width=10cm]{figures/cic}
 	\caption{Overview of CIC network design \cite{CIC}.}
   \label{fig:cic}
 \end{figure}
@@ -107,6 +92,12 @@ interpolated LR image, such that the SLR image is a humanly understandable
 representation. Next to SISR the approach is shown to be applicable for large
 scale factor up to 128 as well as for colorization.
 
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=8cm]{figures/taid_colorization}
+	\caption{Qualitative results of TAID colorization for Set14 dataset.}
+  \label{fig:taid_colorization}
+\end{figure}
 
 % Describe the other's work in the field, with the following purposes in mind:
 %

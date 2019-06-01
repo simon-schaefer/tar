@@ -34,8 +34,8 @@ optimization problems can be solved more independently than learning both
 $X_{SLR}$ and $X_{SHR}$ from scratch and typically the first optimization
 problem (readibility of $X_{SLR}$) is easier to solve for the model.
 
-\subsection{Autoencoder Network Design}
-\label{sec:Approach_AND}
+\subsection{Autoencoder Network Architecture}
+\label{sec:Approach_ANA}
 As no groundtruth for the low resolution image is available, since \ac{TAD}
 poses requirements for both the down- and upscaling and because it has proven
 to work for the \ac{TAD} problem in previous works an autoencoder design
@@ -122,6 +122,87 @@ guaranteed to be useful for upscaling.
   \label{fig:loss_w_wo_adding_guidance}
 \end{figure}
 
+\subsection{Task-Specific Design}
+\label{sec:Approach_TSD}
+While the general approach derived in \mysecref{sec:Approach_GPF} can be trivially
+applied on the \ac{SISR} and on the \ac{IC} problem the extension to the
+\ac{VSR} task is more advanced. In the following the specification of all three
+problems are presented:
+
+\subsubsection*{Single-Image-Super-Resolution Problem}
+An example of the overall design of the \ac{TAD} pipeline applied on the
+\ac{SISR} problem is shown in \myfigref{fig:architecture}. The high-dimensional
+space here is a high-resolution image ($X_{GT} = X_{HR}$), while the
+low-resolution guidance image is the bilinearly downscaled image
+($X_{GD} = X_{LR}^{B}$). As shown for an example of scaling factor 4 in
+\myfigref{fig:comparison_scaling_iter_vs_direct} the model can be trained more
+efficiently as well as performs better when iteratively scaling (i.e. scaling
+two times with factor 2, instead of one time with factor 4 directly).
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=10cm]{figures/cvl}
+	\caption{Comparison between iterative and direct upscaling for an example
+  scaling factor 4: Loss curve (left), PSNR curve (right)}
+  \label{fig:comparison_scaling_iter_vs_direct}
+\end{figure}
+
+\subsubsection*{Video-Super-Resolution}
+As pointed out in \mychapterref{sec:RelatedWork} the challenge of \ac{VSR}
+compared to \ac{SISR} is to not only take one frame into account but subsequent
+frames in order to reconstruct opaqued objects, reflect motions, etc.
+As shown in \mychapterref{sec:RelatedWork} most approaches tackling the
+\ac{VSR} problem follow a two-step approach, firstly reconstructing the optical
+flow using the current and previous low-resolution, using the result to warp
+the image and finally upscale it. An improvement in any of these building blocks
+would improve the overall reconstruction, therefore there are multiplie
+possibilities for finding a more optimal low-dimensional representation. Several
+approaches were tried including a direct approach which encodes the
+reconstruction capability of a given \ac{VSR} model into the loss function and
+tries to shape the low-dimensional representation such that the model's
+performance improves as well as an approach directly targeting the optical
+flow calculation (more details in the appendix).
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=14cm]{figures/architecture_video_external}
+	\caption{Design for \ac{TAD} video super-resolution task (example network
+  architecture).}
+  \label{fig:architecture_video}
+\end{figure}
+
+The most promising approach is displayed in \myfigref{fig:architecture_video}
+and involves a training in multiple steps. In the first step, the autoencoder
+model is trained on incoherent images (similar to \ac{SISR}) to learn a good
+general down- and upscaling transformation. In a second step the pretrained
+model is explicitly trained on a video dataset, in order to produce the
+training dataset for a \ac{VSR} model, which is trained on this SLR frames
+specifically in the third step. After training to validate the model subsequent
+frames are downscaled first using the video pretrained \ac{TAD} model, the
+downscaled images are then fed to the trained \ac{VSR} model, upscaling them.
+While this approach basically is appliable to all \ac{VSR} frameworks in the
+scope of this project the SOFVSR (\cite{SOFVSR}) model was used.
+\footnote{Further details about the selection of SOFVSR and a description of
+the approach itself can be found in the appendix.}
+
+\subsubsection*{Image Colorization}
+While in a grayscale image information about intensity, color value and
+saturation are mingled over all channels, other color spaces split these
+information in seperate channels. In order to contain as much information about
+the original colors a non-uniformly-weighted (while grayscale would be a
+uniformly weighted sum, destroying color contrast information) and static
+(i.e. non periodic like hue in HSV color space) sum of original color values
+would be optimal, which is e.g. the Y channel of the YCbCr channel. Therefore
+it is used as guidance image ($X_{GD} = X_{GRY}^Y$), while the original colored
+image can be used as groundtruth ($X_{GT} = X_{COL}$).
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=14cm]{figures/architecture_color}
+	\caption{Design for \ac{TAD} colorization task (example network architecture).}
+  \label{fig:architecture_color}
+\end{figure}
+
 \subsection{Implementation}
 \label{sec:Approach_IMP}
 The project was implemented in Python 3, using the PyTorch deep learning
@@ -132,7 +213,8 @@ available publically (nor upon request). As PyTorch merely supports
 subpixel convolutional layers, their inverse transformation was implemented as
 well. During program development it was paid attention to generality and
 commutability in order to efficiently test a variety of different models and
-datasets as well as guarantee comparability of different approaches. 
+datasets as well as guarantee comparability of different approaches. The full
+code stack can be found on \url{https://github.com/simon-schaefer/tar}.
 
 % The objectives of the ``Materials and Methods'' section are the following:
 % \begin{itemize}

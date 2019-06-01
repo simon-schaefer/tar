@@ -1,6 +1,6 @@
 \documentclass[a4paper,11pt,headsepline]{article}
 
-\usepackage[margin=1.75cm,includeheadfoot,footskip=30pt]{geometry}
+\usepackage[margin=2cm,includeheadfoot,footskip=30pt]{geometry}
 %\usepackage{fullpage} % Use the full page
 \usepackage{paralist}		% List environment
 \usepackage{color}		% For colored text
@@ -23,6 +23,7 @@
 % \usepackage{algorithmic}	% Nice algorithm environment
 % \usepackage{algorithm}
 \usepackage{fancyhdr}		% Produce the nice header
+\usepackage{hyperref} % URLs
 \input{acronyms}
 
 %% ----------------------------------------------------------------------------
@@ -115,6 +116,7 @@
 %% ----------------------------------------------------------------------------
 % Bibliography is stored in references.bib.
 %% ----------------------------------------------------------------------------
+\newpage
 \bibliographystyle{plain}
 \addcontentsline{toc}{section}{References}
 \bibliography{references}
