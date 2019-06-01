@@ -19,34 +19,47 @@ the performance of the subsequent upscaling task.
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=5cm]{figures/shrb_vs_shrt_x4}
-\includegraphics[width=5cm]{figures/cvl}
+\includegraphics[width=10cm]{figures/shrb_vs_shrt_x4}
 \caption{Comparison between an upscaled image based on bicubic downsampled
-(left) and task-aware downsampled (right) LR image applied on the same model
-with upscaling factor 4, for the image-domain, SET 14 dataset, and video
-domain, CALENDAR dataset.}
+(left) and task aware downsampled (right) LR image applied on the same model
+with upscaling factor 4.}
 \label{fig:shrb_vs_shrt_x4}
 \end{figure}
 
-As can be seen above a task-aware approach can dramatically improve the
-performance of existing super-resolution models. However, the research on task-
+As can be seen above a task aware approach can dramatically improve the
+performance of existing super-resolution models in terms of reconstruction
+quality while keeping the compression rate constant. However, the research on task
 aware downscaling methods is a very new field and therefore there still are
-a lot of unresolved issues such as the effect of noise or the feasibility of
-applying it to tasks other than \ac{SISR}.
+a lot of unresolved issues such as the effect of perturbation or the feasibility of
+applying it to tasks other than \ac{SISR} and \ac{IC}.
 
 \subsection{Focus of this Work}
 For this reason this work focuses on \ac{TAD} for several standard
 computer vision problems such as super-resolution or colorization in both the
 image and video domain, as recently purposed by Heewon Kim et. alt. (\cite{TAID})
-for the image domain only. Therefore the goals of this work are the following
+for the image domain only. However, as shown in \myfigref{fig:taid_problems}
+the \ac{TAD} implementation purposed in \cite{TAID} suffers from vulnerability
+against perturbation of the downscaled image. Although the purposed model is
+quite shallow having 10 convolutions for each scaling process only, there still
+is potential for improvement, which especially gains importance when \ac{TAD} is
+applied to the video domain (for real-time capabilites).
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=10cm]{figures/cvl}
+\caption{Problems of task aware downscaling as purposed by \cite{TAID}:
+Perturbation (left), Runtime (right)}
+\label{fig:taid_problems}
+\end{figure}
+
+Therefore the goals of this work are the following:
 
 \begin{itemize}
-\item reimplement and evaluate the TAD framework purposed in (\cite{TAID})
-\item improve the TAD framework especially with regards on accuracy
-(PSNR) and speed in the image domain
-\item evaluate the effect of external effects such as noise on the TAD
-framework
-\item extend the TAD framework to the video domain
+\item reimplement and evaluate the \ac{TAD} framework purposed in (\cite{TAID})
+\item improve the \ac{TAD} framework especially with regards on the trade-off
+between model-complexity (runtime) and restoring quality (PSNR) as well as
+with regards on robustness against perturbations
+\item extend the \ac{TAD} framework to the video domain
 \end{itemize}
 
 By that to the best of our knowledge this work is the first one using deep

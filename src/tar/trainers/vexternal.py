@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : Task-aware super resolution trainer for videos.
+# Description : Task aware super resolution trainer for videos.
 # =============================================================================
 import argparse
 import numpy as np

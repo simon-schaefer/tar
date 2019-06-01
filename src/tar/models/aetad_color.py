@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : Task-aware image downscaling autoencoder model - Colorization.
+# Description : Task aware image downscaling autoencoder model - Colorization.
 # =============================================================================
 import torch
 from torch import nn

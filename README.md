@@ -36,7 +36,7 @@ Implementation inspired by EDSR code (https://github.com/thstkdgus35/EDSR-PyTorc
 - [x] Read papers about video super resolution in general
 - [x] RNN and GAN training in pytorch tutorials
 - [x] Read papers about task aware image superresolution
-### Implementation of task-aware image downscaling
+### Implementation of task aware image downscaling
 - [x] Build image processing, training pipeline and network architecture (downscaling for
 I_guidance bicubic with anti-alising, cropping to factor of 2, normalization, 6 patches of
 96 × 96 HR sub images each coming from different HR image --> mini-batch, Adam Optimizer,

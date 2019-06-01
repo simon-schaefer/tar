@@ -155,6 +155,8 @@ def set_template(args):
         args.model      = "AETAD_VERY_LARGE"
     if args.template.count("CONV_ONLY") > 0:
         args.model      = "CONV_ONLY"
+    if args.template.count("CONV_ONLY_LARGE") > 0:
+        args.model      = "CONV_ONLY_LARGE"
     # Type.
     if args.template.count("ISCALE") > 0:
         args.type       = "SCALING"
@@ -184,6 +186,12 @@ def set_template(args):
     if args.template.find("ICOLOR_AETAD_LARGE_DIV2K") >= 0:
         args.loss         = "COL*100*L1*0+GRY*1*L1*1"
         args.model        = "AETAD_COLOR_LARGE"
+        args.scales_train = [1]
+        args.scales_valid = [1]
+
+    if args.template.find("ICOLOR_AETAD_SMALL_DIV2K") >= 0:
+        args.loss         = "COL*100*L1*0+GRY*1*L1*1"
+        args.model        = "AETAD_COLOR_SMALL"
         args.scales_train = [1]
         args.scales_valid = [1]
 

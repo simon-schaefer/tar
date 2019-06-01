@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # =============================================================================
 # Created By  : Simon Schaefer
-# Description : Task-aware image downscaling autoencoder model - SCALING.
+# Description : Task aware image downscaling autoencoder model - SCALING.
 #               Convolutional layers only (no resblocks).
 # =============================================================================
 import torch
