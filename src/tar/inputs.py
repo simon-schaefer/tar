@@ -76,7 +76,7 @@ parser.add_argument("--epochs_base", type=int, default=200,
                     help="number of epochs to train on base scale")
 parser.add_argument("--epochs_zoom", type=int, default=0,
                     help="number of epochs to train on further scale")
-parser.add_argument("--fine_tuning", type=int, default=400,
+parser.add_argument("--fine_tuning", type=int, default=150,
                     help="start fine tuning model at epoch")
 parser.add_argument("--batch_size", type=int, default=16,
                     help="input batch size for training")
