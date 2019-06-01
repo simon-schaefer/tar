@@ -11,13 +11,12 @@ import imageio
 import numpy as np
 import os
 from skimage.color import rgb2gray
+import torch
 import sys
 
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
-import torch
 
 from tar.miscellaneous import calc_psnr
 

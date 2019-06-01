@@ -3,17 +3,16 @@
 # =============================================================================
 # Created By  : Simon Schaefer
 # Description : Count the number of network parameters.
+# Arguments   : Model name
 # =============================================================================
-import tar
-import tar.inputs
-import torch
+import argparse
+from .utils import num_model_params
 
-# Load model from normal framework.
-tar.miscellaneous.print_header()
-args   = tar.inputs.args
-ckp    = tar.miscellaneous._Checkpoint_(args)
-model  = tar.modules._Model_(args, ckp)
-
-# Get torch module and return number of parameters.
-num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-print("Number of parameters is {}".format(num_params))
+# Parse input arguments.
+parser = argparse.ArgumentParser(description="net_params")
+parser.add_argument("--model", type=str, default="")
+args = parser.parse_args()
+model_name = str(args.model)
+# Determine number of model parameters and log it.
+num_params = num_model_params(model_name)
+print("Number of parameters of {} is {}".format(model_name, num_params))
