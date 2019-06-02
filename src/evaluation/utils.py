@@ -5,7 +5,9 @@
 # Description : Utility functions for evaluations.
 # =============================================================================
 import importlib
+import itertools
 import os
+import numpy as np
 import pandas as pd
 import tar
 import torch
@@ -20,8 +22,8 @@ def read_config_file(fname):
     return d
 
 def num_model_params(model_name):
-    module = importlib.import_module('tar.models.' + args.model.lower())
-    model  = module.build_net().to(self.device)
+    module = importlib.import_module('tar.models.' + model_name.lower())
+    model  = module.build_net().to('cpu')
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 def parse_logging(log_file_path):
@@ -62,7 +64,7 @@ def scrap_outputs(directory):
                     "PSNR_SHRT_best", "PSNR_SHRB_mean", "PSNR_SHRB_best",
                     "PSNR_SCOLT_best", "PSNR_SCOLT_mean", "PSNR_SGRY_best",
                     "PSNR_SGRY_mean"]
-    overall_keys = config_keys + results_keys
+    overall_keys = config_keys + results_keys + ["path"]
     scrapped = {x: [] for x in overall_keys}
     for dir in out_dirs:
         if not os.path.isfile(os.path.join(dir, "config.txt")): continue
@@ -77,9 +79,16 @@ def scrap_outputs(directory):
             for x in results_keys:
                 if x == "RUNTIME_AL" and "RUNTIME" in row.keys():
                     scrapped[x][-1] = row["RUNTIME"]
+                elif x == "dataset": scrapped[x][-1] = row[x].replace(" ", "")
                 elif x not in row.keys(): continue
                 else: scrapped[x][-1] = row[x]
-    return pd.DataFrame.from_dict(scrapped)
+
+            scrapped["path"][-1] = dir.split("/")[-1]
+    df = pd.DataFrame.from_dict(scrapped)
+    # Add model complexity to dataframe.
+    complexity_dict = {x: num_model_params(x) for x in np.unique(df["model"])}
+    df["complexity"] = df["model"].apply(lambda x: complexity_dict[x])
+    return df
 
 def filter_string(phrase, punctuation='[^!?]+:', space=False):
     for x in phrase.lower():
@@ -87,6 +96,34 @@ def filter_string(phrase, punctuation='[^!?]+:', space=False):
             phrase = phrase.replace(x, "")
     if space: phrase = phrase.replace(" ", "")
     return phrase
+
+def average_key_over_key(df, key_avg, key1_rel, key2_rel=None):
+    if key2_rel is None:
+        mean_dict = {x: np.mean(df[df[key_rel1] == x][key_avg]) \
+                     for x in np.unique(df[key1_rel])}
+        values = df[key1_rel].apply(lambda x: mean_dict[x])
+        df["{}_{}_avg".format(key_avg, key1_rel)] = values
+        return df
+    else:
+        uniques1 = np.unique(df[key1_rel]).tolist()
+        uniques2 = np.unique(df[key2_rel]).tolist()
+        mean_dict = {}
+        for combi in itertools.product(uniques1, uniques2):
+            subset = df[(df[key1_rel]==combi[0])&(df[key2_rel]==combi[1])]
+            mean = np.mean(subset[key_avg])
+            mean_dict["{}_{}".format(*combi)] = mean
+        values = []
+        for _, row in df.iterrows():
+            x = mean_dict["{}_{}".format(row[key1_rel], row[key2_rel])]
+            values.append(x)
+        df["{}_{}_{}_avg".format(key_avg, key1_rel, key2_rel)] = values
+        return df
+
+def remove_outliers(df, key, outlier_constant=4):
+    upper, lower = np.percentile(df[key], 75), np.percentile(df[key], 25)
+    IQR = (upper - lower) * outlier_constant
+    upper, lower = upper + IQR, lower - IQR
+    return df[(df[key] <= upper) & (df[key] >= lower)], lower, upper
 
 # =============================================================================
 # Created By  : Simon Schaefer
