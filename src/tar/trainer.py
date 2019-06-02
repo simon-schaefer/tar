@@ -172,6 +172,8 @@ class _Trainer_(object):
         assert mode in ["all", "up", "down"]
         if mode == "up": assert not dec_input is None
         nmin, nmax  = self.args.norm_min, self.args.norm_max
+        iter_scale  = self.args.iter_scale_factor
+        assert scale % iter_scale == 0
         # Downsample image until output (decoded image) has the
         # the right scale, add to LR image and discretize.
         def _downsample(hr, scale):
@@ -179,7 +181,7 @@ class _Trainer_(object):
             scl   = 1
             while scl < scale:
                 lr_out = self.model.model.encode(hr_in)
-                hr_in, scl = lr_out, scl*2
+                hr_in, scl = lr_out, scl*iter_scale
             if scale in self.args.scales_guidance: lr_out=torch.add(lr_out, lr.clone())
             if discretize: lr_out = misc.discretize(lr_out,[nmin,nmax])
             return lr_out
@@ -187,7 +189,7 @@ class _Trainer_(object):
             hr_out = lr.clone()
             while scl > 1:
                 hr_out = self.model.model.decode(hr_out)
-                scl    = scl//2
+                scl    = scl//iter_scale
             return hr_out
         # In case of down- or upscaling only perform only part scalings.
         if mode == "down":

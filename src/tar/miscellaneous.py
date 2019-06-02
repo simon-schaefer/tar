@@ -58,17 +58,15 @@ class _Checkpoint_(object):
                     if not len(x.split(":")) == 2: continue
                     key, val = x.replace(" ", "").split(":")
                     self.args_load[key] = type(vars(args)[key])(val)
-        print(args)
         if not args.load == "" and args.valid_only:
             for key, value in self.args_load.items():
                 if key in ["data_train","data_valid","scale_train",
                            "scale_valid","valid_only","load","cpu",
                            "no_augment"]: continue
                 args.__dict__[key] = value
-        args = reformat_args(args)
-        print("-----"*10)
-        print(args)
-        self.args  = args
+        # Reformat and set input arguments. 
+        args      = reformat_args(args)
+        self.args = args
         # Creating output directories for model.
         os.makedirs(self.dir, exist_ok=True)
         if not args.valid_only: os.makedirs(self.get_path('model'),exist_ok=True)

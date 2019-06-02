@@ -54,6 +54,8 @@ parser.add_argument("--scales_guidance", type=str, default="[1,2,4,8,16]",
                     help="subset of training in which guidance image should be added")
 parser.add_argument("--scales_valid", type=str, default="[2,4]",
                     help="list of validation scales")
+parser.add_argument("--iter_scale_factor", type=int, default=2,
+                    help="iterative scaling factor")
 parser.add_argument("--patch_size", type=int, default=96,
                     help="input patch size")
 parser.add_argument("--max_test_samples", type=int, default=20,
@@ -150,6 +152,8 @@ def set_template(args):
     # Model.
     if args.template.count("AETAD") > 0:
         args.model      = "AETAD"
+        if args.template.count("ICOLOR") > 0:
+            args.model  = "AETAD_COLOR"
     if args.template.count("AETAD_SMALL") > 0:
         args.model      = "AETAD_SMALL"
         if args.template.count("ICOLOR") > 0:
@@ -176,7 +180,6 @@ def set_template(args):
     elif args.template.count("ICOLOR") > 0:
         args.type       = "COLORING"
         args.format     = "IMAGE"
-        args.model      = "AETAD_COLOR"
         #args.loss       = "COL*100*L1*0+GRY*1*L1*1"
         args.scales_train = "[1]"
         args.scales_valid = "[1]"
@@ -190,6 +193,12 @@ def set_template(args):
         args.scales_valid = "[16]"
 
     # Specific types.
+    if args.template.find("ISCALE_AETAD_4DIRECT") >= 0:
+        args.model        = "AETAD_4DIRECT"
+        args.scales_train = "[4]"
+        args.scales_valid = "[4]"
+        args.iter_scale_factor = 4
+
     if args.template.find("ISCALE_AETAD_NTIAASPEN_4") >= 0:
         args.scales_valid = "[4]"
 
