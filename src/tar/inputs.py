@@ -7,6 +7,8 @@
 import argparse
 import os
 
+from tar.miscellaneous import reformat_args
+
 parser = argparse.ArgumentParser(description="tar")
 parser.add_argument("--type", type=str, default="SCALING",
                     choices=("SCALING" "COLORING"))
@@ -46,11 +48,11 @@ parser.add_argument("--data_valid", default="SET5:SET14:VDIV2K",
                     help="validation datasets names (>= 1 dataset!), \
                     choices=URBAN100,SET5,SET14,BSDS100,VDIV2K,CUSTOM, \
                     CALENDAR,NTIAASPEN,WALK,CITY,FOLIAGE")
-parser.add_argument("--scales_train", type=str, default=[2],
+parser.add_argument("--scales_train", type=str, default="[2]",
                     help="super resolution scales for training/testing")
-parser.add_argument("--scales_guidance", type=str, default=[1,2,4,8,16],
+parser.add_argument("--scales_guidance", type=str, default="[1,2,4,8,16]",
                     help="subset of training in which guidance image should be added")
-parser.add_argument("--scales_valid", type=str, default=[2,4],
+parser.add_argument("--scales_valid", type=str, default="[2,4]",
                     help="list of validation scales")
 parser.add_argument("--patch_size", type=int, default=96,
                     help="input patch size")
@@ -60,6 +62,9 @@ parser.add_argument("--norm_min", type=float, default=0.0,
                     help="normalization lower border")
 parser.add_argument("--norm_max", type=float, default=1.0,
                     help="normalization upper border")
+parser.add_argument("--color_space", type=str, default="ycbcr",
+                    choices=("ycbcr", "hsv", "gray"),
+                    help="colorization guidance image color encoding")
 parser.add_argument("--no_augment", action="store_true",
                     help="use data augmentation (default=False)")
 
@@ -97,7 +102,7 @@ parser.add_argument("--optimizer", default="ADAM",
                     help="optimization class")
 parser.add_argument("--momentum", type=float, default=0.9,
                     help="SGD momentum")
-parser.add_argument("--betas", type=tuple, default=(0.9, 0.999),
+parser.add_argument("--betas", type=str, default="(0.9, 0.999)",
                     help="ADAM beta")
 parser.add_argument("--epsilon", type=float, default=1e-8,
                     help="ADAM epsilon for numerical stability")
@@ -147,10 +152,14 @@ def set_template(args):
         args.model      = "AETAD"
     if args.template.count("AETAD_SMALL") > 0:
         args.model      = "AETAD_SMALL"
+        if args.template.count("ICOLOR") > 0:
+            args.model  = "AETAD_COLOR_SMALL"
     if args.template.count("AETAD_VERY_SMALL") > 0:
         args.model      = "AETAD_VERY_SMALL"
     if args.template.count("AETAD_LARGE") > 0:
         args.model      = "AETAD_LARGE"
+        if args.template.count("ICOLOR") > 0:
+            args.model  = "AETAD_COLOR_LARGE"
     if args.template.count("AETAD_VERY_LARGE") > 0:
         args.model      = "AETAD_VERY_LARGE"
     if args.template.count("CONV_ONLY") > 0:
@@ -168,35 +177,21 @@ def set_template(args):
         args.type       = "COLORING"
         args.format     = "IMAGE"
         args.model      = "AETAD_COLOR"
+        #args.loss       = "COL*100*L1*0+GRY*1*L1*1"
+        args.scales_train = "[1]"
+        args.scales_valid = "[1]"
     # Scales.
     if args.template.count("_4") > 0:
-        args.scales_train = [4]
+        args.scales_train = "[4]"
     elif args.template.count("_2") > 0:
-        args.scales_train = [2]
+        args.scales_train = "[2]"
     elif args.template.count("_16") > 0:
-        args.scales_train = [16]
-        args.scales_valid = [16]
+        args.scales_train = "[16]"
+        args.scales_valid = "[16]"
 
     # Specific types.
-    if args.template.find("ICOLOR_AETAD_DIV2K") >= 0:
-        args.loss         = "COL*100*L1*0+GRY*1*L1*1"
-        args.scales_train = [1]
-        args.scales_valid = [1]
-
-    if args.template.find("ICOLOR_AETAD_LARGE_DIV2K") >= 0:
-        args.loss         = "COL*100*L1*0+GRY*1*L1*1"
-        args.model        = "AETAD_COLOR_LARGE"
-        args.scales_train = [1]
-        args.scales_valid = [1]
-
-    if args.template.find("ICOLOR_AETAD_SMALL_DIV2K") >= 0:
-        args.loss         = "COL*100*L1*0+GRY*1*L1*1"
-        args.model        = "AETAD_COLOR_SMALL"
-        args.scales_train = [1]
-        args.scales_valid = [1]
-
     if args.template.find("ISCALE_AETAD_NTIAASPEN_4") >= 0:
-        args.scales_valid = [4]
+        args.scales_valid = "[4]"
 
     # if args.template.find("VSCALE_AETAD_SOFVSR_4") >= 0:
     #     args.format     = "VIDEO"
@@ -205,26 +200,9 @@ def set_template(args):
     #     args.external   = "SOFVSR-iter18500x4"
     #     args.scales_valid = [4]
     #     args.batch_size = 6
-
 # =============================================================================
 # MAIN.
 # =============================================================================
 args = parser.parse_args()
 set_template(args)
-
-def reformat_to_list(inputs):
-    if type(inputs) == list: return inputs
-    elif type(inputs) == int: return [inputs]
-    elif type(inputs) == str: return [int(x) for x in inputs[1:-1].split(",")]
-
-# Reformat arguments.
-args.scales_train = reformat_to_list(args.scales_train)
-args.scales_guidance = reformat_to_list(args.scales_guidance)
-args.scales_valid = reformat_to_list(args.scales_valid)
-args.data_valid = args.data_valid.split(":")
-#args.data_valid.append(args.data_train)
-for arg in vars(args):
-    if vars(args)[arg] == "True":
-        vars(args)[arg] = True
-    elif vars(args)[arg] == "False":
-        vars(args)[arg] = False
+#reformat_args(args)

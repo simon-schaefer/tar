@@ -15,15 +15,12 @@ import os
 import random
 import sys
 import time
+import torch
 from typing import Dict, List
-
-import cv2
 
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
-import torch
 
 class _Checkpoint_(object):
     """ Logging class for model training, including saving the model,
@@ -33,7 +30,6 @@ class _Checkpoint_(object):
         super(_Checkpoint_, self).__init__()
         # Initializing checkpoint module.
         self.ready = False
-        self.args  = args
         self.log   = torch.Tensor()
         # Building model directory based on name and time.
         now = time.strftime("%H_%M_%S_%d_%b", time.gmtime())
@@ -41,7 +37,9 @@ class _Checkpoint_(object):
         self.dir = os.path.join(os.environ['SR_PROJECT_OUTS_PATH'], tag)
         self.dir_load = None
         # If previous training/model should be loaded, build loading path
-        # from input arguments and read loaded config file.
+        # from input arguments and read loaded config file. After reading
+        # old config reset config to old config (except of some values
+        # like the datasets used).
         if not args.load == "":
             assert len(args.load.split("x")) == 2
             path, tag = args.load.split("x")
@@ -58,8 +56,19 @@ class _Checkpoint_(object):
                 for line in f:
                     x = line.rstrip('\n')
                     if not len(x.split(":")) == 2: continue
-                    key, val = x.split(":")
-                    self.args_load[key] = val.replace(" ", "")
+                    key, val = x.replace(" ", "").split(":")
+                    self.args_load[key] = type(vars(args)[key])(val)
+        print(args)
+        if not args.load == "" and args.valid_only:
+            for key, value in self.args_load.items():
+                if key in ["data_train","data_valid","scale_train",
+                           "scale_valid","valid_only","load","cpu",
+                           "no_augment"]: continue
+                args.__dict__[key] = value
+        args = reformat_args(args)
+        print("-----"*10)
+        print(args)
+        self.args  = args
         # Creating output directories for model.
         os.makedirs(self.dir, exist_ok=True)
         if not args.valid_only: os.makedirs(self.get_path('model'),exist_ok=True)
@@ -333,6 +342,30 @@ def is_power2(num):
 def all_power2(numbers):
     return all([is_power2(x) for x in numbers])
 
+# =============================================================================
+# Input arguments.
+# =============================================================================
+def reformat_args(args):
+    def reformat_to_list(inputs):
+        if type(inputs) == list: return inputs
+        elif type(inputs) == int: return [inputs]
+        elif type(inputs) == str and inputs[0] == "[":
+            return [int(x) for x in inputs[1:-1].split(",")]
+        elif type(inputs) == str and inputs[0] == "(":
+            return [float(x) for x in inputs[1:-1].split(",")]
+
+    args.scales_train = reformat_to_list(args.scales_train)
+    args.scales_guidance = reformat_to_list(args.scales_guidance)
+    args.scales_valid = reformat_to_list(args.scales_valid)
+    args.betas = reformat_to_list(args.betas)
+    args.data_valid = args.data_valid.split(":")
+    #args.data_valid.append(args.data_train)
+    for arg in vars(args):
+        if vars(args)[arg] == "True":
+            vars(args)[arg] = True
+        elif vars(args)[arg] == "False":
+            vars(args)[arg] = False
+    return args
 
 # =============================================================================
 # Flow to color functions (https://github.com/georgegach/flow2image).

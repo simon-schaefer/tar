@@ -131,8 +131,12 @@ class _Dataset_(Dataset):
         return [_np2Tensor_x(x) for x in imgs]
 
     @staticmethod
-    def _entcolorize(img) -> np.ndarray:
-        return np.expand_dims(sc.rgb2ycbcr(img)[:,:,0], axis=2)/255.0
+    def _entcolorize(img, colorspace) -> np.ndarray:
+        if colorspace == "ycbcr":  x = sc.rgb2ycbcr(img)[:,:,0]
+        elif colorspace == "hsv":  x = sc.rgb2hsv(img)[:,:,0]
+        elif colorspace == "gray": x = sc.rgb2gray(img)[:,:]
+        else: raise ValueError("Undefined colorspace {} !".format(colorspace))
+        return np.expand_dims(x, axis=2)/255.0
 
     # =========================================================================
     # Miscellaneous
@@ -170,7 +174,8 @@ class _IDataset_(_Dataset_):
         # Set right number of channels.
         pair = self._set_channel(pair)
         # In colorization mode convert "LR" image to YCbCr and take Y-channel.
-        if self.args.type=="COLORING": pair[0]=self._entcolorize(pair[1].copy())
+        if self.args.type=="COLORING":
+            pair[0]=self._entcolorize(pair[1].copy(),self.args.color_space)
         # Convert to torch tensor and return.
         pair_t = self._np2Tensor(pair)
         return pair_t[0], pair_t[1], filename
@@ -207,7 +212,8 @@ class _VDataset_(_Dataset_):
             # Set right number of channels.
             pair = self._set_channel(pair)
             # In colorization mode convert "LR" image to YCbCr and take Y-channel.
-            if self.args.type == "COLORING": pair[0] = self._entcolorize(pair[1].copy())
+            if self.args.type == "COLORING":
+                pair[0] = self._entcolorize(pair[1].copy(),self.args.color_space)
             # Convert to torch tensor and return.
             pair_t = self._np2Tensor(pair)
             lrs.append(pair_t[0])

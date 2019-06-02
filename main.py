@@ -11,6 +11,8 @@ import torch
 tar.miscellaneous.print_header()
 args   = tar.inputs.args
 ckp    = tar.miscellaneous._Checkpoint_(args)
+print("*"*20)
+print(args)
 loader = tar.dataloader._Data_(args)
 loss   = tar.optimization._Loss_(args, ckp) if not args.valid_only else None
 model  = tar.modules._Model_(args, ckp)
