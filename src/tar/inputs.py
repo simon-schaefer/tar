@@ -180,7 +180,7 @@ def set_template(args):
     elif args.template.count("ICOLOR") > 0:
         args.type       = "COLORING"
         args.format     = "IMAGE"
-        #args.loss       = "COL*100*L1*0+GRY*1*L1*1"
+        args.loss       = "COL*100*L1*0+GRY*1*L1*1"
         args.scales_train = "[1]"
         args.scales_valid = "[1]"
     # Scales.
