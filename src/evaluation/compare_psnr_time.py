@@ -26,6 +26,7 @@ print("Scrapping and filtering outs data ...")
 data = scrap_outputs(directory=os.environ["SR_PROJECT_OUTS_PATH"])
 data["RUNTIME_AL"] = round(data["RUNTIME_AL"]*1000, 2)
 for key_value in args.filter.split("&"):
+    if key_value == "": continue
     key, value = key_value.split(":")
     if len(value.split("/")) > 0:
         data = data[data[key].isin(value.split("/"))]
@@ -37,6 +38,8 @@ data = average_key_over_key(data, "PSNR_SHRT_best", "model", "dataset")
 #data, lower, upper = remove_outliers(data, "RUNTIME_AL")
 #print("... removing runtime outliers outside of [{},{}]".format(lower, upper))
 data.to_csv("data_filtered.csv")
+data_sorted = data.sort("RUNTIME_AL")
+data_sorted.to_csv("data_sorted.csv")
 
 print("... plotting psnr boxplot plots")
 f, axes = plt.subplots(figsize=(8,8))

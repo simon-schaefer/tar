@@ -170,6 +170,8 @@ def set_template(args):
         args.model      = "CONV_ONLY"
     if args.template.count("CONV_ONLY_LARGE") > 0:
         args.model      = "CONV_ONLY_LARGE"
+    if args.template.count("CONV_ONLY_VERY_LARGE") > 0:
+        args.model      = "CONV_ONLY_VERY_LARGE"
     # Type.
     if args.template.count("ISCALE") > 0:
         args.type       = "SCALING"
