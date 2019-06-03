@@ -366,6 +366,7 @@ def reformat_args(args):
     args.scales_valid = reformat_to_list(args.scales_valid)
     args.betas = reformat_to_list(args.betas)
     args.data_valid = args.data_valid.split(":")
+    args.data_train = args.data_train.split(":")
     #args.data_valid.append(args.data_train)
     for arg in vars(args):
         if vars(args)[arg] == "True":

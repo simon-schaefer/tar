@@ -283,12 +283,14 @@ class _Data_(object):
         # Load training dataset, if not valid only. For training several
         # datasets are trained in one process and therefore, each given
         # training dataset is concatinated to one large dataset (for each scale).
-        for s in args.scales_train:
-            tset = self.load_dataset(args, args.data_train, train=True, scale=s)
-            #tset2 = self.load_dataset(args, "NTIAASPEN", train=True, scale=s)
-            self.loader_train[s] = _DataLoader_(
-                tset, args.batch_size, shuffle=True, num_workers=args.n_threads
-            )
+        for dataset in args.data_train:
+            self.loader_train[s] = []
+            for s in args.scales_train:
+                tset = self.load_dataset(args, dataset, train=True, scale=s)
+                shuf = args.format != "VIDEO"
+                self.loader_train[s].append(_DataLoader_(
+                tset, args.batch_size, shuffle=shuf, num_workers=args.n_threads
+                ))
 
     def init_coloring(self, args: argparse.Namespace):
         # Load validation dataset. It is not about scaling here so merely the
@@ -305,10 +307,13 @@ class _Data_(object):
         # Load training dataset, if not valid only. For training several
         # datasets are trained in one process and therefore, each given
         # training dataset is concatinated to one large dataset.
-        tset = self.load_dataset(args, args.data_train, train=True, scale=1)
-        self.loader_train[1] = _DataLoader_(
-            tset, args.batch_size, shuffle=True, num_workers=args.n_threads
-        )
+        self.loader_train[1] = []
+        for dataset in args.data_train:
+            tset = self.load_dataset(args, args.data_train, train=True, scale=1)
+            shuffle = args.format != "VIDEO"
+            self.loader_train[1].append(_DataLoader_(
+            tset, args.batch_size, shuffle=shuffle, num_workers=args.n_threads
+        ))
 
     @staticmethod
     def load_dataset(args, name: str, train: bool, scale: int):

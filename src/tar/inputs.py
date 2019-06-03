@@ -44,8 +44,8 @@ parser.add_argument("--n_gpus", type=int, default=1,
 parser.add_argument("--dir_data", type=str, default=os.environ["SR_PROJECT_DATA_PATH"],
                     help="dataset directory")
 parser.add_argument("--data_train", type=str, default="DIV2K",
-                    choices=("DIV2K", "NTIAASPEN", "INTIAASPEN"),
-                    help="training dataset name (= 1 dataset!)")
+                    help="training dataset name (>= 1 dataset!), \
+                    choices=DIV2K,NTIAASPEN,INTIAASPEN")
 parser.add_argument("--data_valid", default="SET5:SET14",
                     help="validation datasets names (>= 1 dataset!), \
                     choices=URBAN100,SET5,SET14,BSDS100,VDIV2K,CUSTOM, \
@@ -181,6 +181,7 @@ def set_template(args):
     elif args.template.count("VSCALE") > 0:
         args.type       = "SCALING"
         args.format     = "VIDEO"
+        args.no_augment = True
     elif args.template.count("ICOLOR") > 0:
         args.type       = "COLORING"
         args.format     = "IMAGE"

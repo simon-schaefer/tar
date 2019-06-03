@@ -63,30 +63,32 @@ class _Trainer_(object):
         self.model.train()
         # Iterate over all batches in epoch.
         timer_data, timer_model = misc._Timer_(), misc._Timer_()
-        for batch, data in enumerate(self.loader_train[scale]):
-            # Load images.
-            lr, hr = self.prepare(data)
-            timer_data.hold()
-            timer_model.tic()
-            # Optimization core.
-            self.optimizer.zero_grad()
-            loss = self.optimization_core(lr, hr, finetuning, scale)
-            loss.backward()
-            if self.args.gclip > 0:
-                torch.nn.utils.clip_grad_value_(self.model.parameters(),self.args.gclip)
-            self.optimizer.step()
-            timer_model.hold()
-            # Logging (if printable epoch).
-            if (batch + 1) % self.args.print_every == 0:
-                self.ckp.write_log("[{}/{}]\t{}\t{:.1f}+{:.1f}s".format(
-                    (batch + 1) * self.args.batch_size,
-                    len(self.loader_train[scale].dataset),
-                    self.loss.display_loss(batch),
-                    timer_model.release(),
-                    timer_data.release()))
-            timer_data.tic()
+        for d in self.loader_train[scale]:
+            for batch, data in enumerate(d):
+                # Load images.
+                lr, hr = self.prepare(data)
+                timer_data.hold()
+                timer_model.tic()
+                # Optimization core.
+                self.optimizer.zero_grad()
+                loss = self.optimization_core(lr, hr, finetuning, scale)
+                loss.backward()
+                if self.args.gclip > 0:
+                    torch.nn.utils.clip_grad_value_(self.model.parameters(),
+                                                    self.args.gclip)
+                self.optimizer.step()
+                timer_model.hold()
+                # Logging (if printable epoch).
+                if (batch + 1) % self.args.print_every == 0:
+                    self.ckp.write_log("[{}/{}]\t{}\t{:.1f}+{:.1f}s".format(
+                        (batch + 1) * self.args.batch_size,
+                        len(d.dataset),
+                        self.loss.display_loss(batch),
+                        timer_model.release(),
+                        timer_data.release()))
+                timer_data.tic()
         # Finalizing - Save error and logging.
-        self.loss.end_log(len(self.loader_train[scale]))
+        self.loss.end_log(len(d.dataset))
         self.error_last = self.loss.log[-1, -1]
         print("... epoch {} with train loss {}".format(epoch, self.error_last))
 
@@ -288,7 +290,8 @@ class _Trainer_(object):
                 but should be {} !".format(d.name, d.format, format))
         for d in self.loader_valid: _check(d.dataset, self.args.format)
         if self.args.valid_only: return True
-        for d in self.loader_train.values(): _check(d.dataset, self.args.format)
+        for datasets in self.loader_train.values():
+            for d in datasets: _check(d.dataset, self.args.format)
         return True
 
     def prepare(self, data):
