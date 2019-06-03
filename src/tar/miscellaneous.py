@@ -344,8 +344,9 @@ def all_power2(numbers):
 # =============================================================================
 def build_log_list(datasets, scales):
     log_list = []
-    datasets = "".join(datasets)[1:-1].replace("'","").split(",")
-    scales   = "".join(scales)[1:-1].replace("'","").split(",")
+    if "''" in datasets:
+        datasets = "".join(datasets)[1:-1].replace("'","").split(",")
+        scales   = "".join(scales)[1:-1].replace("'","").split(",")
     for dv in datasets:
         for sv in scales:
             log_list.append(dv + "x" + str(sv))

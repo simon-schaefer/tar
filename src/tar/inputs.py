@@ -46,7 +46,7 @@ parser.add_argument("--dir_data", type=str, default=os.environ["SR_PROJECT_DATA_
 parser.add_argument("--data_train", type=str, default="DIV2K",
                     choices=("DIV2K", "NTIAASPEN", "INTIAASPEN"),
                     help="training dataset name (= 1 dataset!)")
-parser.add_argument("--data_valid", default="SET5:SET14:VDIV2K",
+parser.add_argument("--data_valid", default="SET5:SET14",
                     help="validation datasets names (>= 1 dataset!), \
                     choices=URBAN100,SET5,SET14,BSDS100,VDIV2K,CUSTOM, \
                     CALENDAR,NTIAASPEN,WALK,CITY,FOLIAGE")
