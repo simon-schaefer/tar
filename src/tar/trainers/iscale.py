@@ -25,7 +25,10 @@ class _Trainer_IScale_(_Trainer_):
         self.ckp.write_log("... successfully built iscale trainer !")
 
     def optimization_core(self, lr, hr, finetuning, scale):
-        lr_out, hr_out = self.apply(lr, hr, scale, discretize=finetuning)
+        if not self.args.no_task_aware:
+            lr_out, hr_out = self.apply(lr, hr, scale, discretize=finetuning)
+        else:
+            lr_out, hr_out = lr, self.apply(lr, hr, scale, mode="up")
         loss_kwargs = {'HR_GT': hr, 'HR_OUT': hr_out, 'LR_GT': lr, 'LR_OUT': lr_out}
         loss = self.loss(loss_kwargs)
         return loss
@@ -33,24 +36,20 @@ class _Trainer_IScale_(_Trainer_):
     def testing_core(self, v, d, di, save=False, finetuning=False):
         num_valid_samples = d.dataset.sample_size
         nmin, nmax  = self.args.norm_min, self.args.norm_max
-        psnrs = np.zeros((num_valid_samples, 3))
+        psnrs = np.zeros((num_valid_samples, 2))
         for i, (lr, hr, fname) in enumerate(d):
             lr, hr = self.prepare([lr, hr])
             scale  = d.dataset.scale
             lr_out, hr_out_t = self.apply(lr, hr, scale, discretize=finetuning)
-            hr_out_b = self.apply(lr, hr, scale, dec_input=lr, mode="up")
             # PSNR - Low resolution image.
             lr_out = misc.discretize(lr_out, [nmin, nmax])
             psnrs[i,0] = misc.calc_psnr(lr_out, lr, None, nmax-nmin)
             # PSNR - High resolution image (base: lr_out).
             hr_out_t = misc.discretize(hr_out_t, [nmin, nmax])
             psnrs[i,1] = misc.calc_psnr(hr_out_t, hr, None, nmax-nmin)
-            # PSNR - High resolution image (base: lr).
-            hr_out_b = misc.discretize(hr_out_b, [nmin, nmax])
-            psnrs[i,2] = misc.calc_psnr(hr_out_b, hr, None, nmax-nmin)
             if save:
-                slist = [hr_out_t, hr_out_b, lr_out, lr, hr]
-                dlist = ["SHRT", "SHRB", "SLR", "LR", "HR"]
+                slist = [hr_out_t, lr_out, lr, hr]
+                dlist = ["SHRT", "SLR", "LR", "HR"]
                 self.ckp.save_results(slist,dlist,fname[0],d,scale)
             if save and i % self.args.n_threads == 0:
                 self.ckp.end_background()
@@ -63,8 +62,7 @@ class _Trainer_IScale_(_Trainer_):
         return v
 
     def psnr_description(self):
-        return ["SLR","SHRT","SHRB"]
+        return ["SLR","SHRT"]
 
     def log_description(self):
-        return ["SHRT_best", "SHRT_mean", "SHRB_best", "SHRB_mean",
-                "SLR_best", "SLR_mean"]
+        return ["SHRT_best", "SHRT_mean", "SLR_best", "SLR_mean"]

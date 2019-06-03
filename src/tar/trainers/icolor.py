@@ -27,7 +27,6 @@ class _Trainer_IColor_(_Trainer_):
     def apply(self, gry, col, scale=None, discretize=False, dec_input=None, mode="all"):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         assert mode in ["all", "up", "down"]
-        if mode == "up": assert not dec_input is None
         # Encoding i.e. decolorization and decoding i.e. colorization
         def _decolorization(col):
             gry_out = self.model.model.encode(col.clone())
@@ -47,7 +46,10 @@ class _Trainer_IColor_(_Trainer_):
         return gry_out, col_out
 
     def optimization_core(self, gry, col, finetuning, *args):
-        gry_out, col_out = self.apply(gry, col, discretize=finetuning)
+        if not self.args.no_task_aware:
+            gry_out, col_out = self.apply(gry, col,discretize=finetuning)
+        else:
+            gry_out, col_out = gry, self.apply(gry, col,mode="up")
         loss_kwargs={'COL_GT':col,'COL_OUT':col_out,'GRY_GT':gry,'GRY_OUT':gry_out}
         loss = self.loss(loss_kwargs)
         return loss
@@ -55,33 +57,20 @@ class _Trainer_IColor_(_Trainer_):
     def testing_core(self, v, d, di, save=False, finetuning=False):
         num_valid_samples = d.dataset.sample_size
         nmin, nmax  = self.args.norm_min, self.args.norm_max
-        psnrs = np.zeros((num_valid_samples, 4))
+        psnrs = np.zeros((num_valid_samples, 2))
         for i, (gry, col, fname) in enumerate(d):
             gry, col = self.prepare([gry, col])
             scale  = d.dataset.scale
             gry_out, col_out_t = self.apply(gry, col, discretize=finetuning)
-            col_cpy = col.clone()
-            col_gry = (col_cpy[:,0,:,:]+col_cpy[:,1,:,:]+col_cpy[:,2,:,:])/3.0
-            _,w,h = col_gry.size()
-            col_gry = col_gry.view(1,1,w,h)
-            col_out_g = self.apply(gry, col, dec_input=col_gry, mode="up")
-            timer_apply = misc._Timer_()
-            col_out_y = self.apply(gry, col, dec_input=gry, mode="up")
             # PSNR - Grey image.
             gry_out = misc.discretize(gry_out, [nmin, nmax])
             psnrs[i,0] = misc.calc_psnr(gry_out, gry, None, nmax-nmin)
             # PSNR - Colored image (base: gry_out).
             col_out_t = misc.discretize(col_out_t, [nmin, nmax])
             psnrs[i,1] = misc.calc_psnr(col_out_t, col, None, nmax-nmin)
-            # PSNR - Colored image (base: col_gry).
-            col_out_g = misc.discretize(col_out_g, [nmin, nmax])
-            psnrs[i,2] = misc.calc_psnr(col_out_g, col, None, nmax-nmin)
-            # PSNR - Colored image (base: lr).
-            col_out_y = misc.discretize(col_out_y, [nmin, nmax])
-            psnrs[i,3] = misc.calc_psnr(col_out_y, col, None, nmax-nmin)
             if save:
-                slist = [col_out_t, col_out_y, col_out_g, gry_out, gry, col]
-                dlist = ["SCOLT", "SCOLY", "SCOLG", "SGRY", "GRY", "COL"]
+                slist = [col_out_t, gry_out, gry, col]
+                dlist = ["SCOLT", "SGRY", "GRY", "COL"]
                 self.ckp.save_results(slist,dlist,fname[0],d,scale)
             if save and i % self.args.n_threads == 0:
                 self.ckp.end_background()
@@ -94,7 +83,7 @@ class _Trainer_IColor_(_Trainer_):
         return v
 
     def psnr_description(self):
-        return ["SGRY","SCOLT","SCOLG","SCOLY"]
+        return ["SGRY","SCOLT"]
 
     def log_description(self):
         return ["SCOLT_best", "SCOLT_mean", "SGRY_best", "SGRY_mean"]

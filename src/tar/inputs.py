@@ -16,6 +16,8 @@ parser.add_argument("--format", type=str, default="IMAGE",
                     choices=("IMAGE", "VIDEO"))
 parser.add_argument("--external", type=str, default="",
                     help="external model, format (program-model)")
+parser.add_argument("--no_task_aware", action="store_true",
+                    help="use task aware downscaling (default=False)")
 parser.add_argument("--load", type=str, default="",
                     help="directory to load model from, training is not \
                     continued to not overwrite, format [outs,models]xdir_name")

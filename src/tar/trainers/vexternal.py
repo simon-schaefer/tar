@@ -26,6 +26,8 @@ class _Trainer_VExternal_(_Trainer_):
         if external == "": raise ValueError("External module must not be empty !")
         use_gpu  = not self.args.cpu
         self._external = self.load_module(external,self.scale_current(0),use_gpu)
+        if args.no_task_aware:
+            raise ValueError("Not task-aware downscaling not supported for VSR!")
         self.ckp.write_log("... successfully built vscale trainer !")
 
     def apply(self,lrs,hrs,scale,discretize=False,dec_input=[None,None,None],mode="all"):
@@ -39,15 +41,16 @@ class _Trainer_VExternal_(_Trainer_):
                 lr1, hr1, scale, discretize, dec_input[1], mode="down"
             )
         # Apply input images to model and determine output.
-        lr0_out = super(_Trainer_VExternal_, self).apply(
-            lr0, hr0, scale, discretize, dec_input[0], mode="down"
-        )
-        lr1_out = super(_Trainer_VExternal_, self).apply(
-            lr1, hr1, scale, discretize, dec_input[1], mode="down"
-        )
-        lr2_out = super(_Trainer_VExternal_, self).apply(
-            lr2, hr2, scale, discretize, dec_input[2], mode="down"
-        )
+        lr0_out, lr1_out, lr2_out = dec_input
+        if lr0_out is None:
+            lr0_out = super(_Trainer_VExternal_, self).apply(
+            lr0, hr0, scale, discretize, mode="down")
+        if lr1_out is None:
+            lr1_out = super(_Trainer_VExternal_, self).apply(
+            lr1, hr1, scale, discretize, mode="down")
+        if lr2_out is None:
+            lr2_out = super(_Trainer_VExternal_, self).apply(
+            lr2, hr2, scale, discretize, mode="down")
         lr0e = misc.discretize(lr0_out.clone(),[nmin,nmax])
         lr1e = misc.discretize(lr1_out.clone(),[nmin,nmax])
         lr2e = misc.discretize(lr2_out.clone(),[nmin,nmax])
@@ -73,17 +76,14 @@ class _Trainer_VExternal_(_Trainer_):
             lr0,lr1,lr2 = lrs; hr0,hr1,hr2 = hrs
             scale  = d.dataset.scale
             lr_out,hrm_out = self.apply(lrs,hrs,scale,discretize=finetuning)
-            hrm_out2 = self.apply(lrs,hrs,scale,discretize=finetuning,
-                                  dec_input=[lr0,lr1,lr2], mode="up")
             # PSNR - Low resolution image.
             lr_out = misc.discretize(lr_out, [nmin, nmax])
             psnrs[i,0] = misc.calc_psnr(lr_out, lr1, None, nmax-nmin)
             # PSNR - Model image.
             psnrs[i,1] = misc.calc_psnr(hrm_out, hr1, None, nmax-nmin)
-            psnrs[i,2] = misc.calc_psnr(hrm_out2, hr1, None, nmax-nmin)
             if save:
-                slist = [lr_out, hrm_out, hrm_out2, lr1, hr1]
-                dlist = ["SLR", "SHRET", "SHREB", "LR", "HR"]
+                slist = [lr_out, hrm_out, lr1, hr1]
+                dlist = ["SLR", "SHRET", "LR", "HR"]
                 self.ckp.save_results(slist,dlist,fnames[1],d,scale)
             if save and i % self.args.n_threads == 0:
                 self.ckp.end_background()
@@ -120,11 +120,10 @@ class _Trainer_VExternal_(_Trainer_):
         return tuple(lrs), tuple(hrs)
 
     def psnr_description(self):
-        return ["SLR","SHRET","SHREB"]
+        return ["SLR","SHRET"]
 
     def log_description(self):
-        return ["SLR_best", "SLR_mean",
-                "SHRET_best", "SHRET_mean", "SHREB_best", "SHREB_mean"]
+        return ["SLR_best", "SLR_mean", "SHRET_best", "SHRET_mean"]
 
     def scale_current(self, epoch):
         if not self.args.valid_only:

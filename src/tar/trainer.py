@@ -165,7 +165,7 @@ class _Trainer_(object):
                      save: bool=False, finetuning: bool=False) -> dict:
         raise NotImplementedError
 
-    def apply(self, lr, hr, scale, discretize=False, dec_input=None, mode="all"):
+    def apply(self, lr, hr, scale, discretize=False, mode="all"):
         assert misc.is_power2(scale)
         assert mode in ["all", "up", "down"]
         if mode == "up": assert not dec_input is None
@@ -190,10 +190,8 @@ class _Trainer_(object):
                 scl    = scl//iter_scale
             return hr_out
         # In case of down- or upscaling only perform only part scalings.
-        if mode == "down":
-            if dec_input is not None: return lr.clone()
-            else:                     return _downsample(hr, scale)
-        elif mode == "up":            return _upsample(dec_input, scale)
+        if mode == "down": return _downsample(hr, scale)
+        elif mode == "up": return _upsample(lr, scale)
         # Otherwise perform down- and upscaling and return both tensors.
         lr_out = _downsample(hr, scale)
         hr_out = _upsample(lr_out, scale)
