@@ -88,10 +88,7 @@ class _Checkpoint_(object):
                 f.write('{}: {}\n'.format(arg, getattr(args, arg)))
         # Build list containing names of test and validation datasets
         # for logging and plotting purposes.
-        self.log_datasets = []
-        for dv in self.args.data_valid:
-            for sv in self.args.scales_valid:
-                self.log_datasets.append(dv + "x" + str(sv))
+        self.log_datasets = build_log_list(args.data_valid, args.scales_valid)
         # Set number of logging threats.
         self.n_processes  = 8
         self.iter_is_best = False
@@ -345,6 +342,15 @@ def all_power2(numbers):
 # =============================================================================
 # Input arguments.
 # =============================================================================
+def build_log_list(datasets, scales):
+    log_list = []
+    datasets = "".join(datasets)[1:-1].replace("'","").split(",")
+    scales   = "".join(scales)[1:-1].replace("'","").split(",")
+    for dv in datasets:
+        for sv in scales:
+            log_list.append(dv + "x" + str(sv))
+    return log_list
+
 def reformat_args(args):
     def reformat_to_list(inputs):
         if type(inputs) == list: return inputs

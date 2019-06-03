@@ -3,8 +3,8 @@
 # =============================================================================
 # Created By  : Simon Schaefer
 # Description : Load and compare loss curves from two out directories.
-# Arguments   : Out directiory path I.
-#               Out directiory path II.
+# Arguments   : Out directiory paths (seperated by &).
+#               Plot labels (tags) (seperated by &).
 # =============================================================================
 import argparse
 import os
@@ -17,25 +17,23 @@ import matplotlib.pyplot as plt
 from utils import parse_logging, save_path
 
 # Parse out directories from user input.
-parser = argparse.ArgumentParser(description="loss_curves")
-parser.add_argument("--out1", type=str, default="")
-parser.add_argument("--out2", type=str, default="")
-parser.add_argument("--tag1", type=str, default="1")
-parser.add_argument("--tag2", type=str, default="2")
+parser = argparse.ArgumentParser(description="psnr_curves")
+parser.add_argument("--outs", type=str, default="")
+parser.add_argument("--tags", type=str, default="")
 args = parser.parse_args()
-out1 = os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], args.out1)
-out2 = os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], args.out2)
-assert os.path.isdir(out1) and os.path.isdir(out2)
+outs, tags = args.outs.split("&"), args.tags.split("&")
+assert len(outs) == len(tags)
+outs = [os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], x) for x in outs]
+assert all([os.path.isdir(x) for x in outs])
 
 # Read and parse logging files to get loss curves.
-log1 = parse_logging(os.path.join(out1, "log.txt"))
-log2 = parse_logging(os.path.join(out2, "log.txt"))
+logs = [parse_logging(os.path.join(x, "log.txt")) for x in outs]
 
 # Plot loss curves and label with tags.
 print("... plotting and saving loss curve")
 fig = plt.figure()
-plt.plot(log1["epoch"], log1["loss"], label=args.tag1)
-plt.plot(log2["epoch"], log2["loss"], label=args.tag2)
+for log, tag in zip(logs, tags):
+    plt.plot(log["epoch"], log["loss"], label=tag)
 plt.legend()
 plt.xlabel("EPOCH")
 plt.ylabel("LOSS")

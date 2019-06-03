@@ -26,8 +26,20 @@ def num_model_params(model_name):
     model  = module.build_net().to('cpu')
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
+def parse_config(config_file_path):
+    """ Parse config file (as string values only) and return as dictionary. """
+    assert os.path.isfile(config_file_path)
+    config = {}
+    with open(config_file_path, "r") as f:
+        for line in f:
+            x = line.rstrip('\n')
+            if not len(x.split(":")) == 2: continue
+            key, val = x.replace(" ", "").split(":")
+            config[key] = str(val)
+    return config
+
 def parse_logging(log_file_path):
-    """ Parse information from log.txt file and return in dictionary.
+    """ Parse information from log.txt file and return as dataframe.
     Supported information: epoch, overall loss. """
     assert os.path.isfile(log_file_path)
     num_lines    = sum(1 for line in open(log_file_path, 'r'))
