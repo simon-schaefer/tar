@@ -33,7 +33,7 @@ def parse_logging(log_file_path):
     num_lines    = sum(1 for line in open(log_file_path, 'r'))
     logging_list = []
     epoch_dict   = {"epoch":0, "loss": 0}
-    print("\nRead logging file {} ... ".format(log_file_path))
+    print("Read logging file {} ... ".format(log_file_path))
     with open(log_file_path, "r") as file:
         for il, line in enumerate(file):
             if line.count("Epoch") > 0:
