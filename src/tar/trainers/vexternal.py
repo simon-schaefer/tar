@@ -98,7 +98,6 @@ class _Trainer_VExternal_(_Trainer_):
     def perturbation_core(self, d, eps):
         num_testing_samples = min(len(d), 10)
         psnrs_t = np.zeros((num_testing_samples,len(eps)))
-        psnrs_b = np.zeros((num_testing_samples,len(eps)))
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         for id, (lrs, hrs, fname) in enumerate(d):
             if id >= num_testing_samples: break
@@ -113,14 +112,7 @@ class _Trainer_VExternal_(_Trainer_):
                                         dec_input=[None,lr_out,None], mode="up")
                 hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
                 psnrs_t[id,ie] = misc.calc_psnr(hr_out_eps, hr1, None, nmax-nmin)
-                lr0e = lr0.clone() + error.to(self.device)
-                lr1e = lr1.clone() + error.to(self.device)
-                lr2e = lr2.clone() + error.to(self.device)
-                hr_out_eps = self.apply(lrs, hrs, scale,
-                                        dec_input=[lr0e, lr1e, lr2e], mode="up")
-                hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
-                psnrs_b[id,ie] = misc.calc_psnr(hr_out_eps, hr1, None, nmax-nmin)
-        return psnrs_t.mean(axis=0), psnrs_b.mean(axis=0)
+        return psnrs_t.mean(axis=0)
 
     def prepare(self, data):
         lrs = [a.to(self.device) for a in data[0]]

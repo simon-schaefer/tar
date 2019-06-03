@@ -64,7 +64,7 @@ def scrap_outputs(directory):
                     "PSNR_SHRT_best", "PSNR_SHRB_mean", "PSNR_SHRB_best",
                     "PSNR_SCOLT_best", "PSNR_SCOLT_mean", "PSNR_SGRY_best",
                     "PSNR_SGRY_mean"]
-    overall_keys = config_keys + results_keys + ["path"]
+    overall_keys = config_keys + results_keys + ["path", "epsball"]
     scrapped = {x: [] for x in overall_keys}
     for dir in out_dirs:
         if not os.path.isfile(os.path.join(dir, "config.txt")): continue
@@ -82,8 +82,9 @@ def scrap_outputs(directory):
                 elif x == "dataset": scrapped[x][-1] = row[x].replace(" ", "")
                 elif x not in row.keys(): continue
                 else: scrapped[x][-1] = row[x]
-
             scrapped["path"][-1] = dir.split("/")[-1]
+            epsball = scrapped["loss"][-1].split("*")[-1]
+            scrapped["epsball"][-1] = epsball if epsball.isdigit() else "0"
     df = pd.DataFrame.from_dict(scrapped)
     # Add model complexity to dataframe.
     complexity_dict = {x: num_model_params(x) for x in np.unique(df["model"])}
@@ -124,6 +125,9 @@ def remove_outliers(df, key, outlier_constant=4):
     IQR = (upper - lower) * outlier_constant
     upper, lower = upper + IQR, lower - IQR
     return df[(df[key] <= upper) & (df[key] >= lower)], lower, upper
+
+def save_path(fname):
+    return os.path.join(os.environ["SR_PROJECT_PLOTS_PATH"], fname)
 
 # =============================================================================
 # Created By  : Simon Schaefer

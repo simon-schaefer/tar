@@ -12,6 +12,7 @@ import math
 from multiprocessing import Process, Queue
 import numpy as np
 import os
+import pandas as pd
 import random
 import sys
 import time
@@ -64,7 +65,7 @@ class _Checkpoint_(object):
                            "scale_valid","valid_only","load","cpu",
                            "no_augment"]: continue
                 args.__dict__[key] = value
-        # Reformat and set input arguments. 
+        # Reformat and set input arguments.
         args      = reformat_args(args)
         self.args = args
         # Creating output directories for model.
@@ -145,21 +146,17 @@ class _Checkpoint_(object):
             tensor_cpu = normalized.byte().permute(1, 2, 0).cpu()
             self.queue.put(('{}{}.png'.format(filename, p), tensor_cpu))
 
-    def save_pertubation(self, eps, psnrs, labels, names):
-        assert len(names) == len(psnrs)
-        assert all([len(labels) == len(x) for x in psnrs])
-        num_datasets = len(labels)
-        fig, ax = plt.subplots(1, num_datasets)
-        plt.title("Perturbation")
-        for li, label in enumerate(labels):
-            for name in names:
-                ax[li].plot(eps, psnrs[i,:], label="{}_{}".format(label,name))
-            plt.legend()
-            plt.xlabel('Perturbation (white Gaussian noise)')
-            plt.ylabel('PSNR')
-            plt.grid(True)
-        plt.savefig(self.get_path("perturbation.pdf"))
-        plt.close(fig)
+    def save_pertubation(self, eps, psnrs, labels):
+        """ Save perturbation array (dataset, eps) as dataframe. """
+        assert len(labels) == x.shape[0]
+        # Convert to dataframe and store as csv.
+        records = []
+        for i in range(eps.size):
+            record_i = [psnrs[id,i] for id in range(pnsr_collection.shape[0])]
+            record_i.append(eps[i])
+            records.append(record_i)
+        df = pd.DataFrame.from_records(records, columns=[*labels, "epsilon"])
+        df.to_csv(self.get_path("perturbation.csv"))
 
     def save_runtimes(self, all, up, down):
         """ Plots average runtimes [s] of overall pipeline, upscaling and

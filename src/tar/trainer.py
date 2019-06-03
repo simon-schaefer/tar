@@ -138,14 +138,12 @@ class _Trainer_(object):
             )
             eps     = np.linspace(0.0,self.args.max_eps,num=10).tolist()
             psnrs_t = np.zeros((len(self.loader_valid),len(eps)))
-            psnrs_b = np.zeros((len(self.loader_valid),len(eps)))
             labels  = []
             for di, d in enumerate(self.loader_valid):
                 name, scale = d.dataset.name, d.dataset.scale
-                psnrs_t[di,:], psnrs_b[di,:] = self.perturbation_core(d, eps)
+                psnrs_t[di,:] = self.perturbation_core(d, eps)
                 labels.append("{}x{}".format(name,scale))
-            self.ckp.save_pertubation(eps, [psnrs_t, psnrs_b], labels,
-                                      ["task_aware", "bilinear"])
+            self.ckp.save_pertubation(eps, psnrs_t, labels)
         # Finalizing.
         self.ckp.iter_is_best = best[1][0] + 1 == epoch
         if save: self.ckp.end_background()
@@ -214,7 +212,6 @@ class _Trainer_(object):
     def perturbation_core(self, d, eps: List[float]):
         num_testing_samples = min(len(d), 10)
         psnrs_t = np.zeros((num_testing_samples,len(eps)))
-        psnrs_b = np.zeros((num_testing_samples,len(eps)))
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         for id, (lr, hr, fname) in enumerate(d):
             if id >= num_testing_samples: break
@@ -227,11 +224,7 @@ class _Trainer_(object):
                 hr_out_eps = self.apply(lr,hr,scale,dec_input=lr_out,mode="up")
                 hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
                 psnrs_t[id,ie] = misc.calc_psnr(hr_out_eps, hr, None, nmax-nmin)
-                lr_error = lr.clone() + error.to(self.device)
-                hr_out_eps = self.apply(lr,hr,scale,dec_input=lr_error,mode="up")
-                hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
-                psnrs_b[id,ie] = misc.calc_psnr(hr_out_eps, hr, None, nmax-nmin)
-        return psnrs_t.mean(axis=0), psnrs_b.mean(axis=0)
+        return psnrs_t.mean(axis=0)
 
     def runtime_core(self, d, v: dict) -> dict:
         runtimes = np.zeros((2, min(len(d),10)))
