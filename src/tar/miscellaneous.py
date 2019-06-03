@@ -58,7 +58,12 @@ class _Checkpoint_(object):
                     x = line.rstrip('\n')
                     if not len(x.split(":")) == 2: continue
                     key, val = x.replace(" ", "").split(":")
-                    self.args_load[key] = type(vars(args)[key])(val)
+                    type = type(vars(args)[key])
+                    if type is bool and val.lower() == "true":
+                        self.args_load[key] = True
+                    elif type is bool and val.lower() == "false":
+                        self.args_load[key] = False
+                    else: self.args_load[key] = type(vars(args)[key])(val)
         if not args.load == "" and args.valid_only:
             for key, value in self.args_load.items():
                 if key in ["data_train","data_valid","scale_train",

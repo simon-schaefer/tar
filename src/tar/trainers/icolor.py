@@ -24,7 +24,7 @@ class _Trainer_IColor_(_Trainer_):
         super(_Trainer_IColor_, self).__init__(args, loader, model, loss, ckp)
         self.ckp.write_log("... successfully built icolor trainer !")
 
-    def apply(self, gry, col, scale=None, discretize=False, dec_input=None, mode="all"):
+    def apply(self, gry, col, scale=None, discretize=False, mode="all"):
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         assert mode in ["all", "up", "down"]
         # Encoding i.e. decolorization and decoding i.e. colorization
@@ -36,10 +36,8 @@ class _Trainer_IColor_(_Trainer_):
         def _colorization(gry):
             return self.model.model.decode(gry.clone())
         # In case of down- or upscaling only perform only part scalings.
-        if mode == "down":
-            if dec_input is not None: return gry.clone()
-            else:                     return _decolorization(col)
-        elif mode == "up":            return _colorization(gry)
+        if mode == "down": return _decolorization(col)
+        elif mode == "up": return _colorization(gry)
         # Otherwise perform down- and upscaling and return both tensors.
         gry_out = _decolorization(col)
         col_out = _colorization(gry_out)
@@ -49,7 +47,7 @@ class _Trainer_IColor_(_Trainer_):
         if not self.args.no_task_aware:
             gry_out, col_out = self.apply(gry, col,discretize=finetuning)
         else:
-            gry_out, col_out = gry, self.apply(gry, col,mode="up")
+            gry_out, col_out = gry, self.apply(gry, col, mode="up")
         loss_kwargs={'COL_GT':col,'COL_OUT':col_out,'GRY_GT':gry,'GRY_OUT':gry_out}
         loss = self.loss(loss_kwargs)
         return loss

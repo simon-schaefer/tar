@@ -168,7 +168,6 @@ class _Trainer_(object):
     def apply(self, lr, hr, scale, discretize=False, mode="all"):
         assert misc.is_power2(scale)
         assert mode in ["all", "up", "down"]
-        if mode == "up": assert not dec_input is None
         nmin, nmax  = self.args.norm_min, self.args.norm_max
         iter_scale  = self.args.iter_scale_factor
         assert scale % iter_scale == 0
@@ -219,7 +218,7 @@ class _Trainer_(object):
             for ie, e in enumerate(eps):
                 error = torch.normal(mean=0.0,std=torch.ones(lr_out.size())*e)
                 lr_out = lr_out.clone() + error.to(self.device)
-                hr_out_eps = self.apply(lr,hr,scale,dec_input=lr_out,mode="up")
+                hr_out_eps = self.apply(lr_out, hr, scale, mode="up")
                 hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
                 psnrs_t[id,ie] = misc.calc_psnr(hr_out_eps, hr, None, nmax-nmin)
         return psnrs_t.mean(axis=0)
@@ -234,7 +233,7 @@ class _Trainer_(object):
             self.apply(lr, hr, scale, discretize=False, mode="all")
             runtimes[0,i] = timer_all.toc()
             timer_up = misc._Timer_()
-            self.apply(lr, hr, scale, discretize=False, dec_input=lr, mode="up")
+            self.apply(lr, hr, scale, discretize=False, mode="up")
             runtimes[1,i] = timer_up.toc()
         v["RUNTIME_AL"] = "{:.8f}".format(np.median(runtimes[0,:]))
         v["RUNTIME_UP"] = "{:.8f}".format(np.median(runtimes[1,:]))
