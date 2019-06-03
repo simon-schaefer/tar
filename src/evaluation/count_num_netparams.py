@@ -6,7 +6,7 @@
 # Arguments   : Model name
 # =============================================================================
 import argparse
-from .utils import num_model_params
+from utils import num_model_params
 
 # Parse input arguments.
 parser = argparse.ArgumentParser(description="net_params")
