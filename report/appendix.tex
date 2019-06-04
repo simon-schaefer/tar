@@ -13,7 +13,7 @@ Unfortunately, the approach did not converge to useful representation. Since
 other approaches could successfully solve the \ac{VSR} task this approach was
 discarded.
 
-\begin{figure}[!htbp]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=14cm]{figures/architecture_video_flow}
 	\caption{Design for \ac{TAD} video super-resolution task (example network
@@ -21,7 +21,7 @@ discarded.
   \label{fig:architecture_video_flow}
 \end{figure}
 
-\begin{figure}[!htbp]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=10cm]{figures/flow}
 	\caption{Optical flow reconstruction: Groundtruth (left) and reconstructed
@@ -37,7 +37,7 @@ then motion compensation is performed according to the HR optical flows and
 finally, the compensated LR inputs are fed to a super-resolution network to
 generate the HR frame estimate (comp. \myfigref{fig:sofvsr}).
 
-\begin{figure}[!htbp]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=14cm]{figures/sofvsr}
 	\caption{Overview of SOFVSR pipeline \cite{LFVSRTHROFE}.}
@@ -48,18 +48,18 @@ The SOFVSR model was selected based on a combination of criteria such as the
 stated reconstruction performance (PSNR) and runtime, the closeness to
 state-of-the-art and the availability of a PyTorch open-source implementation.
 
-\begin{figure}[!htbp]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=14cm]{figures/sofvsr_selection}
 	\caption{Comparison of several \ac{VSR} methods according to PapersWithCode.}
   \label{fig:sofvsr_selection}
 \end{figure}
 
+\subsection*{List of Experiments}
 
-% In the appendix, list the following material:
-%
-% \begin{itemize}
-%  \item Data (evaluation tables, graphs etc.)
-%  \item Program code
-%  \item Further material
-% \end{itemize}
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=14cm]{figures/cvl}
+	\caption{List of important (non-complete) experiments.}
+  \label{fig:experiments}
+\end{figure}

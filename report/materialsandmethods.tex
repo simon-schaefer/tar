@@ -181,7 +181,7 @@ specifically in the third step. After training to validate the model subsequent
 frames are downscaled first using the video pretrained \ac{TAD} model, the
 downscaled images are then fed to the trained \ac{VSR} model, upscaling them.
 While this approach basically is appliable to all \ac{VSR} frameworks in the
-scope of this project the SOFVSR (\cite{SOFVSR}) model was used.
+scope of this project the SOFVSR (\cite{LFVSRTHROFE}) model was used.
 \footnote{Further details about the selection of SOFVSR and a description of
 the approach itself can be found in the appendix.}
 
@@ -211,7 +211,11 @@ described above the pipeline had to be re-implemented from scratch and
 re-validated since neither code nor any pretrained model have been
 available publically (nor upon request). As PyTorch merely supports
 subpixel convolutional layers, their inverse transformation was implemented as
-well. During program development it was paid attention to generality and
+well. Since most of the open-source models for the \ac{VSR} problem merely are
+available in Tensorflow, as is the used model, it was reimplemented and
+adapted to the \ac{TAD} pipeline.
+\newline
+During program development it was paid attention to generality and
 commutability in order to efficiently test a variety of different models and
 datasets as well as guarantee comparability of different approaches. The full
 code stack can be found on \url{https://github.com/simon-schaefer/tar}.
