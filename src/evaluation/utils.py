@@ -70,7 +70,7 @@ def scrap_outputs(directory):
     # Iterate over all output directories, search for configuration and
     # validation file and add to global dataframe.
     config_keys  = ["type", "format", "external", "no_augment", "model", "loss",
-                    "data_train", "scales_train"]
+                    "data_train", "scales_train", "no_task_aware"]
     results_keys = ["scale", "dataset", "RUNTIME_UP", "RUNTIME_DW", "RUNTIME_AL",
                     "PSNR_SLR_mean", "PSNR_SLR_best", "PSNR_SHRT_mean",
                     "PSNR_SHRT_best", "PSNR_SHRB_mean", "PSNR_SHRB_best",

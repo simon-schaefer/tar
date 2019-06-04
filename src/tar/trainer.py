@@ -134,7 +134,7 @@ class _Trainer_(object):
             self.ckp.save_runtimes(runtime_al,runtime_up,runtime_dw)
         # Perturbation/Noise testing i.e. perturb random SLR image in dataset
         # in different degrees and measure drop of PSNR.
-        if save:
+        if save and self.args.valid_only: 
             self.ckp.write_log(
                 "Validation {} (perturbation test) ...".format(self.valid_iter)
             )

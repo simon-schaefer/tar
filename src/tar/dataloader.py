@@ -309,7 +309,7 @@ class _Data_(object):
         # training dataset is concatinated to one large dataset.
         self.loader_train[1] = []
         for dataset in args.data_train:
-            tset = self.load_dataset(args, args.data_train, train=True, scale=1)
+            tset = self.load_dataset(args, dataset, train=True, scale=1)
             shuffle = args.format != "VIDEO"
             self.loader_train[1].append(_DataLoader_(
             tset, args.batch_size, shuffle=shuffle, num_workers=args.n_threads
