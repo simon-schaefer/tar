@@ -283,9 +283,9 @@ class _Data_(object):
         # Load training dataset, if not valid only. For training several
         # datasets are trained in one process and therefore, each given
         # training dataset is concatinated to one large dataset (for each scale).
-        for dataset in args.data_train:
+        for s in args.scales_train:
             self.loader_train[s] = []
-            for s in args.scales_train:
+            for dataset in args.data_train:
                 tset = self.load_dataset(args, dataset, train=True, scale=s)
                 shuf = args.format != "VIDEO"
                 self.loader_train[s].append(_DataLoader_(

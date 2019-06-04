@@ -64,6 +64,7 @@ class _Trainer_(object):
         # Iterate over all batches in epoch.
         timer_data, timer_model = misc._Timer_(), misc._Timer_()
         for d in self.loader_train[scale]:
+            self.ckp.write_log("Training on dataset {}".format(d.dataset.name))
             for batch, data in enumerate(d):
                 # Load images.
                 lr, hr = self.prepare(data)
@@ -124,7 +125,7 @@ class _Trainer_(object):
             best = self.save_psnr_checkpoint(d, di)
             validations.append(v)
         # Determine average runtime.
-        if save:
+        if save and self.args.valid_only:
             self.ckp.write_log(
                 "Validation {} (runtime test) ...".format(self.valid_iter)
             )
@@ -134,7 +135,7 @@ class _Trainer_(object):
             self.ckp.save_runtimes(runtime_al,runtime_up,runtime_dw)
         # Perturbation/Noise testing i.e. perturb random SLR image in dataset
         # in different degrees and measure drop of PSNR.
-        if save and self.args.valid_only: 
+        if save and self.args.valid_only:
             self.ckp.write_log(
                 "Validation {} (perturbation test) ...".format(self.valid_iter)
             )
