@@ -23,8 +23,14 @@ from utils import parse_config, save_path
 parser = argparse.ArgumentParser(description="psnr_curves")
 parser.add_argument("--outs", type=str, default="")
 parser.add_argument("--tags", type=str, default="")
+parser.add_argument("--index", type=str, default="SHRm&SLRm",
+                    help="SHR_best, SHR_mean, SLR_best, SLR_mean")
+parser.add_argument("--filter", type=str, default="")
 args = parser.parse_args()
 outs, tags = args.outs.split("&"), args.tags.split("&")
+index_dict = {"SHRb": 0, "SHRm": 1, "SLRb": 4, "SLRm": 5}
+value_labels = args.index.split("&")
+value_indexs = [index_dict[x] for x in args.index.split("&")]
 assert len(outs) == len(tags)
 outs = [os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], x) for x in outs]
 assert all([os.path.isdir(x) for x in outs])
@@ -33,25 +39,31 @@ assert all([os.path.isdir(x) for x in outs])
 configs = [parse_config(os.path.join(x, "config.txt")) for x in outs]
 logs    = [torch.load(os.path.join(x, "psnr_log.pt")) for x in outs]
 log_lists = [build_log_list(x["data_valid"],x["scales_valid"]) for x in configs]
-unique_labels = np.unique([x for y in log_lists for x in y])
-print("... unique labels are {}".format(unique_labels))
-unique_all_labels = []
-for label in unique_labels:
+unique_dsets = np.unique([x for y in log_lists for x in y])
+print("... unique datsets are {}".format(unique_dsets))
+unique_all_dsets = []
+for label in unique_dsets:
     if not all([label in x for x in log_lists]): continue
-    unique_all_labels.append(label)
-print("... all contain labels {}".format(unique_all_labels))
+    unique_all_dsets.append(label)
+print("... all contain datasets {}".format(unique_all_dsets))
+unique_all_dsets = [x for x in unique_all_dsets if not args.filter in x]
+print("... after filtering datasets {}".format(unique_all_dsets))
 
 # Plot loss curves and label with tags.
 print("... plotting and saving psnr curves")
-fig, ax = plt.subplots(1, len(unique_all_labels), figsize=(15,5))
-for il, label in enumerate(unique_all_labels):
+num_uni_all = len(unique_all_dsets)
+fig, ax = plt.subplots(1, num_uni_all, figsize=(5*num_uni_all,5))
+for il, dset in enumerate(unique_all_dsets):
     for i in range(len(logs)):
         xs = np.arange(logs[i].size()[0])
-        ys = logs[i][:,log_lists[i].index(label),0].tolist()
-        ax[il].plot(xs, ys, label=tags[i])
+        for j in range(len(value_indexs)):
+            index = value_indexs[j]
+            legend = "{}({})".format(tags[i], value_labels[j])
+            ys = logs[i][:,log_lists[i].index(dset),index].tolist()
+            ax[il].plot(xs, ys, label=legend)
+    ax[il].set_title(dset)
     ax[il].legend()
     ax[il].set_xlabel("EPOCH")
     ax[il].set_ylabel("PSNR [dB]")
-    ax[il].set_title(label)
 plt.savefig(save_path("psnr_curves.png"))
 plt.close()

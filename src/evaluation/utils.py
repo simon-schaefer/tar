@@ -75,7 +75,7 @@ def scrap_outputs(directory):
                     "PSNR_SLR_mean", "PSNR_SLR_best", "PSNR_SHRT_mean",
                     "PSNR_SHRT_best", "PSNR_SCOLT_best", "PSNR_SCOLT_mean",
                     "PSNR_SGRY_best", "PSNR_SGRY_mean"]
-    overall_keys = config_keys + results_keys + ["path", "epsball"]
+    overall_keys = config_keys + results_keys + ["path", "epsball", "perturbation"]
     scrapped = {x: [] for x in overall_keys}
     for dir in out_dirs:
         if not os.path.isfile(os.path.join(dir, "config.txt")): continue
@@ -96,6 +96,9 @@ def scrap_outputs(directory):
             scrapped["path"][-1] = dir.split("/")[-1]
             epsball = scrapped["loss"][-1].split("*")[-1]
             scrapped["epsball"][-1] = epsball if epsball.isdigit() else "0"
+            if os.path.isfile(os.path.join(dir, "perturbation.csv")):
+                df_pert = pd.read_csv(os.path.join(dir, "perturbation.csv"))
+                scrapped["perturbation"][-1] = df_pert.to_dict()
     df = pd.DataFrame.from_dict(scrapped)
     # Add model complexity to dataframe.
     complexity_dict = {x: num_model_params(x) for x in np.unique(df["model"])}

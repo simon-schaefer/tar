@@ -58,16 +58,15 @@ class _Checkpoint_(object):
                     x = line.rstrip('\n')
                     if not len(x.split(":")) == 2: continue
                     key, val = x.replace(" ", "").split(":")
-                    type = type(vars(args)[key])
-                    if type is bool and val.lower() == "true":
+                    if type(vars(args)[key]) is bool and val.lower() == "true":
                         self.args_load[key] = True
-                    elif type is bool and val.lower() == "false":
+                    elif type(vars(args)[key]) is bool and val.lower() == "false":
                         self.args_load[key] = False
                     else: self.args_load[key] = type(vars(args)[key])(val)
         if not args.load == "" and args.valid_only:
             for key, value in self.args_load.items():
-                if key in ["data_train","data_valid","scale_train",
-                           "scale_valid","valid_only","load","cpu",
+                if key in ["data_train","data_valid","scales_train",
+                           "scales_valid","valid_only","load","cpu",
                            "no_augment"]: continue
                 args.__dict__[key] = value
         # Reformat and set input arguments.
@@ -150,11 +149,11 @@ class _Checkpoint_(object):
 
     def save_pertubation(self, eps, psnrs, labels):
         """ Save perturbation array (dataset, eps) as dataframe. """
-        assert len(labels) == x.shape[0]
+        assert len(labels) == psnrs.shape[0]
         # Convert to dataframe and store as csv.
         records = []
-        for i in range(eps.size):
-            record_i = [psnrs[id,i] for id in range(pnsr_collection.shape[0])]
+        for i in range(len(eps)):
+            record_i = [psnrs[id,i] for id in range(psnrs.shape[0])]
             record_i.append(eps[i])
             records.append(record_i)
         df = pd.DataFrame.from_records(records, columns=[*labels, "epsilon"])
@@ -344,7 +343,7 @@ def all_power2(numbers):
 # =============================================================================
 def build_log_list(datasets, scales):
     log_list = []
-    if "''" in datasets:
+    if "'" in datasets:
         datasets = "".join(datasets)[1:-1].replace("'","").split(",")
         scales   = "".join(scales)[1:-1].replace("'","").split(",")
     for dv in datasets:

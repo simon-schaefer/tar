@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 from utils import parse_logging, save_path
 
 # Parse out directories from user input.
-parser = argparse.ArgumentParser(description="psnr_curves")
+parser = argparse.ArgumentParser(description="loss_curves")
 parser.add_argument("--outs", type=str, default="")
 parser.add_argument("--tags", type=str, default="")
 args = parser.parse_args()

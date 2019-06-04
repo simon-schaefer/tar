@@ -123,7 +123,7 @@ class _Trainer_VExternal_(_Trainer_):
         return ["SLR","SHRET"]
 
     def log_description(self):
-        return ["SLR_best", "SLR_mean", "SHRET_best", "SHRET_mean"]
+        return ["SHRET_best", "SHRET_mean", "SLR_best", "SLR_mean"]
 
     def scale_current(self, epoch):
         if not self.args.valid_only:
