@@ -40,7 +40,10 @@ class _Trainer_IScale_(_Trainer_):
         for i, (lr, hr, fname) in enumerate(d):
             lr, hr = self.prepare([lr, hr])
             scale  = d.dataset.scale
-            lr_out, hr_out_t = self.apply(lr, hr, scale, discretize=finetuning)
+            if not self.args.no_task_aware:
+                lr_out, hr_out_t = self.apply(lr,hr,scale,discretize=finetuning)
+            else:
+                lr_out, hr_out_t = lr.clone(), self.apply(lr,hr,scale,mode="up")
             # PSNR - Low resolution image.
             lr_out = misc.discretize(lr_out, [nmin, nmax])
             psnrs[i,0] = misc.calc_psnr(lr_out, lr, None, nmax-nmin)

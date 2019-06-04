@@ -59,7 +59,10 @@ class _Trainer_IColor_(_Trainer_):
         for i, (gry, col, fname) in enumerate(d):
             gry, col = self.prepare([gry, col])
             scale  = d.dataset.scale
-            gry_out, col_out_t = self.apply(gry, col, discretize=finetuning)
+            if not self.args.no_task_aware:
+                gry_out, col_out_t = self.apply(gry, col, discretize=finetuning)
+            else:
+                gry_out, col_out_t = gry.clone(), self.apply(gry, col, mode="up")
             # PSNR - Grey image.
             gry_out = misc.discretize(gry_out, [nmin, nmax])
             psnrs[i,0] = misc.calc_psnr(gry_out, gry, None, nmax-nmin)
