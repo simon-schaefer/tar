@@ -73,9 +73,8 @@ def scrap_outputs(directory):
                     "data_train", "scales_train", "no_task_aware"]
     results_keys = ["scale", "dataset", "RUNTIME_UP", "RUNTIME_DW", "RUNTIME_AL",
                     "PSNR_SLR_mean", "PSNR_SLR_best", "PSNR_SHRT_mean",
-                    "PSNR_SHRT_best", "PSNR_SHRB_mean", "PSNR_SHRB_best",
-                    "PSNR_SCOLT_best", "PSNR_SCOLT_mean", "PSNR_SGRY_best",
-                    "PSNR_SGRY_mean"]
+                    "PSNR_SHRT_best", "PSNR_SCOLT_best", "PSNR_SCOLT_mean",
+                    "PSNR_SGRY_best", "PSNR_SGRY_mean"]
     overall_keys = config_keys + results_keys + ["path", "epsball"]
     scrapped = {x: [] for x in overall_keys}
     for dir in out_dirs:

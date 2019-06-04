@@ -19,11 +19,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 parser = argparse.ArgumentParser(description="psnr_time")
+parser.add_argument("--directory", type=str, default="")
 parser.add_argument("--filter", type=str, default="")
 args = parser.parse_args()
 
 print("Scrapping and filtering outs data ...")
-data = scrap_outputs(directory=os.environ["SR_PROJECT_OUTS_PATH"])
+dir = os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], args.directory)
+data = scrap_outputs(directory=dir)
 data["RUNTIME_AL"] = round(data["RUNTIME_AL"]*1000, 2)
 for key_value in args.filter.split("&"):
     if key_value == "": continue
@@ -37,9 +39,6 @@ data = average_key_over_key(data, "RUNTIME_AL", "model", "dataset")
 data = average_key_over_key(data, "PSNR_SHRT_mean", "model", "dataset")
 data = average_key_over_key(data, "PSNR_SHRT_best", "model", "dataset")
 #print("... removing runtime outliers outside of [{},{}]".format(lower, upper))
-data.to_csv(save_path("data_filtered.csv"))
-data_sorted = data.sort_values("RUNTIME_AL")
-data_sorted.to_csv(save_path("data_sorted.csv"))
 
 print("... plotting psnr boxplot plots")
 f, axes = plt.subplots(figsize=(8,8))
