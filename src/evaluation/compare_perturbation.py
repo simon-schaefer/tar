@@ -8,6 +8,7 @@
 # =============================================================================
 import argparse
 import os
+import numpy as np
 
 import matplotlib
 matplotlib.use('Agg')
@@ -29,13 +30,24 @@ for index, row in data.iterrows():
     eps_psnrs[row["epsball"]] = list(row["perturbation"]["SET5x4"].values())
     epsilons = list(row["perturbation"]["epsilon"].values())
 
-
 print("... plotting epsball-psnr-correlation plot")
 f, axes = plt.subplots()
 for eps in eps_psnrs.keys():
-    plt.plot(epsilons, eps_psnrs[eps], label=eps)
+    plt.plot(epsilons, eps_psnrs[eps], label="epsilon={}".format(eps))
 plt.legend()
 plt.ylabel("PSNR [dB]")
 plt.xlabel("Perturbation - Image = [0,1]")
 plt.savefig(save_path("epsball_psnr.png"))
+plt.close()
+
+print("... plotting epsball-msr-correlation plot")
+f, axes = plt.subplots()
+for eps in eps_psnrs.keys():
+    mse = np.power(np.divide(eps_psnrs[eps], 20), -10)
+    plt.plot(epsilons, mse, label="epsilon={}".format(eps))
+plt.ylim([0, 4000])
+plt.legend()
+plt.ylabel("MSE")
+plt.xlabel("Perturbation - Image = [0,1]")
+plt.savefig(save_path("epsball_mse.png"))
 plt.close()

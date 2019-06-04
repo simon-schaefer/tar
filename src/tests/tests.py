@@ -45,8 +45,7 @@ class DataLoaderTest(unittest.TestCase):
 
     def test_div2k(self):
         args = argus.args
-        args.data_train = "DIV2K"
-        args.data_test = "DIV2K"
+        args.data_train = ["DIV2K"]
         args.patch_size, args.scale = 96, 2
         loader = dataloader._Data_(args)
         for batch, (lr, hr, files) in enumerate(loader.loader_train[2]):
@@ -86,8 +85,7 @@ class OptimizationTest(unittest.TestCase):
         # Intialize loss module input arguments.
         args = argus.args
         args.loss = "HR*1*L1"
-        args.data_train = "DIV2K"
-        args.data_test = "DIV2K"
+        args.data_train = ["DIV2K"]
         args.scales_train = 2
         ckp = miscellaneous._Checkpoint_(args)
         loader = dataloader._Data_(args)
