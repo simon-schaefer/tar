@@ -24,11 +24,11 @@ parser = argparse.ArgumentParser(description="psnr_curves")
 parser.add_argument("--outs", type=str, default="")
 parser.add_argument("--tags", type=str, default="")
 parser.add_argument("--index", type=str, default="SHRm&SLRm",
-                    help="SHR_best, SHR_mean, SLR_best, SLR_mean")
-parser.add_argument("--filter", type=str, default="")
+                    help="SHRb, SHRm, SLRb, SLRm")
+parser.add_argument("--throw", type=str, default="")
 args = parser.parse_args()
 outs, tags = args.outs.split("&"), args.tags.split("&")
-index_dict = {"SHRb": 0, "SHRm": 1, "SLRb": 4, "SLRm": 5}
+index_dict = {"SHRb": 0, "SHRm": 1, "SLRb": 2, "SLRm": 3}
 value_labels = args.index.split("&")
 value_indexs = [index_dict[x] for x in args.index.split("&")]
 assert len(outs) == len(tags)
@@ -46,7 +46,7 @@ for label in unique_dsets:
     if not all([label in x for x in log_lists]): continue
     unique_all_dsets.append(label)
 print("... all contain datasets {}".format(unique_all_dsets))
-unique_all_dsets = [x for x in unique_all_dsets if not args.filter in x]
+unique_all_dsets = [x for x in unique_all_dsets if not args.throw in x]
 print("... after filtering datasets {}".format(unique_all_dsets))
 
 # Plot loss curves and label with tags.

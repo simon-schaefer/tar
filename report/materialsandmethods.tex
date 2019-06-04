@@ -86,10 +86,10 @@ L1(X_{GD}, X_{SLR}) & \text{if } ||L1/d_{max}|| \geq \epsilon
 
 with $||L1/d_{max}||$ being the $L1(X_{GD}, X_{SLR})$ loss normalized
 by the maximal deviation between $X_{GD}$ and $X_{SLR}$. Hence, $L_{LATENT}$
-is zero in an $l1$-ball around the guidance image, ensuring that \ac{SLR} is
+is zero in an $\eps$-ball around the guidance image, ensuring that \ac{SLR} is
 close to the guidance image but also helps to prevent overfitting to the trivial
 solution $X_{GD} = X_{SLR} \Leftrightarrow g_\phi = 0$. As shown in
-\mychapterref{sec:ExperimentsandResults} introducing an $l1$-ball also improves
+\mychapterref{sec:ExperimentsandResults} introducing an $\eps$-ball also improves
 the model's robustness against perturbations.
 \newline
 The overall loss function is a weighted sum of both of the loss function

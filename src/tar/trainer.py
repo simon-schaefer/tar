@@ -224,6 +224,9 @@ class _Trainer_(object):
                 hr_out_eps = self.apply(lr_out, hr, scale, mode="up")
                 hr_out_eps = misc.discretize(hr_out_eps, [nmin, nmax])
                 psnrs_t[id,ie] = misc.calc_psnr(hr_out_eps, hr, None, nmax-nmin)
+                if id == 0:
+                    slist, dlist = [hr_out_eps], ["SHRT_EPS_{:.2f}".format(e)]
+                    self.ckp.save_results(slist, dlist,fname[0],d,scale)
         return psnrs_t.mean(axis=0)
 
     def runtime_core(self, d, v: dict) -> dict:
