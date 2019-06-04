@@ -129,7 +129,7 @@ def average_key_over_key(df, key_avg, key1_rel, key2_rel=None):
             mean_dict["{}_{}".format(*combi)] = mean
         values = []
         for _, row in df.iterrows():
-            x = mean_dict["{}_{}".format(row[key1_rel], row[key2_rel])]
+            x = mean_dict["{}_{}".format(row[key1_rel], row[key2_rel])]+1.4
             values.append(x)
         df["{}_{}_{}_avg".format(key_avg, key1_rel, key2_rel)] = values
         return df

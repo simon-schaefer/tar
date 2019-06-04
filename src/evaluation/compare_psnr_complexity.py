@@ -9,6 +9,7 @@ import argparse
 import numpy as np
 import os
 import pandas as pd
+from scipy.optimize import curve_fit
 
 from utils import average_key_over_key, remove_outliers, scrap_outputs, save_path
 
@@ -20,13 +21,16 @@ import seaborn as sns
 
 parser = argparse.ArgumentParser(description="psnr_time")
 parser.add_argument("--directory", type=str, default="")
+parser.add_argument("--psnr_tag", type=str, default="SHRT",
+                    choices=("SHRT_mean", "SCOLT_mean",
+                             "SHRT_best", "SCOLT_best"))
 parser.add_argument("--filter", type=str, default="")
 args = parser.parse_args()
 
 print("Scrapping and filtering outs data ...")
 dir = os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], args.directory)
 data = scrap_outputs(directory=dir)
-data["RUNTIME_AL"] = round(data["RUNTIME_AL"]*1000, 2)
+psnr_tag = "PSNR_{}".format(args.psnr_tag)
 for key_value in args.filter.split("&"):
     if key_value == "": continue
     key, value = key_value.split(":")
@@ -35,33 +39,43 @@ for key_value in args.filter.split("&"):
     else:
         data = data[data[key] == value]
 print("... averaging over models")
-data = average_key_over_key(data, "RUNTIME_AL", "model", "dataset")
-data = average_key_over_key(data, "PSNR_SHRT_mean", "model", "dataset")
-data = average_key_over_key(data, "PSNR_SHRT_best", "model", "dataset")
-#print("... removing runtime outliers outside of [{},{}]".format(lower, upper))
+data = average_key_over_key(data, psnr_tag, "model", "dataset")
 
 print("... plotting psnr boxplot plots")
 f, axes = plt.subplots(figsize=(8,8))
-sns.violinplot(x="model",y="PSNR_SHRT_mean",data=data, orient='v')
+sns.violinplot(x="model",y=psnr_tag,data=data, orient='v')
 plt.ylabel("PSNR [dB]")
-plt.xticks(rotation=30)
+plt.xticks(rotation=20)
 plt.savefig(save_path("pnsr_boxplot.png"))
 plt.close()
 
-print("... plotting runtime boxplot plots")
-f, axes = plt.subplots(figsize=(8,8))
-sns.boxplot(x="dataset",y="RUNTIME_AL_model_dataset_avg",
-            hue="model", data=data, orient='v')
-plt.ylabel("RUNTIME OVERALL [ms]")
-plt.xticks(rotation=30)
-plt.savefig(save_path("runtime_boxplot.png"))
-plt.close()
+print("... regressing non-linear function")
+def func(x, a, b, c, d):
+    return a + b*x + c*np.exp(d*x)
 
 print("... plotting complexity-psnr-correlation plot")
-f, axes = plt.subplots(figsize=(8,8))
-sns.catplot(x="complexity", y="PSNR_SHRT_best_model_dataset_avg",
-            hue="model", col="dataset", data=data)
-axes.set_ylabel("PSNR [dB]")
-axes.set_xlabel("Model complexity")
+unique_datasets  = np.unique(data["dataset"])
+num_unique_dsets = len(unique_datasets)
+f, axes = plt.subplots(1, num_unique_dsets, figsize=(8*num_unique_dsets,8))
+for id, dataset in enumerate(unique_datasets):
+    xs, ys = [], []
+    # Plot actual data.
+    for index, row in data.iterrows():
+        if not row["dataset"] == dataset: continue
+        x, y = row["complexity"], row["{}_model_dataset_avg".format(psnr_tag)]
+        axes[id].scatter(x, y, marker='x')
+        axes[id].text(x+.03, y+.03, row["model"], fontsize=9)
+        xs.append(x/100000); ys.append(y)
+    # Plot non-linear regression.
+    guess_params = [120, 100, -10, -0.01]
+    popt, _      = curve_fit(func, xs, ys, guess_params)
+    xs_plot = (np.linspace(np.min(xs), np.max(xs), num=20)*100000).tolist()
+    print(popt)
+    print("-"*20)
+    ys_plot = [func(x/100000, *popt) for x in xs_plot]
+    axes[id].plot(xs_plot, ys_plot, '--')
+    axes[id].set_title(dataset)
+    axes[id].set_ylabel("PSNR [dB]")
+    axes[id].set_xlabel("Model complexity")
 plt.savefig(save_path("psnr_complexity_linear.png"))
 plt.close()
