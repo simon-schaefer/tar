@@ -27,6 +27,7 @@ dir = os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], args.directory)
 data = scrap_outputs(directory=dir)
 epsilons, eps_psnrs = [], {}
 for index, row in data.iterrows():
+    if not "perturbation" in row.keys(): continue
     eps_psnrs[row["epsball"]] = list(row["perturbation"]["SET5x4"].values())
     epsilons = list(row["perturbation"]["epsilon"].values())
 

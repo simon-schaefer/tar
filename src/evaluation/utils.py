@@ -12,22 +12,6 @@ import pandas as pd
 import tar
 import torch
 
-def add_baseline_results(data):
-    data_base_sisr = pd.DataFrame([[31.81, 671350, "SET5", "Kim et al."],
-        [31.81, "x4", "[4]", 671350, "SET5", "Kim et al."],
-        [28.63, "x4", "[4]", 671350, "SET14", "Kim et al."],
-        [28.51, "x4", "[4]", 671350, "BSDS100", "Kim et al."],
-        [26.63, "x4", "[4]", 671350, "URBAN100", "Kim et al."],
-        [31.16, "x4", "[4]", 671350, "VDIV2K", "Kim et al."]],
-        columns=["PSNR_SHRT_mean", "scale", "scales_train", "complexity", "dataset", "model"])
-    data_base_sisr["PSNR_SHRT_mean"] = data_base_sisr["PSNR_SHRT_mean"] - 2.0
-    data = data.append(data_base_sisr, sort=False)
-    data_base_ic = pd.DataFrame([[36.14, 671350, "BSDS100", "Kim et al."],
-        [33.68, 671350, "URBAN100", "Kim et al."]],
-        columns=["PSNR_SCOLT_mean", "complexity", "dataset", "model"])
-    data = data.append(data_base_ic, sort=False)
-    return data
-
 def read_config_file(fname):
     d = {}
     with open(fname) as f:
@@ -120,6 +104,22 @@ def scrap_outputs(directory):
     complexity_dict = {x: num_model_params(x) for x in np.unique(df["model"])}
     df["complexity"] = df["model"].apply(lambda x: complexity_dict[x])
     return df
+
+def add_baseline_results(data):
+    data_base_sisr = pd.DataFrame([[31.81, 671350, "SET5", "Kim et al."],
+        [31.81, "x4", "[4]", 671350, "SET5", "Kim et al."],
+        [28.63, "x4", "[4]", 671350, "SET14", "Kim et al."],
+        [28.51, "x4", "[4]", 671350, "BSDS100", "Kim et al."],
+        [26.63, "x4", "[4]", 671350, "URBAN100", "Kim et al."],
+        [31.16, "x4", "[4]", 671350, "VDIV2K", "Kim et al."]],
+        columns=["PSNR_SHRT_mean", "scale", "scales_train", "complexity", "dataset", "model"])
+    data_base_sisr["PSNR_SHRT_mean"] = data_base_sisr["PSNR_SHRT_mean"] - 2.0
+    data = data.append(data_base_sisr, sort=False)
+    data_base_ic = pd.DataFrame([[36.14, 671350, "BSDS100", "Kim et al."],
+        [33.68, 671350, "URBAN100", "Kim et al."]],
+        columns=["PSNR_SCOLT_mean", "complexity", "dataset", "model"])
+    data = data.append(data_base_ic, sort=False)
+    return data
 
 def filter_string(phrase, punctuation='[^!?]+:', space=False):
     for x in phrase.lower():
