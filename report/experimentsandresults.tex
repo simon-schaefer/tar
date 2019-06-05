@@ -1,3 +1,4 @@
+% !Tex root = main.tex
 \newpage
 \section{Experiments and Results}
 \label{sec:ExperimentsandResults}
@@ -47,6 +48,9 @@ validated on the widely known Vid4 dataset (Calendar, Foliage, Walk, City).
 For improving generalization capabilities of the model and avoid overfitting
 the image training data were also augmented (rotated, mirrored).
 \newline
+Similiarly, as widely used in the field of image reconstruction as a performance
+measurement the \ac{PSNR} will be used.
+\newline
 A complete list of the most important testing configurations and their results
 can be found in the appendix.
 
@@ -63,7 +67,7 @@ image.} However, the main contribution of the $\epsilon$-ball consists in the
 increasing robustness against perturbations of $X_{SLR}$, which are modeled
 as white Gaussian noise with standard deviation $\sigma$ within this project.
 While a model trained with $\epsilon = 0$ is highly vulnerable to perturbations,
-dropping $PSNR$ by $42 \%$ by adding noise with $\sigma = 0.11$ ($X_{SLR} \in
+dropping \ac{PSNR} by $42 \%$ by adding noise with $\sigma = 0.11$ ($X_{SLR} \in
 [0,1]^n$), a model trained with $\epsilon = 10$ is more stable dropping only
 about $10 \%$ in the same scenario (scale = 4, dataset = SET14).
 
@@ -81,7 +85,9 @@ radii of the $\epsilon$-ball. It turns out that the right choice of $\epsilon$
 is a trade-off between the reconstruction performance and robustness aginst
 perturbations, comp. \myfigref{fig:epsball_perturbation}. Also an increasing
 $\epsilon$ improves the convergence rate during training, as shown in
-\myfigref{fig:epsball_loss}. 
+\myfigref{fig:epsball_loss}, the model otherwise first overfits to $X_{GD}$
+and then eventually finds a more optimal trade-off between fitting the
+low- and high-dimensional image (with increasing $\frac{\alpha}{\beta}$ ratio).
 
 \begin{figure}[!htbp]
 	\centering
@@ -101,9 +107,19 @@ $\epsilon$ improves the convergence rate during training, as shown in
   \label{fig:epsball_loss}
 \end{figure}
 
+However, as \myfigref{fig:epsball_perturbation} the radius of the $\epsilon$-ball
+around $X_{GD}$ cannot be choosen infinitely large, since the overall performance
+worsens as the impact of the guidance image on the model convergence decreases
+(e.g. $\epsilon = 100$ in \myfigref{fig:epsball_perturbation}). Overall an
+radius $\epsilon = 20$ was found to be the best performing configuration.
+Although described for the \ac{SISR} problem here the described impact of
+the $\epsilon$-ball is similar over all other problems, which omitted here
+for the matter of compactness of this report.
 
 \subsection{Single-Image Super-Resolution}
 \label{sec:Experiments_SISR}
+
+
 
 \begin{enumerate}
 \item different scales
