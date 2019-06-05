@@ -67,13 +67,13 @@ for id, dataset in enumerate(unique_datasets):
         axes[id].text(x+.03, y+.03, row["model"], fontsize=9)
         xs.append(x/100000); ys.append(y)
     # Plot non-linear regression.
-    guess_params = [120, 100, -10, -0.01]
-    popt, _      = curve_fit(func, xs, ys, guess_params)
-    xs_plot = (np.linspace(np.min(xs), np.max(xs), num=20)*100000).tolist()
-    print(popt)
-    print("-"*20)
-    ys_plot = [func(x/100000, *popt) for x in xs_plot]
-    axes[id].plot(xs_plot, ys_plot, '--')
+    # guess_params = [120, 100, -10, -0.01]
+    # popt, _      = curve_fit(func, xs, ys, guess_params)
+    # xs_plot = (np.linspace(np.min(xs), np.max(xs), num=20)*100000).tolist()
+    # print(popt)
+    # print("-"*20)
+    # ys_plot = [func(x/100000, *popt) for x in xs_plot]
+    # axes[id].plot(xs_plot, ys_plot, '--')
     axes[id].set_title(dataset)
     axes[id].set_ylabel("PSNR [dB]")
     axes[id].set_xlabel("Model complexity")
