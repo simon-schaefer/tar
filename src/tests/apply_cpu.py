@@ -20,8 +20,8 @@ import seaborn as sns
 import tar
 
 device     = "cpu"
-model_name = "AETAD"
-model_path = "models/iscale4/model"
+model_name = "AETAD_VERY_SMALL"
+model_path = "models/aetad_very_small/model"
 img_path   = "src/tests/ressources/0002.png"
 num_trials = 10
 

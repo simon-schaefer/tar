@@ -35,8 +35,8 @@ training procedure. Next to enhancing the loss function as discussed in
 \mysecref{sec:Approach_LF} instead of a constant an linearly annealing learning
 rate was used, starting at $4*10^{-4}$ and annealing by factor $\gamma = 0.25$
 after $20$, $100$ and again after $200$ training epochs. Adam optimizer was used
-with $\beta = (0.9, 0.999)$, $\epsilon = 10^{-8}$, gradient clipping and  zero
-weight decay.
+with $\beta = (0.9, 0.999)$, $\epsilon_{ADAM} = 10^{-8}$, gradient clipping and
+zero weight decay.
 \newline
 To guarantee comparability to other super-resolution and colorization paper
 in the image domain the model was trained using the DIV2K training dataset
@@ -52,7 +52,7 @@ Similiarly, as widely used in the field of image reconstruction as a performance
 measurement the \ac{PSNR} will be used.
 \newline
 A complete list of the most important testing configurations and their results
-can be found in the appendix.
+as well as a list of architectures can be found in the appendix.
 
 \subsection{Impact of L1 Ball}
 \label{sec:Experiments_EPS_BALL}
@@ -83,19 +83,29 @@ In the following experiment the same model (AETAD)\footnote{An overview over
 all model architectures can be found in the appendix.} was trained with different
 radii of the $\epsilon$-ball. It turns out that the right choice of $\epsilon$
 is a trade-off between the reconstruction performance and robustness aginst
-perturbations, comp. \myfigref{fig:epsball_perturbation}. Also an increasing
-$\epsilon$ improves the convergence rate during training, as shown in
-\myfigref{fig:epsball_loss}, the model otherwise first overfits to $X_{GD}$
-and then eventually finds a more optimal trade-off between fitting the
-low- and high-dimensional image (with increasing $\frac{\alpha}{\beta}$ ratio).
+perturbations, comp. \myfigref{fig:epsball_perturbation}.
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=8cm]{figures/epsball_perturbation}
+	\includegraphics[width=10cm]{figures/epsball_perturbation}
 	\caption{Reconstruction performance over several values of $\epsilon$
   and $\sigma$ (scale = 4).}
   \label{fig:epsball_perturbation}
 \end{figure}
+
+Also an increasing
+$\epsilon$ improves the convergence rate during training, as shown in
+\myfigref{fig:epsball_loss}, the model otherwise first overfits to $X_{GD}$
+and then eventually finds a more optimal trade-off between fitting the
+low- and high-dimensional image (with increasing $\frac{\alpha}{\beta}$ ratio).
+However, as \myfigref{fig:epsball_perturbation} the radius of the $\epsilon$-ball
+around $X_{GD}$ cannot be choosen infinitely large, since the overall performance
+worsens as the impact of the guidance image on the model convergence decreases
+(e.g. $\epsilon = 100$ in \myfigref{fig:epsball_perturbation}). Overall an
+radius $\epsilon = 20$ was found to be the best performing configuration.
+Although described for the \ac{SISR} problem here the described impact of
+the $\epsilon$-ball is similar over all other problems, which omitted here
+for the matter of compactness of this report.
 
 \begin{figure}[!htbp]
 	\centering
@@ -107,24 +117,50 @@ low- and high-dimensional image (with increasing $\frac{\alpha}{\beta}$ ratio).
   \label{fig:epsball_loss}
 \end{figure}
 
-However, as \myfigref{fig:epsball_perturbation} the radius of the $\epsilon$-ball
-around $X_{GD}$ cannot be choosen infinitely large, since the overall performance
-worsens as the impact of the guidance image on the model convergence decreases
-(e.g. $\epsilon = 100$ in \myfigref{fig:epsball_perturbation}). Overall an
-radius $\epsilon = 20$ was found to be the best performing configuration.
-Although described for the \ac{SISR} problem here the described impact of
-the $\epsilon$-ball is similar over all other problems, which omitted here
-for the matter of compactness of this report.
-
 \subsection{Single-Image Super-Resolution}
 \label{sec:Experiments_SISR}
+Next to improving the robustness of the \ac{TAD} model several improvements
+were made on both the way of training as well as on the architecture itself.
+\myfigref{fig:psnr_complexty_sisr} shows the correlation on both the SET5
+and the SET14 dataset for different architectures which were trained using the
+same parameters (learning parameters as described above, $\epsilon = 10$) for
+the sake of a comparability.
 
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=14cm]{figures/psnr_complexty_sisr}
+	\caption{Model complexity vs reconstruction performance for \ac{SISR}
+	problem (scale = 4, dataset = SET14 and SET5).}
+  \label{fig:psnr_complexty_sisr}
+\end{figure}
 
+Several conclusion can be drawn from \myfigref{fig:psnr_complexty_sisr}, which
+could be confirmed also for the other validation datasets used:
+
+\begin{itemize}
+\item The \textit{Resblocks} have a large impact on the models performance,
+purely convolutional models with neither a skip connection nor a ReLU layer
+(as occurring in \textit{Resblocks}), such as the models \textit{conv\_only} or
+\textit{conv\_only\_very\_large}, have an overall worse reconstruction
+performance with a similar number of parameters.
+\item In a direct comparison the model \textit{aetad\_direct4} performs worse
+than the iteratively scaling structured, but otherwise equivalent model
+\textit{aetad}.
+\item In both displayed validation datasets the reconstruction performance
+stagnates with increasing number of parameters, as the difference in \ac{PSNR}
+between the \textit{aetad\_large} and the \textit{aetad\_very\_large}
+model does not improve much anymore.
+\end{itemize}
+
+While more complex architectures than the baseline (\textit{Kim et al.}-model)
+do not gain a lot of accuracy, for less complex models with similar architecture
+there is a large drop in accurcy. Therefore, the baseline architecture already
+is very reasonable.
 
 \begin{enumerate}
-\item different scales
-\item very large scales
+\item different scales (maybe large scales as well)
 \item performance on other non-trained scales
+\item final model for other scales and other datasets
 \end{enumerate}
 
 \subsection{Image Colorization}
@@ -139,6 +175,8 @@ for the matter of compactness of this report.
 
 \subsection{Qualitative Improvements}
 \label{sec:Experiments_QI}
+
+
 
 \begin{enumerate}
 \item gummibear image (TAD learns to downscale an image task-aware and thereby
