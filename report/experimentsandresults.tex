@@ -52,7 +52,54 @@ can be found in the appendix.
 
 \subsection{Impact of L1 Ball}
 \label{sec:Experiments_EPS_BALL}
+As already seen in \mychapterref{sec:Approach} introducing an $\epsilon$-ball
+to the loss term pervents the model from overfitting on the low-dimensional
+image, $X_{SLR} = X_{GD}$ (i.e. trivial solution $g_\theta = 0$ in the
+beginning of the training).\footnote{As discussed in \mychapterref{sec:Approach}
+the training is splitted into two parts, first learning only the difference
+between the guidance image and a more optimal representation and later
+learning the low-dimensional representation independent from the guidance
+image.} However, the main contribution of the $\epsilon$-ball consists in the
+increasing robustness against perturbations of $X_{SLR}$, which are modeled
+as white Gaussian noise with standard deviation $\sigma$ within this project.
+While a model trained with $\epsilon = 0$ is highly vulnerable to perturbations,
+dropping $PSNR$ by $42 \%$ by adding noise with $\sigma = 0.11$ ($X_{SLR} \in
+[0,1]^n$), a model trained with $\epsilon = 10$ is more stable dropping only
+about $10 \%$ in the same scenario (scale = 4, dataset = SET14).
 
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=8cm]{figures/epsball_qualitative_comp}
+	\caption{Qualitative comparison between the impact of perturbation on a
+  model trained without and with $\epsilon$-ball (scale = 4, dataset = SET14).}
+  \label{fig:epsball_qualitative_comp}
+\end{figure}
+
+In the following experiment the same model (AETAD)\footnote{An overview over
+all model architectures can be found in the appendix.} was trained with different
+radii of the $\epsilon$-ball. It turns out that the right choice of $\epsilon$
+is a trade-off between the reconstruction performance and robustness aginst
+perturbations, comp. \myfigref{fig:epsball_perturbation}. Also an increasing
+$\epsilon$ improves the convergence rate during training, as shown in
+\myfigref{fig:epsball_loss}. 
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=8cm]{figures/epsball_perturbation}
+	\caption{Reconstruction performance over several values of $\epsilon$
+  and $\sigma$ (scale = 4).}
+  \label{fig:epsball_perturbation}
+\end{figure}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=6cm]{figures/epsball_loss_1_set14}
+  \includegraphics[width=6cm]{figures/epsball_loss_50_set14}
+	\caption{Closeness between $X_{SLR}$ and guidance image (blue) and $X_{SHR}$
+  and groudtruth image (orange) for different values of $\epsilon$ (left:
+  $\epsilon = 1$, right $\epsilon = 50$).}
+  \label{fig:epsball_loss}
+\end{figure}
 
 
 \subsection{Single-Image Super-Resolution}
