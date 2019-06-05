@@ -11,7 +11,7 @@ import numpy as np
 import os
 import pandas as pd
 
-from utils import scrap_outputs, save_path
+from utils import *
 
 parser = argparse.ArgumentParser(description="psnr_time")
 parser.add_argument("--directory", type=str, default="")
@@ -19,12 +19,17 @@ parser.add_argument("--filter", type=str, default="")
 parser.add_argument("--sort", type=str, default="")
 args = parser.parse_args()
 
-print("Scrapping and filtering outs data ...")
+print("Scrapping outs data ...")
 dir = os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], args.directory)
 data = scrap_outputs(directory=dir)
 data["RUNTIME_AL"] = round(data["RUNTIME_AL"]*1000, 2)
 data["RUNTIME_DW"] = round(data["RUNTIME_DW"]*1000, 2)
 data["RUNTIME_UP"] = round(data["RUNTIME_UP"]*1000, 2)
+
+print("... add baseline results")
+data = add_baseline_results(data)
+
+print("... filtering data")
 for key_value in args.filter.split("&"):
     if key_value == "": continue
     key, value = key_value.split(":")
@@ -32,6 +37,7 @@ for key_value in args.filter.split("&"):
         data = data[data[key].isin(value.split("/"))]
     else:
         data = data[data[key] == value]
+
 print("... dropping pure NaN columns")
 data = data.dropna(axis=1, how='all')
 if args.sort != "":

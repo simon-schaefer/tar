@@ -11,7 +11,7 @@ import os
 import pandas as pd
 from scipy.optimize import curve_fit
 
-from utils import average_key_over_key, remove_outliers, scrap_outputs, save_path
+from utils import *
 
 import matplotlib
 matplotlib.use('Agg')
@@ -21,16 +21,21 @@ import seaborn as sns
 
 parser = argparse.ArgumentParser(description="psnr_time")
 parser.add_argument("--directory", type=str, default="")
-parser.add_argument("--psnr_tag", type=str, default="SHRT",
+parser.add_argument("--psnr_tag", type=str, default="SHRTm",
                     choices=("SHRT_mean", "SCOLT_mean",
                              "SHRT_best", "SCOLT_best"))
 parser.add_argument("--filter", type=str, default="")
 args = parser.parse_args()
 
-print("Scrapping and filtering outs data ...")
+print("Scrapping outs data ...")
+psnr_tag = "PSNR_{}".format(args.psnr_tag)
 dir = os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], args.directory)
 data = scrap_outputs(directory=dir)
-psnr_tag = "PSNR_{}".format(args.psnr_tag)
+
+print("... add baseline results")
+data = add_baseline_results(data)
+
+print("... filtering outs data")
 for key_value in args.filter.split("&"):
     if key_value == "": continue
     key, value = key_value.split(":")
@@ -38,6 +43,7 @@ for key_value in args.filter.split("&"):
         data = data[data[key].isin(value.split("/"))]
     else:
         data = data[data[key] == value]
+
 print("... averaging over models")
 data = average_key_over_key(data, psnr_tag, "model", "dataset")
 
@@ -49,9 +55,9 @@ plt.xticks(rotation=20)
 plt.savefig(save_path("pnsr_boxplot.png"))
 plt.close()
 
-print("... regressing non-linear function")
-def func(x, a, b, c, d):
-    return a + b*x + c*np.exp(d*x)
+# print("... regressing non-linear function")
+# def func(x, a, b, c, d):
+#     return a + b*x + c*np.exp(d*x)
 
 print("... plotting complexity-psnr-correlation plot")
 unique_datasets  = np.unique(data["dataset"])
