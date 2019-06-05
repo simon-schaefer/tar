@@ -26,9 +26,13 @@ parser.add_argument("--tags", type=str, default="")
 parser.add_argument("--index", type=str, default="SHRm&SLRm",
                     help="SHRb, SHRm, SLRb, SLRm")
 parser.add_argument("--throw", type=str, default="")
+parser.add_argument("--old_config", action="store_true")
 args = parser.parse_args()
 outs, tags = args.outs.split("&"), args.tags.split("&")
-index_dict = {"SHRb": 0, "SHRm": 1, "SLRb": 2, "SLRm": 3}
+if args.old_config:
+    index_dict = {"SHRb": 0, "SHRm": 1, "SLRb": 4, "SLRm": 5}
+else:
+    index_dict = {"SHRb": 0, "SHRm": 1, "SLRb": 2, "SLRm": 3}
 value_labels = args.index.split("&")
 value_indexs = [index_dict[x] for x in args.index.split("&")]
 assert len(outs) == len(tags)
