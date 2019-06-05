@@ -67,7 +67,7 @@ class _Checkpoint_(object):
             for key, value in self.args_load.items():
                 if key in ["data_train","data_valid","scales_train",
                            "scales_valid","valid_only","load","cpu",
-                           "no_augment"]: continue
+                           "no_augment", "resume"]: continue
                 args.__dict__[key] = value
         # Reformat and set input arguments.
         args      = reformat_args(args)
