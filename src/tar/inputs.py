@@ -172,6 +172,10 @@ def set_template(args):
         args.model      = "AETAD_VERY_LARGE"
         if args.template.count("ICOLOR") > 0:
             args.model  = "AETAD_COLOR_VERY_LARGE"
+    if args.template.count("AETAD_SKIP") > 0:
+        args.model      = "AETAD_SKIP"
+    if args.template.count("AETAD_SKIP2") > 0:
+        args.model      = "AETAD_SKIP2"
     if args.template.count("CONV_ONLY") > 0:
         args.model      = "CONV_ONLY"
     if args.template.count("CONV_ONLY_LARGE") > 0:
