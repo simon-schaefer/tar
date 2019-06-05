@@ -20,8 +20,7 @@ class AETAD_COLOR_VERY_LARGE(nn.Module):
         # Build encoding part.
         self._downscaling = nn.Sequential(
             nn.Conv2d(3, 8, 3, stride=1, padding=1),
-            nn.Conv2d(8, 16, 3, stride=1, padding=1),
-            _ReversePixelShuffle_(downscale_factor=2),
+            nn.Conv2d(8, 64, 3, stride=1, padding=1),
         )
         self._res_en1 = _Resblock_(64)
         self._res_en2 = _Resblock_(64)
@@ -44,9 +43,8 @@ class AETAD_COLOR_VERY_LARGE(nn.Module):
         self._conv_de2 = nn.Conv2d(64, 64, 3, stride=1, padding=1)
         self._conv_de3 = nn.Conv2d(64, 64, 3, stride=1, padding=1)
         self._upscaling = nn.Sequential(
-            nn.Conv2d(64, 256, 3, stride=1, padding=1),
-            nn.PixelShuffle(upscale_factor=2),
-            nn.Conv2d(64, 3, 3, stride=1, padding=1)
+            nn.Conv2d(64, 8, 3, stride=1, padding=1),
+            nn.Conv2d(8, 3, 3, stride=1, padding=1),
         )
 
     def encode(self, x: torch.Tensor) -> torch.Tensor:              # b, 3, p, p

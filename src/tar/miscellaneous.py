@@ -356,7 +356,10 @@ def reformat_args(args):
         if type(inputs) == list: return inputs
         elif type(inputs) == int: return [inputs]
         elif type(inputs) == str and inputs[0] == "[":
-            return [int(x) for x in inputs[1:-1].split(",")]
+            try:
+                return [int(x) for x in inputs[1:-1].split(",")]
+            except ValueError:
+                return [float(x) for x in inputs[1:-1].split(",")]
         elif type(inputs) == str and inputs[0] == "(":
             return [float(x) for x in inputs[1:-1].split(",")]
 
