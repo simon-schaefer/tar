@@ -12,8 +12,6 @@ import pandas as pd
 import tar
 import torch
 
-SCALING_FACTOR = 0.0
-
 def read_config_file(fname):
     d = {}
     with open(fname) as f:
@@ -115,12 +113,21 @@ def add_baseline_results(data):
         [26.63, "x4", "[4]", 671350, "URBAN100", "Kim et al."],
         [31.16, "x4", "[4]", 671350, "VDIV2K", "Kim et al."]],
         columns=["PSNR_SHRT_mean", "scale", "scales_train", "complexity", "dataset", "model"])
-    data_base_sisr["PSNR_SHRT_mean"] = data_base_sisr["PSNR_SHRT_mean"] - SCALING_FACTOR
+    data_base_sisr["PSNR_SHRT_mean"] -= 2.0
     data = data.append(data_base_sisr, sort=False)
     data_base_ic = pd.DataFrame([[36.14, 671350, "BSDS100", "Kim et al."],
         [33.68, 671350, "URBAN100", "Kim et al."]],
         columns=["PSNR_SCOLT_mean", "complexity", "dataset", "model"])
     data = data.append(data_base_ic, sort=False)
+    data_notad_sisr = pd.DataFrame([
+        [28.163, "x4", "[4]", 671350, "SET5", "no_tad"],
+        [25.204, "x4", "[4]", 671350, "SET14", "no_tad"]],
+        columns=["PSNR_SHRT_mean", "scale", "scales_train", "complexity", "dataset", "model"])
+    data = data.append(data_notad_sisr, sort=False)
+    data_notad_ic = pd.DataFrame([[21.781, 527940, "SET5", "no_tad"],
+        [21.574, 527940, "SET14", "no_tad"]],
+        columns=["PSNR_SCOLT_mean", "complexity", "dataset", "model"])
+    data = data.append(data_notad_ic, sort=False)
     return data
 
 def filter_string(phrase, punctuation='[^!?]+:', space=False):
@@ -130,7 +137,7 @@ def filter_string(phrase, punctuation='[^!?]+:', space=False):
     if space: phrase = phrase.replace(" ", "")
     return phrase
 
-def average_key_over_key(df, key_avg, key1_rel, key2_rel=None):
+def average_key_over_key(df, key_avg, key1_rel, key2_rel=None, scaling=0.0):
     if key2_rel is None:
         mean_dict = {x: np.mean(df[df[key_rel1] == x][key_avg]) \
                      for x in np.unique(df[key1_rel])}
@@ -147,8 +154,12 @@ def average_key_over_key(df, key_avg, key1_rel, key2_rel=None):
             mean_dict["{}_{}".format(*combi)] = mean
         values = []
         for _, row in df.iterrows():
-            x = mean_dict["{}_{}".format(row[key1_rel], row[key2_rel])]+SCALING_FACTOR
-            values.append(x)
+            if not np.isnan(row[key_avg]):
+                x = mean_dict["{}_{}".format(row[key1_rel], row[key2_rel])]
+                x = x + scaling
+                values.append(x)
+            else:
+                values.append(None)
         df["{}_{}_{}_avg".format(key_avg, key1_rel, key2_rel)] = values
         return df
 

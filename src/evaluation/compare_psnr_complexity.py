@@ -25,6 +25,7 @@ parser.add_argument("--psnr_tag", type=str, default="SHRTm",
                     choices=("SHRT_mean", "SCOLT_mean",
                              "SHRT_best", "SCOLT_best"))
 parser.add_argument("--filter", type=str, default="")
+parser.add_argument("--scaling", type=int, default=0.0)
 args = parser.parse_args()
 
 print("Scrapping outs data ...")
@@ -45,7 +46,7 @@ for key_value in args.filter.split("&"):
         data = data[data[key] == value]
 
 print("... averaging over models")
-data = average_key_over_key(data, psnr_tag, "model", "dataset")
+data = average_key_over_key(data, psnr_tag, "model", "dataset", args.scaling)
 
 print("... plotting psnr boxplot plots")
 f, axes = plt.subplots(figsize=(8,8))
