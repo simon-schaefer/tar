@@ -162,16 +162,22 @@ def set_template(args):
             args.model  = "AETAD_COLOR_SMALL"
     if args.template.count("AETAD_VERY_SMALL") > 0:
         args.model      = "AETAD_VERY_SMALL"
+        if args.template.count("ICOLOR") > 0:
+            args.model  = "AETAD_COLOR_VERY_SMALL"
     if args.template.count("AETAD_LARGE") > 0:
         args.model      = "AETAD_LARGE"
         if args.template.count("ICOLOR") > 0:
             args.model  = "AETAD_COLOR_LARGE"
     if args.template.count("AETAD_VERY_LARGE") > 0:
         args.model      = "AETAD_VERY_LARGE"
+        if args.template.count("ICOLOR") > 0:
+            args.model  = "AETAD_COLOR_VERY_LARGE"
     if args.template.count("CONV_ONLY") > 0:
         args.model      = "CONV_ONLY"
     if args.template.count("CONV_ONLY_LARGE") > 0:
         args.model      = "CONV_ONLY_LARGE"
+        if args.template.count("ICOLOR") > 0:
+            args.model  = "CONV_ONLY_COLOR_LARGE"
     if args.template.count("CONV_ONLY_VERY_LARGE") > 0:
         args.model      = "CONV_ONLY_VERY_LARGE"
     # Type.
