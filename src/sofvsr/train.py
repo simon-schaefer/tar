@@ -32,6 +32,8 @@ def main(cfg):
     train_set = TrainsetLoader(cfg.trainsets, cfg.upscale_factor, cfg.patch_size, cfg.n_iters)
     train_loader = DataLoader(train_set, num_workers=4, batch_size=cfg.batch_size, shuffle=True)
     log_dir = os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], "sofvsr")
+    print(cfg.trainsets)
+    log_dir = log_dir + "_" + "".join(cfg.trainsets)
     log_dir = log_dir + "x" + str(cfg.upscale_factor)
     os.makedirs(log_dir, exist_ok=True)
 
