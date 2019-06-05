@@ -128,7 +128,7 @@ the sake of a comparability.
 
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=14cm]{figures/psnr_complexty_sisr}
+	\includegraphics[width=18cm]{figures/psnr_complexity_sisr}
 	\caption{Model complexity vs reconstruction performance for \ac{SISR}
 	problem (scale = 4, dataset = SET14 and SET5).}
   \label{fig:psnr_complexty_sisr}
@@ -138,6 +138,16 @@ Several conclusion can be drawn from \myfigref{fig:psnr_complexty_sisr}, which
 could be confirmed also for the other validation datasets used:
 
 \begin{itemize}
+\item The model \textit{no\_tad} is the baseline model which is trained to
+only upscale based on the guidance image, i.e. the standard approach to solve
+the \ac{SISR} problem. Although the reconstruction performance of the
+\textit{no\_tad} model is worse than state-of-the-art methods (e.g. VDSR
+\cite{AISRUVDCN} shown in \myfigref{fig:vdsr}), clearly the task-aware
+downscaling approach could largely improve the performance, compared the equivalent
+\textit{aetad} model which is trained using task aware downscaling. In fact
+for similar performance more than about $25 \%$ of the model parameters can
+be omitted, still resulting in a better accuracy (comparison \textit{no\_tad}
+vs \textit{aetad\_small}).
 \item The \textit{Resblocks} have a large impact on the models performance,
 purely convolutional models with neither a skip connection nor a ReLU layer
 (as occurring in \textit{Resblocks}), such as the models \textit{conv\_only} or
@@ -158,6 +168,7 @@ there is a large drop in accurcy. Therefore, the baseline architecture already
 is very reasonable.
 
 \begin{enumerate}
+\item final model
 \item different scales (maybe large scales as well)
 \item performance on other non-trained scales
 \item final model for other scales and other datasets
@@ -166,9 +177,10 @@ is very reasonable.
 \subsection{Image Colorization}
 \label{sec:Experiments_IC}
 
+
 \begin{figure}[!htbp]
 	\centering
-	\includegraphics[width=14cm]{figures/psnr_complexity_ic}
+	\includegraphics[width=18cm]{figures/psnr_complexity_ic}
 	\caption{Model complexity vs reconstruction performance for \ac{IC}
 	problem (dataset = SET14 and SET5).}
   \label{fig:psnr_complexity_ic}
@@ -183,16 +195,30 @@ is very reasonable.
 
 \subsection{Qualitative Improvements}
 \label{sec:Experiments_QI}
+As demonstrated above \ac{TAD} is able to improve the performance of
+image reconstruction models quantitatively, but the \ac{TAD} approach also
+improves the results in a qualitative manner, in sense of that images can be
+restored that would be able to be restored from the trivially downscaled image,
+in the following shown using the example of a \ac{IC} task.
+\newline
+Consider \myfigref{fig:gummibears} displaying objects with equivalent shape
+but different colors (gummibears). While by using trivial downscaling methods
+like averaging over the colors (grayscale) some color information are
+unrecoverably lost, e.g. the yellow and orange gummibear looking nearly
+equivalent in grayscale, a task aware approach learns to keep basic color
+information despite of downscaling, figuratively speaking. Hence, even the color
+of shapes which are (exactly) similar in grayscale can be restored.
 
-
-
-\begin{enumerate}
-\item gummibear image (TAD learns to downscale an image task-aware and thereby
-can store information that are lost by simple downscaling (e.g. bilinear
-interpolation, averaging colors). Therefore, possibly even image can restored
-that are impossible to restore  using classic approaches, like exactly
-similar gummibears.)
-\end{enumerate}
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=8cm]{figures/gummibears_GRY}
+	\includegraphics[width=8cm]{figures/gummibears_COL}
+	\includegraphics[width=8cm]{figures/gummibears_SCOLT_notad}
+	\includegraphics[width=8cm]{figures/gummibears_SCOLT}
+	\caption{Image colorization of similar shapes (from upper left to lower
+	right: grayscale, groundtruth, colorized without \ac{TAD}, colorized with \ac{TAD})}
+  \label{fig:gummibears}
+\end{figure}
 
 % Describe the evaluation you did in a way, such that an independent researcher can repeat it. Cover the following questions:
 % \begin{itemize}
