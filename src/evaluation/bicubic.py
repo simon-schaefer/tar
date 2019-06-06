@@ -27,7 +27,7 @@ lrs = glob.glob(args.directory + "/*.png")
 if args.tag != "": lrs = [x for x in lrs if x.count(args.tag) > 0]
 out = "{}_x{}b".format(os.path.basename(args.directory), args.scale)
 out = os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], out)
-os.makedirs(out)
+os.makedirs(out, exist_ok=True)
 
 # Load image, upscale it and save it.
 print("Bilinearly upscaling {} ...".format(os.path.basename(args.directory)))

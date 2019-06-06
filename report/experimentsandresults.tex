@@ -153,7 +153,7 @@ for the matter of compactness of this report.
 \label{sec:Experiments_SISR}
 Next to improving the robustness of the \ac{TAD} model several improvements
 were made on both the way of training as well as on the architecture itself.
-\myfigref{fig:psnr_complexty_sisr} shows the correlation on both the SET5
+\myfigref{fig:psnr_complexity_sisr} shows the correlation on both the SET5
 and the SET14 dataset for different architectures which were trained using the
 same parameters (learning parameters as described above, $\epsilon = 10$) for
 the sake of a comparability.
@@ -163,10 +163,10 @@ the sake of a comparability.
 	\includegraphics[width=18cm]{figures/psnr_complexity_sisr}
 	\caption{Model complexity vs reconstruction performance for \ac{SISR}
 	problem (scale = 4, dataset = SET14 and SET5).}
-  \label{fig:psnr_complexty_sisr}
+  \label{fig:psnr_complexity_sisr}
 \end{figure}
 
-Several conclusion can be drawn from \myfigref{fig:psnr_complexty_sisr}, which
+Several conclusion can be drawn from \myfigref{fig:psnr_complexity_sisr}, which
 could be confirmed also for the other validation datasets used:
 
 \begin{itemize}
@@ -237,7 +237,7 @@ factor 2 and 4.
 	& \pbox{3cm}{PSNR \\ (\textit{aetad\_very\_small})}
 	& \pbox{3cm}{\# model param. gain \\ (\textit{aetad\_very\_small})} \\
 	\hline
-  SET5 & 31.81 & 31.814 & 0 \% & 30.302 & -44 \% \\
+  SET5 & 31.81 & 31.814 & 0 \% & 31.102 & -44 \% \\
 	SET14 & 28.63 & 28.665 & 0 \% & 28.334 & -44 \% \\
 	URBAN100 & 26.63 & 24.156 & 0 \% & 23.084 & -44 \% \\
 	BSDS100 & 28.51 & 28.601 & 0 \% & 25.719 & -44 \% \\
@@ -284,12 +284,12 @@ factor 2 and 4.
 
 \begin{table}[!htbp]
 	\begin{center}
-	\begin{tabular}{c|c|c|c|c}
-	scale & dataset & \ac{SISR} model & non task aware SOFVSR
+	\begin{tabular}{c|c|c|c|c|c}
+	scale & dataset & Bicubic & \ac{SISR} model & non task aware SOFVSR
 	& task aware SOFVSR \\
 	\hline
-  x4 & CALENDAR & 21.297 & 19.190 & 18.573 \\
-	x4 & CITY & 25.332 & 24.677 & 24.191 \\
+  x4 & CALENDAR & 18.537 & 21.297 & 18.573  & 19.190 \\
+	x4 & CITY & 23.483 & 25.332 & 24.191 & 24.677 \\
 	\end{tabular}
 	\caption{Comparison of reconstruction accuracy of \ac{SISR} model and
 	the rebuild SOFVSR model without and with \ac{TAD}.}
@@ -297,10 +297,20 @@ factor 2 and 4.
 	\end{center}
 \end{table}
 
-
-\begin{enumerate}
-\item super-large scale for videos
-\end{enumerate}
+\begin{table}[!htbp]
+	\begin{center}
+	\begin{tabular}{c|c|c|c|c}
+	scale & dataset & Bicubic  & non task aware SOFVSR
+	& task aware SOFVSR \\
+	\hline
+  x4 & CALENDAR & 18.537 & 18.573  & 19.190 \\
+	x4 & CITY & 23.483 & 24.191 & 24.677 \\
+	\end{tabular}
+	\caption{Comparison of reconstruction accuracy of \ac{SISR} model and
+	the rebuild SOFVSR model without and with \ac{TAD}.}
+	\label{table:vsrperformance}
+	\end{center}
+\end{table}
 
 \subsection{Qualitative Improvements}
 \label{sec:Experiments_QI}
