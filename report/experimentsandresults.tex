@@ -101,11 +101,7 @@ low- and high-dimensional image (with increasing $\frac{\alpha}{\beta}$ ratio).
 However, as \myfigref{fig:epsball_perturbation} the radius of the $\epsilon$-ball
 around $X_{GD}$ cannot be choosen infinitely large, since the overall performance
 worsens as the impact of the guidance image on the model convergence decreases
-(e.g. $\epsilon = 100$ in \myfigref{fig:epsball_perturbation}). Overall an
-radius $\epsilon = 20$ was found to be the best performing configuration.
-Although described for the \ac{SISR} problem here the described impact of
-the $\epsilon$-ball is similar over all other problems, which omitted here
-for the matter of compactness of this report.
+(e.g. $\epsilon = 100$ in \myfigref{fig:epsball_perturbation}).
 
 \begin{figure}[!htbp]
 	\centering
@@ -116,6 +112,42 @@ for the matter of compactness of this report.
   $\epsilon = 1$, right $\epsilon = 50$).}
   \label{fig:epsball_loss}
 \end{figure}
+
+\mytableref{table:epsilonotherscales} displays the impact of models trained
+with different values of $\epsilon$ on the reconstruction capabilities on
+non-trained scales. In general the model overfits on a scale it is trained on,
+however allowing to deviate from the guidance image by increasing $\epsilon$
+amplifies the effect of overfitting the learnt transformation to a the scaling
+factor the model is trained on. Hence, as shown below especially for large
+deviations in scaling factor the accuracy worsens with increasing $\epsilon$.
+
+\begin{table}[!htbp]
+	\begin{center}
+	\begin{tabular}{c|c|c|c|c}
+	epsilon & x2 & x4 & x8 & x16 \\
+	\hline
+	0 & 8.446 & 24.406 & 8.555 & 18.938 \\
+	20 & 6.244 & 22.188 & 6.492 & 17.308 \\
+	50 & 6.771 & 22.459 & 6.925 & 16.992 \\
+	100 & 10.901 & 23.784 & 11.870 & 13.225 \\
+	\end{tabular}
+	\caption{Impact of $\epsilon$ on performance on non-trained scales
+	(trained scale = 4, dataset = SET14).}
+	\label{table:epsilonotherscales}
+	\end{center}
+\end{table}
+
+Overall the choice of $\epsilon$ depends very much on the application and its
+external conditions that should be solved, e.g. whether perturbations are
+probable for example during the storing, downloading etc. process.
+In case only the performance without any disturbances matters, $\epsilon < 10$
+is a good choice, as it fastens convergence of the model, prevents overfitting
+on the guidance image but also does not affect the accuracy without any
+disturbances much. For the further experiments a value $\epsilon = 1$ was used.
+\newline
+Although described for the \ac{SISR} problem here the described impact of
+the $\epsilon$-ball is similar over all other problems, which omitted here
+for the matter of compactness of this report.
 
 \subsection{Single-Image Super-Resolution}
 \label{sec:Experiments_SISR}
@@ -168,11 +200,35 @@ there is a large drop in accurcy. Therefore, the baseline architecture already
 is very reasonable.
 
 \begin{enumerate}
-\item final model
-\item different scales (maybe large scales as well)
-\item performance on other non-trained scales
 \item final model for other scales and other datasets
 \end{enumerate}
+
+\myfigref{fig:fig:sisr_different_scales} shows the \ac{PSNR} curves for a model
+trained on a scaling factor of 2, while being validated on both of the scaling
+factor 2 and 4.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=10cm]{figures/sisr_different_scales}
+	\caption{\ac{PSNR} curve on SET5 validation dataset for different scales
+	(trained scaling factor = 2).}
+  \label{fig:sisr_different_scales}
+\end{figure}
+
+\begin{table}[!htbp]
+	\begin{center}
+	\begin{tabular}{c|c|c|c|c}
+	model & x2 & x4 & x8 & x16 \\
+	\hline
+  \textit{no\_tad} & 7.457 & 27.204 & 7.459 & 19.488 \\
+	\textit{aetad\_very\_small} & 8.527 & 28.814 & 7.780 & 18.799 \\
+	\textit{aetad\_very\_large} & 5.882 & 29.617 & 5.928 & 18.673 \\
+	\end{tabular}
+	\caption{Comparison of the reconstruction performance on non-trained scales
+	between task aware and non task aware trained models on SET14.}
+	\label{table:sisrotherscales}
+	\end{center}
+\end{table}
 
 \subsection{Image Colorization}
 \label{sec:Experiments_IC}
@@ -185,6 +241,10 @@ is very reasonable.
 	problem (dataset = SET14 and SET5).}
   \label{fig:psnr_complexity_ic}
 \end{figure}
+
+\begin{enumerate}
+\item final model for other scales and other datasets
+\end{enumerate}
 
 \subsection{Video Super-Resolution}
 \label{sec:Experiments_VSR}

@@ -21,11 +21,11 @@ import seaborn as sns
 
 parser = argparse.ArgumentParser(description="psnr_time")
 parser.add_argument("--directory", type=str, default="")
-parser.add_argument("--psnr_tag", type=str, default="SHRTm",
+parser.add_argument("--psnr_tag", type=str, default="SHRT_mean",
                     choices=("SHRT_mean", "SCOLT_mean",
                              "SHRT_best", "SCOLT_best"))
 parser.add_argument("--filter", type=str, default="")
-parser.add_argument("--scaling", type=int, default=0.0)
+parser.add_argument("--scaling", type=float, default=0.0)
 args = parser.parse_args()
 
 print("Scrapping outs data ...")
@@ -34,7 +34,7 @@ dir = os.path.join(os.environ["SR_PROJECT_OUTS_PATH"], args.directory)
 data = scrap_outputs(directory=dir)
 
 print("... add baseline results")
-data = add_baseline_results(data)
+data = add_baseline_results(data, scaling=args.scaling)
 
 print("... filtering outs data")
 for key_value in args.filter.split("&"):

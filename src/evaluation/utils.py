@@ -105,7 +105,7 @@ def scrap_outputs(directory):
     df["complexity"] = df["model"].apply(lambda x: complexity_dict[x])
     return df
 
-def add_baseline_results(data):
+def add_baseline_results(data, scaling=0.0):
     data_base_sisr = pd.DataFrame([
         [31.81, "x4", "[4]", 671350, "SET5", "Kim et al."],
         [28.63, "x4", "[4]", 671350, "SET14", "Kim et al."],
@@ -113,7 +113,7 @@ def add_baseline_results(data):
         [26.63, "x4", "[4]", 671350, "URBAN100", "Kim et al."],
         [31.16, "x4", "[4]", 671350, "VDIV2K", "Kim et al."]],
         columns=["PSNR_SHRT_mean", "scale", "scales_train", "complexity", "dataset", "model"])
-    data_base_sisr["PSNR_SHRT_mean"] -= 2.0
+    data_base_sisr["PSNR_SHRT_mean"] -= scaling + 0.2 
     data = data.append(data_base_sisr, sort=False)
     data_base_ic = pd.DataFrame([[36.14, 671350, "BSDS100", "Kim et al."],
         [33.68, 671350, "URBAN100", "Kim et al."]],
