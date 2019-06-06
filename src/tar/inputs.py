@@ -52,6 +52,8 @@ parser.add_argument("--data_valid", default="SET5:SET14",
                     CALENDAR,NTIAASPEN,WALK,CITY,FOLIAGE")
 parser.add_argument("--scales_train", type=str, default="[2]",
                     help="super resolution scales for training/testing")
+parser.add_argument("--no_guidance", action="store_true",
+                    help="use no guidance for training(default=False)")
 parser.add_argument("--scales_guidance", type=str, default="[1,2,4,8,16]",
                     help="subset of training in which guidance image should be added")
 parser.add_argument("--scales_valid", type=str, default="[2,4]",

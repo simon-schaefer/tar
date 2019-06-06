@@ -182,7 +182,8 @@ class _Trainer_(object):
             while scl < scale:
                 lr_out = self.model.model.encode(hr_in)
                 hr_in, scl = lr_out, scl*iter_scale
-            if scale in self.args.scales_guidance: lr_out=torch.add(lr_out, lr.clone())
+            if scale in self.args.scales_guidance and not self.args.no_guidance:
+                lr_out=torch.add(lr_out, lr.clone())
             if discretize: lr_out = misc.discretize(lr_out,[nmin,nmax])
             return lr_out
         def _upsample(lr, scl):

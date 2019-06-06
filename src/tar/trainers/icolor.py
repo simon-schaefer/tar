@@ -30,7 +30,7 @@ class _Trainer_IColor_(_Trainer_):
         # Encoding i.e. decolorization and decoding i.e. colorization
         def _decolorization(col):
             gry_out = self.model.model.encode(col.clone())
-            gry_out = torch.add(gry_out, gry)
+            if not self.args.no_guidance: gry_out = torch.add(gry_out, gry)
             if discretize: gry_out = misc.discretize(gry_out,[nmin,nmax])
             return gry_out
         def _colorization(gry):
