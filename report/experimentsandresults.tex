@@ -229,19 +229,24 @@ factor 2 and 4.
 
 \begin{table}[!htbp]
 	\begin{center}
-	\begin{tabular}{c|c|c|c|c}
-	scale & dataset & PSNR (Kim et al.) & PSNR (\textit{aetad\_skip2})
-	& PSNR (\textit{aetad\_very\_small}) \\
+	\footnotesize
+	\begin{tabular}{p{2cm}|p{2cm}|p{2cm}|p{3cm}|p{3cm}|p{3cm}}
+	dataset & \pbox{2cm}{PSNR \\(Kim et al.)}
+	& \pbox{2cm}{PSNR \\ (\textit{aetad\_skip2})}
+	& \pbox{3cm}{\# model param. gain \\ (\textit{aetad\_skip2})}
+	& \pbox{3cm}{PSNR \\ (\textit{aetad\_very\_small})}
+	& \pbox{3cm}{\# model param. gain \\ (\textit{aetad\_very\_small})} \\
 	\hline
-  x4 & SET5 & 31.81 & 31.814 & 30.302 \\
-	x4 & SET14 & 28.63 & 28.665 & 28.334 \\
-	x4 & URBAN100 & 26.63 & 24.156 & 23.084 \\
-	x4 & BSDS100 & 28.51 & 28.601 & 25.719 \\
+  SET5 & 31.81 & 31.814 & 0 \% & 30.302 & -44 \% \\
+	SET14 & 28.63 & 28.665 & 0 \% & 28.334 & -44 \% \\
+	URBAN100 & 26.63 & 24.156 & 0 \% & 23.084 & -44 \% \\
+	BSDS100 & 28.51 & 28.601 & 0 \% & 25.719 & -44 \% \\
 	\end{tabular}
 	\caption{Comparison of reconstruction accuracy between Kim et al. \cite{TAID},
 	\textit{aetad\_skip2} and \textit{aetad\_very\_small}
 	model for scaling factor 4 on several validation datasets. }
 	\label{table:sisperformance}
+	\normalsize
 	\end{center}
 \end{table}
 
@@ -259,14 +264,14 @@ factor 2 and 4.
 
 \begin{table}[!htbp]
 	\begin{center}
-	\begin{tabular}{c|c|c|c|c}
-	scale & dataset & PSNR (Kim et al.)
-	& PSNR (\textit{aetad\_color\_large}) & $\frac{\# params kim et al.}{\# params aetad\_color\_large}$  \\
+	\begin{tabular}{c|c|c|c}
+	dataset & PSNR (Kim et al.) & PSNR (\textit{aetad\_color\_large})
+	& \# model param. gain \\
 	\hline
-  x4 & SET5 & None & 34.416 \\
-	x4 & SET14 & None & 31.262 \\
-	x4 & URBAN100 & 33.68 & 33.604 \\
-	x4 & BSDS100 & 36.14 & 36.786 \\
+  SET5 & 22.56 & 34.416 & 35.7 \%\\
+	SET14 & 23.78 & 31.262 & 35.7 \% \\
+	URBAN100 & 33.68 & 33.604 & 35.7 \% \\
+	BSDS100 & 36.14 & 36.786 & 35.7 \% \\
 	\end{tabular}
 	\caption{Comparison of reconstruction accuracy between Kim et al. \cite{TAID},
 	\textit{aetad\_color\_large} model on several validation datasets. }
