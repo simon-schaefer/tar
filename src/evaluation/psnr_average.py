@@ -30,11 +30,12 @@ print("Determining PSNR values ...")
 psnrs = []
 for fname in imgs_base:
     base = imageio.imread(fname)
-    base = base[:,:,:3]
+    if len(base.shape) >= 3: base = base[:,:,:3]
     fname_base = os.path.join(args.target, os.path.basename(fname))
     fname_base = fname_base.replace(".png", args.target_drop + ".png")
     target = imageio.imread(fname_base)
-    target = target[:,:,:3]
+    if target.shape[2] == 2: target = np.vstack((target,target,target))
+    if len(target.shape) >= 3 and len(base.shape) == 2: target = target[:,:,0]
     base_tensor   = torch.from_numpy(base/255.0)
     target_tensor = torch.from_numpy(target/255.0)
     psnr = calc_psnr(base_tensor, target_tensor, rgb_range=1.0)
