@@ -26,8 +26,6 @@ class _Trainer_VExternal_(_Trainer_):
         if external == "": raise ValueError("External module must not be empty !")
         use_gpu  = not self.args.cpu
         self._external = self.load_module(external,self.scale_current(0),use_gpu)
-        if args.no_task_aware:
-            raise ValueError("Not task-aware downscaling not supported for VSR!")
         self.ckp.write_log("... successfully built vscale trainer !")
 
     def apply(self,lrs,hrs,scale,discretize=False,dec_input=[None,None,None],mode="all"):
@@ -59,7 +57,11 @@ class _Trainer_VExternal_(_Trainer_):
         return lr1_out, hre_out
 
     def optimization_core(self, lrs, hrs, finetuning, scale):
-        lr_out,hrm_out = self.apply(lrs,hrs,scale,discretize=finetuning)
+        if not self.args.no_task_aware:
+            lr_out, hrm_out = self.apply(lrs,hrs,scale,discretize=finetuning)
+        else:
+            lr_out  = lrs[1].clone()
+            hrm_out = self.apply(lrs, hrs, scale, dec_input=lrs, mode="up")
         # Pass loss variables to optimizer and optimize.
         loss_kwargs = { 'LR_GT': lr1,  'LR_OUT': lr_out,
                        'EXT_GT': hr1, 'EXT_OUT': hrm_out}
@@ -75,7 +77,11 @@ class _Trainer_VExternal_(_Trainer_):
             lrs, hrs = self.prepare([lrs, hrs])
             lr0,lr1,lr2 = lrs; hr0,hr1,hr2 = hrs
             scale  = d.dataset.scale
-            lr_out,hrm_out = self.apply(lrs,hrs,scale,discretize=finetuning)
+            if not self.args.no_task_aware:
+                lr_out,hrm_out = self.apply(lrs,hrs,scale,discretize=finetuning)
+            else:
+                lr_out  = lrs[1].clone()
+                hrm_out = self.apply(lrs, hrs, scale, dec_input=lrs, mode="up")
             # PSNR - Low resolution image.
             lr_out = misc.discretize(lr_out, [nmin, nmax])
             psnrs[i,0] = misc.calc_psnr(lr_out, lr1, None, nmax-nmin)
@@ -91,8 +97,6 @@ class _Trainer_VExternal_(_Trainer_):
             #misc.progress_bar(i+1, num_valid_samples)
         # Logging PSNR values.
         v = self.logging_core(psnrs=psnrs, di=di, v=v)
-        # Determine runtimes for up and downscaling and overall.
-        v = self.runtime_core(d, v)
         return v
 
     def perturbation_core(self, d, eps):

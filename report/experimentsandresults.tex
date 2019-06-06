@@ -199,7 +199,7 @@ do not gain a lot of accuracy, for less complex models with similar architecture
 there is a large drop in accurcy. Therefore, the baseline architecture already
 is very reasonable.
 
-\myfigref{fig:fig:sisr_different_scales} shows the \ac{PSNR} curves for a model
+\myfigref{fig:sisr_different_scales} shows the \ac{PSNR} curves for a model
 trained on a scaling factor of 2, while being validated on both of the scaling
 factor 2 and 4.
 
@@ -260,7 +260,8 @@ factor 2 and 4.
 \begin{table}[!htbp]
 	\begin{center}
 	\begin{tabular}{c|c|c|c|c}
-	scale & dataset & PSNR (Kim et al.) & PSNR (\textit{aetad\_color\_large}) \\
+	scale & dataset & PSNR (Kim et al.)
+	& PSNR (\textit{aetad\_color\_large}) & $\frac{\# params kim et al.}{\# params aetad\_color\_large}$  \\
 	\hline
   x4 & SET5 & None & 34.416 \\
 	x4 & SET14 & None & 31.262 \\
@@ -282,13 +283,11 @@ factor 2 and 4.
 	scale & dataset & \ac{SISR} model & non task aware SOFVSR
 	& task aware SOFVSR \\
 	\hline
-  x4 & CALENDAR & 21.297 & 31.814 & 30.302 \\
-	x4 & FOLIAGE & 26.253 & 28.665 & 28.334 \\
-	x4 & CITY & 25.332 & 24.156 & 23.084 \\
+  x4 & CALENDAR & 21.297 & 19.190 & 18.573 \\
+	x4 & CITY & 25.332 & 24.677 & 24.191 \\
 	\end{tabular}
-	\caption{Comparison of reconstruction accuracy between Kim et al. \cite{TAID},
-	\textit{aetad\_skip2} and \textit{aetad\_very\_small}
-	model for scaling factor 4 on several validation datasets. }
+	\caption{Comparison of reconstruction accuracy of \ac{SISR} model and
+	the rebuild SOFVSR model without and with \ac{TAD}.}
 	\label{table:vsrperformance}
 	\end{center}
 \end{table}
