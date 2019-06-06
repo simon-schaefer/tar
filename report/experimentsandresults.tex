@@ -199,10 +199,6 @@ do not gain a lot of accuracy, for less complex models with similar architecture
 there is a large drop in accurcy. Therefore, the baseline architecture already
 is very reasonable.
 
-\begin{enumerate}
-\item final model for other scales and other datasets
-\end{enumerate}
-
 \myfigref{fig:fig:sisr_different_scales} shows the \ac{PSNR} curves for a model
 trained on a scaling factor of 2, while being validated on both of the scaling
 factor 2 and 4.
@@ -221,12 +217,31 @@ factor 2 and 4.
 	model & x2 & x4 & x8 & x16 \\
 	\hline
   \textit{no\_tad} & 7.457 & 27.204 & 7.459 & 19.488 \\
-	\textit{aetad\_very\_small} & 8.527 & 28.814 & 7.780 & 18.799 \\
+	\textit{aetad\_very\_small} & 8.527 & 28.334 & 7.780 & 18.799 \\
 	\textit{aetad\_very\_large} & 5.882 & 29.617 & 5.928 & 18.673 \\
 	\end{tabular}
 	\caption{Comparison of the reconstruction performance on non-trained scales
 	between task aware and non task aware trained models on SET14.}
 	\label{table:sisrotherscales}
+	\end{center}
+\end{table}
+
+
+\begin{table}[!htbp]
+	\begin{center}
+	\begin{tabular}{c|c|c|c|c}
+	scale & dataset & PSNR (Kim et al.) & PSNR (\textit{aetad\_skip2})
+	& PSNR (\textit{aetad\_very\_small}) \\
+	\hline
+  x4 & SET5 & 31.81 & 31.814 & 30.302 \\
+	x4 & SET14 & 28.63 & 28.665 & 28.334 \\
+	x4 & URBAN100 & 26.63 & 24.156 & 23.084 \\
+	x4 & BSDS100 & 28.51 & 28.601 & 25.719 \\
+	\end{tabular}
+	\caption{Comparison of reconstruction accuracy between Kim et al. \cite{TAID},
+	\textit{aetad\_skip2} and \textit{aetad\_very\_small}
+	model for scaling factor 4 on several validation datasets. }
+	\label{table:sisperformance}
 	\end{center}
 \end{table}
 
@@ -242,12 +257,42 @@ factor 2 and 4.
   \label{fig:psnr_complexity_ic}
 \end{figure}
 
-\begin{enumerate}
-\item final model for other scales and other datasets
-\end{enumerate}
+\begin{table}[!htbp]
+	\begin{center}
+	\begin{tabular}{c|c|c|c|c}
+	scale & dataset & PSNR (Kim et al.) & PSNR (\textit{aetad\_color\_large}) \\
+	\hline
+  x4 & SET5 & None & 34.416 \\
+	x4 & SET14 & None & 31.262 \\
+	x4 & URBAN100 & 33.68 & 33.604 \\
+	x4 & BSDS100 & 36.14 & 36.786 \\
+	\end{tabular}
+	\caption{Comparison of reconstruction accuracy between Kim et al. \cite{TAID},
+	\textit{aetad\_color\_large} model on several validation datasets. }
+	\label{table:icperformance}
+	\end{center}
+\end{table}
 
 \subsection{Video Super-Resolution}
 \label{sec:Experiments_VSR}
+
+\begin{table}[!htbp]
+	\begin{center}
+	\begin{tabular}{c|c|c|c|c}
+	scale & dataset & \ac{SISR} model & non task aware SOFVSR
+	& task aware SOFVSR \\
+	\hline
+  x4 & CALENDAR & 21.297 & 31.814 & 30.302 \\
+	x4 & FOLIAGE & 26.253 & 28.665 & 28.334 \\
+	x4 & CITY & 25.332 & 24.156 & 23.084 \\
+	\end{tabular}
+	\caption{Comparison of reconstruction accuracy between Kim et al. \cite{TAID},
+	\textit{aetad\_skip2} and \textit{aetad\_very\_small}
+	model for scaling factor 4 on several validation datasets. }
+	\label{table:vsrperformance}
+	\end{center}
+\end{table}
+
 
 \begin{enumerate}
 \item super-large scale for videos
