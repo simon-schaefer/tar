@@ -1,0 +1,128 @@
+\documentclass[pdftex,11pt,openright,headsepline]{book}
+\usepackage[margin=2cm,includeheadfoot,footskip=30pt]{geometry}
+%\usepackage{fullpage} % Use the full page
+\usepackage{paralist}		% List environment
+\usepackage{color}		% For colored text
+\usepackage{times}
+\usepackage{amsfonts}		% Additional math fonts
+\usepackage{amsmath}		% Math symbols
+\usepackage{latexsym}
+\usepackage{graphicx}		% For including images
+% \usepackage{listings}		% If listings are needed
+% \usepackage{wrapfig}		% To wrap images
+% \usepackage{algorithmic}	% Nice algorithm environment
+% \usepackage{algorithm}
+\usepackage{fancyhdr}		% Produce the nice header
+\usepackage{hyperref} % URLs
+\usepackage{pbox} % Line break in tables
+\usepackage{pdflscape} % landscape mode
+\usepackage{wrapfig} % text and image side-by-side
+\input{acronyms}
+
+%% ----------------------------------------------------------------------------
+% Definitions and appearance.
+%% ----------------------------------------------------------------------------
+\usepackage{graphicx,calc} % for pix
+\usepackage{subfigure}
+\usepackage{color}    % for coloured text
+\usepackage{ifthen}
+\usepackage{paralist}
+\usepackage{times}
+\usepackage{longtable}
+\usepackage{colortbl}
+\usepackage{nomencl}
+
+\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\mat}[1]{\mathtt{#1}}
+\newcommand{\pinv}{^{+}}
+\newcommand{\inv}{^{-1}}
+\newcommand{\trans}{^{\!\top}}
+\newcommand{\invtrans}{^{-\!\top}}
+\newcommand{\myref}[1]{(\ref{#1})}
+\newcommand{\myeqref}[1]{Eq.~\myref{#1}}
+\newcommand{\myfigref}[1]{Fig.~\ref{#1}}
+\newcommand{\mychapterref}[1]{Chapter~\ref{#1}}
+\newcommand{\mysecref}[1]{Section~\ref{#1}}
+\newcommand{\myalgoref}[1]{Algorithm~\ref{#1}}
+\newcommand{\mytableref}[1]{Table~\ref{#1}}
+
+% Change the appearance of the header. Here \MakeUppercase is hard-coded, so renewing this command allows to elegantly change the header appearance.
+\renewcommand{\MakeUppercase}{\scshape}
+
+% Set the headings' appearance in the ``fancy'' pagestyle
+\fancyhead{}
+\fancyhead[RO, LE]{\leftmark}
+\fancyfoot{}
+\fancyfoot[RO, LE]{\thepage}
+
+% The first pages shall be empty, even no page numbering 
+
+
+\begin{document}
+%% ----------------------------------------------------------------------------
+% Preface of document.
+%% ----------------------------------------------------------------------------
+\pagenumbering{Roman}
+\pagestyle{empty} % even no page number
+\fancypagestyle{plain}{
+  \renewcommand{\headrulewidth}{0.0pt}
+  \fancyfoot{}
+  \fancyhead{}
+}
+% Title page, modify accordingly 
+\input{title.tex}
+\cleardoublepage
+% Abstact.
+\input{abstract.tex}
+% Acknowledgements
+\input{ack.tex}
+\cleardoublepage
+\newpage
+% % Chapter-pages etc. use the ``plain'' pagestyle - since we don't want to have a heading at all at chapter-pages, redefine plain accordingly. Don't forget the page number. 
+\fancypagestyle{plain}{
+  \renewcommand{\headrulewidth}{0.0pt}
+  \fancyfoot{}
+  \fancyfoot[RO, LE]{\thepage}
+  \fancyhead{}
+}
+\pagestyle{fancy}
+% Table of contents
+\tableofcontents
+% List of figures
+\listoffigures
+\addcontentsline{toc}{chapter}{List of Figures}
+\cleardoublepage
+% List of tables
+\listoftables
+\addcontentsline{toc}{chapter}{List of Tables}
+\cleardoublepage
+% Acronyms
+\newpage
+\addcontentsline{toc}{chapter}{Abbreviations}
+\printacronyms[include-classes=abbrev,name=Abbreviations]
+\newpage
+\pagenumbering{arabic}
+
+%% ----------------------------------------------------------------------------
+% Actual text comes here - defer it to other files and use \input{bla.tex}, ..
+%% ----------------------------------------------------------------------------
+\input{intro.tex}
+\input{relatedwork.tex}
+\input{materialsandmethods.tex}
+\input{experimentsandresults.tex}
+\input{discussion.tex}
+
+%% ----------------------------------------------------------------------------
+% If Appendix is needed
+%% ----------------------------------------------------------------------------
+%\appendix
+\input{appendix.tex}
+
+%% ----------------------------------------------------------------------------
+% Bibliography is stored in references.bib.
+%% ----------------------------------------------------------------------------
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
+
