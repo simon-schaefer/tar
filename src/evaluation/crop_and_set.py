@@ -25,10 +25,15 @@ w, h = int(sys.argv[5]), int(sys.argv[6])
 img1, img2 = imageio.imread(fimg1), imageio.imread(fimg2)
 assert img1.shape == img2.shape
 assert img1.shape[0] >= x + w and img1.shape[1] >= y + h
+grayscale = len(img1.shape) == 2
 
 # Crop images and draw overall plot.
-img1c, img2c = img1[x:x+w, y:y+h, :], img2[x:x+w, y:y+h, :]
+if grayscale:
+    img1c, img2c = img1[x:x+w, y:y+h], img2[x:x+w, y:y+h]
+else:
+    img1c, img2c = img1[x:x+w, y:y+h, :], img2[x:x+w, y:y+h, :]
 fig = plt.figure()
+if grayscale: plt.gray()
 ax = fig.add_subplot(221)
 plt.imshow(img1c)
 plt.axis('off')
