@@ -1,5 +1,5 @@
 matplotlib==3.0.3
-numpy==1.16.1
+numpy==1.22.0
 imageio==2.5.0
 scikit-image==0.14.2
 seaborn
